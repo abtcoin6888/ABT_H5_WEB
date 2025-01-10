@@ -1,0 +1,79 @@
+.body-warp {
+    width: 750rpx;
+}
+
+.status-bar {
+    width: 750rpx;
+}
+
+.back-button {
+    width: 750rpx;
+    padding: 50rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.container {
+    width: 750rpx;
+    padding: 0 50rpx 30rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.banner-image {
+    width: 400rpx;
+    margin: 60rpx 0;
+}
+
+.title,
+.desc{
+    width: 650rpx;
+    text-align: left;
+}
+
+.desc {
+    margin-top: 20rpx;
+}
+
+.container-card {
+    width: 620rpx;
+    margin-left: 15rpx;
+    padding: 16rpx 0;
+    border-radius: 16rpx;
+}
+
+.container-card .cell {
+    width: 620rpx;
+    padding: 18rpx 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.container-card .cell .rt {
+    width: 400rpx;
+    text-align: right;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 750rpx;
+    padding: 40rpx 50rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer .button {
+    width: 650rpx;
+    height: 88rpx;
+    border-radius: 88rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

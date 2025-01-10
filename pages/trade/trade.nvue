@@ -1,0 +1,860 @@
+<template>
+    <view class="trade bg-white" :class="userTheme">
+        <!-- navBar -->
+        <fui-nav-bar isFixed
+                     isOccupy
+                     custom
+                     padding="0"
+                     zIndex="9"
+                     :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                     @init="navInit">
+            <view class="nav-bar">
+                <view @click="showDrawer" class="coinSymbol">
+                    <view class="symbolInfo">
+                        <view class="row">
+                            <text class="color-black font-16  font-bold">
+                                {{ currentCurrency['symbol'] ? currentCurrency['symbol'] : '--' }}/USDT
+                            </text>
+                            <image class="cutIcon"
+                                   :src="`/static/img/tactic/down-${ userTheme }.png`"
+                                   mode="widthFix">
+                            </image>
+                        </view>
+                        <text class="color-black font-11  font-weight"
+                              :class="{ 'price_down': currentCurrency['change_rate'] < 0, 'price_up': currentCurrency['change_rate'] > 0 }">
+                            {{
+                                currentCurrency['change_rate'] > 0 ? '+' : ''
+                            }}{{ util.thousandSeparator(currentCurrency['change_rate'], 2) }}%
+                        </text>
+                    </view>
+                </view>
+                <view class="imageButtons">
+                    <view class="btn" @click="optionalChange">
+                        <image class="iconSize"
+                               :src="like ? '/static/newImage/collect-select.png' : `/static/newImage/collect-${userTheme}.png`"
+                               mode="widthFix">
+                        </image>
+                    </view>
+                    <view class="btn" @click="toKline">
+                        <image class="btnIcon"
+                               :src="`/static/newImage/zd-${userTheme}.png`"
+                               mode="widthFix">
+                        </image>
+                    </view>
+                    <!-- <view class="btn" @click="klineToggle">
+                        <image class="iconSize"
+                               :src="`/static/newImage/zdpl-${userTheme}.png`"
+                               mode="widthFix">
+                        </image>
+                    </view> -->
+                </view>
+            </view>
+        </fui-nav-bar>
+        <!-- body -->
+        <view class="tradeBody bg-white"
+              :style="{'height': windowHeight - navHeight + 'px'}">
+            <view class="bg-white"
+                  :style="{'height': windowHeight - navHeight + 'px'}">
+                <list ref="list"
+                      :show-scrollbar="false"
+                      :scrollable="true"
+                      class="listWrap"
+                      :style="{'height': windowHeight - navHeight + 'px'}">
+                    <refresh @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display=" refreshing ? 'show' : 'hide' "
+                             class="refresh">
+                        <text class="font-13  color-gray" v-if="refText">
+                            {{ refreshText }}
+                        </text>
+                        <fui-load-ani color="#03aac7"
+                                      type="3"
+                                      v-else>
+                        </fui-load-ani>
+                    </refresh>
+                    <cell>
+                        <!-- Kline -->
+                        <view class="klineBox" v-if="klineShow">
+                            <web-view ref="webview" class="webview" src="/hybrid/html/trade.html"></web-view>
+                            <view class="line-view"></view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <!-- body-head  -->
+                        <view class="body-head">
+                            <!--    操作区域-->
+                            <view class="toggle-box">
+                                <!--    模式切换按钮-->
+                                <view class="button-group">
+                                    <view class="button buy"
+                                          @click="buttonToggle(0);direction = 0">
+                                        <image class="button-image"
+                                               :src="`/static/img/button_bg/buy-s.png`"
+                                               v-if="bgshow === 0">
+                                        </image>
+                                        <image class="button-image"
+                                               :src="`/static/img/button_bg/buy-n-${userTheme}.png`"
+                                               v-else>
+                                        </image>
+                                        <text class="button-text font-weight"
+                                              :class="bgshow === 0 ? 'always-white' : 'color-gray'">
+                                            {{ $t('trade.buy') }}
+                                        </text>
+                                    </view>
+                                    <view class="button sell"
+                                          @click="buttonToggle(1);direction = 1">
+                                        <image class="button-image"
+                                               :src="`/static/img/button_bg/sell-s.png`"
+                                               v-if="bgshow === 1">
+                                        </image>
+                                        <image class="button-image"
+                                               :src="`/static/img/button_bg/sell-n-${userTheme}.png`"
+                                               v-else>
+                                        </image>
+                                        <text class="button-text font-weight"
+                                              :class="bgshow === 1 ? 'always-white' : 'color-gray'">
+                                            {{ $t('trade.sell') }}
+                                        </text>
+                                    </view>
+                                </view>
+                                <!--    下单模式-->
+                                <fui-dropdown-menu :background="userTheme == 'light' ? '#f6f6f6' : '#282828'"
+                                                   :minWidth="420"
+                                                   :maxHeight="151"
+                                                   :size="24"
+                                                   :isCheckbox="false"
+                                                   :radius="8"
+                                                   :padding="'12rpx'"
+                                                   :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                                                   selectedColor="#03aac7"
+                                                   :options="options"
+                                                   @click="rangeItemClick"
+                                                   ref="ddmRange">
+                                    <view class="cell-box bg-gray" @tap="filterTap">
+                                        <text class="font-13  color-black">
+                                            {{ range }}
+                                        </text>
+                                        <image class="down-icon"
+                                               :src="`/static/img/tactic/down-${userTheme}.png`"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                </fui-dropdown-menu>
+                                <!--    PRICE INPUT-->
+                                <view class="cell-box bg-gray" v-if="order_type == 1">
+                                    <input class="input  font-13"
+                                           type="digit"
+                                           v-model="order_price"
+                                           :placeholder="$t('trade.price')">
+                                    <text class="sysmol-text font-13  color-black">
+                                        USDT
+                                    </text>
+                                </view>
+                                <!--    数量菜单-->
+                                <fui-dropdown-menu :background="userTheme == 'light' ? '#f6f6f6' : '#282828'"
+                                                   :minWidth="420"
+                                                   :maxHeight="151"
+                                                   :size="24"
+                                                   :isCheckbox="false"
+                                                   :radius="8"
+                                                   :padding="'12rpx'"
+                                                   :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                                                   selectedColor="#03aac7"
+                                                   :options="numOption" @click="numRangeChange"
+                                                   ref="numRange">
+                                    <view class="cell-box bg-gray" @tap="numSubMenu">
+                                        <text class="font-13  color-black">
+                                            {{ activeValue }}
+                                        </text>
+                                        <image class="down-icon"
+                                               :src="`/static/img/tactic/down-${userTheme}.png`"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                </fui-dropdown-menu>
+                                <!--    NUMBER INPUT-->
+                                <view class="cell-box bg-gray">
+                                    <input class="input  font-13"
+                                           type="digit"
+                                           v-model="amount"
+                                           :placeholder="trade_type === 0 ? $t('trade.num') : $t('trade.vol_bus')">
+                                    <text class="sysmol-text font-13  color-black">
+                                        {{ trade_type === 0 ? currentCurrency['symbol'] : 'USDT' }}
+                                    </text>
+                                </view>
+                                <!--    SLIDER-->
+                                <view class="slider-box">
+                                    <view class="slider-dot bg-gray">
+                                        <view class="active-box bg-black" :style="`width: ${rateValue*4.34}rpx`"></view>
+                                        <view class="dot bg-white" v-for="item in [0, 25, 50, 75, 100]"></view>
+                                    </view>
+                                    <view class="slider">
+                                        <slider activeColor="transparent"
+                                                backgroundColor="transparent"
+                                                :block-color="userTheme == 'light' ? '#ffffff' : '#111111'"
+                                                block-size="15"
+                                                :value="rateValue"
+                                                step="1"
+                                                @change="sliderChange"
+                                                @changing="sliderChange"/>
+                                    </view>
+                                    <view class="slider-number">
+                                        <text class="font-10 "
+                                              :class="rateValue >= item ? 'color-black' : 'color-gray'"
+                                              v-for="item in [0, 25, 50, 75, 100]">
+                                            {{ item }}%
+                                        </text>
+                                    </view>
+                                </view>
+                                <!--    预估交易金额-->
+                                <view class="row-box">
+                                    <text class="font-11  color-gray">
+                                        {{ trade_type === 0 ? $t('trade.es_tur') : $t('trade.es_tdv') }}
+                                    </text>
+                                    <template v-if="direction == 0">
+                                        <!-- 市价下单买入 -->
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 0 && order_type == 0">
+                                            {{
+                                                util.thousandSeparator(amount * ticker['c'], currentCurrency['decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 1 && order_type == 0">
+                                            {{
+                                                util.thousandSeparator(amount / ticker['c'], currentCurrency['trade_decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <!-- 限价下单买入 -->
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 0 && order_type == 1">
+                                            {{
+                                                util.thousandSeparator(amount * order_price, currentCurrency['decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 1 && order_type == 1">
+                                            {{
+                                                util.thousandSeparator(amount / order_price, currentCurrency['trade_decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                    </template>
+                                    <template v-else>
+                                        <!-- 市价下单卖出 -->
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 0 && order_type == 0">
+                                            {{
+                                                util.thousandSeparator(amount * ticker['c'], currentCurrency['decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 1 && order_type == 0">
+                                            {{
+                                                util.thousandSeparator(amount / ticker['c'], currentCurrency['trade_decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <!-- 限价下单卖出 -->
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 0 && order_type == 1">
+                                            {{
+                                                util.thousandSeparator(amount * order_price, currentCurrency['decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="trade_type == 1 && order_type == 1">
+                                            {{
+                                                util.thousandSeparator(amount / order_price, currentCurrency['trade_decimals'])
+                                            }}
+                                            {{ trade_type == 1 ? currentCurrency['symbol'] : 'USDT' }}
+                                        </text>
+                                    </template>
+                                </view>
+                                <!--    可用-->
+                                <view class="row-box">
+                                    <text class="font-11  color-gray">
+                                        {{ $t('trade.usable') }}
+                                    </text>
+                                    <view class="row-box-right">
+                                        <text class="font-11 color-black font-weight"
+                                              v-if="direction == 0">
+                                            {{ isLogin ? util.thousandSeparator(balance['legal_balance']) : '--' }}
+                                            {{ direction == 0 ? 'USDT' : currentCurrency['symbol'] }}
+                                        </text>
+                                        <text class="font-11 color-black font-weight"
+                                              v-else>
+                                            {{ isLogin ? util.float(balance['trade_balance']) : '--' }}
+                                            {{ direction == 0 ? 'USDT' : currentCurrency['symbol'] }}
+                                        </text>
+                                        <image class="exchange-icon"
+                                               src="/static/img/tactic/tran-icon.png"
+                                               mode="widthFix"
+                                               @click="mroute.exchange(currentCurrency['id'])">
+                                        </image>
+                                    </view>
+                                </view>
+                                <!--    登录/买入/卖出按钮-->
+                                <view class="button-box">
+                                    <!-- 登录按钮 -->
+                                    <template v-if="!isLogin">
+                                        <view class="button bg-black button-active"
+                                              @click="mroute.login()">
+                                            <text class="font-13 color-white font-weight">
+                                                {{ $t('trade.lg_rg') }}
+                                            </text>
+                                        </view>
+                                    </template>
+                                    <template v-else>
+                                        <!-- BUY -->
+                                        <view class="button bg-green button-active"
+                                              v-if="direction === 0"
+                                              @click="submit">
+                                            <text class="font-13 always-white font-weight">
+                                                {{
+                                                    $t('trade.buy')
+                                                }}{{ currentCurrency['symbol'] ? currentCurrency['symbol'] : '--' }}
+                                            </text>
+                                        </view>
+                                        <!-- SELL -->
+                                        <view class="button bg-red button-active"
+                                              v-else
+                                              @click="submit">
+                                            <text class="font-13 always-white font-weight">
+                                                {{
+                                                    $t('trade.sell')
+                                                }}{{ currentCurrency['symbol'] ? currentCurrency['symbol'] : '--' }}
+                                            </text>
+                                        </view>
+                                    </template>
+                                </view>
+                            </view>
+                            <!--    数据展示-->
+                            <view class="data-box">
+                                <view class="desc-box">
+                                    <view class="item item-first">
+                                        <text class="font-10 color-gray">
+                                            {{ $t('trade.price') }}
+                                        </text>
+                                        <text class="font-10 color-gray">
+                                            (USDT)
+                                        </text>
+                                    </view>
+                                    <view class="item item-last">
+                                        <text class="font-10 color-gray">
+                                            {{ $t('trade.num') }}
+                                        </text>
+                                        <text class="font-10 color-gray">
+                                            ({{ currentCurrency['symbol'] ? currentCurrency['symbol'] : '--' }})
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="data-content">
+                                    <view class="data-list">
+                                        <view class="cell-box"
+                                              v-for="(item, index) in bids"
+                                              :key="'bids' + index"
+                                              @click="setOrderPrice(item[0])">
+                                            <view class="cell-background bg-red"
+                                                  :style="`width:${item[1] * 234}rpx`">
+                                            </view>
+                                            <view class="cell-content">
+                                                <text class="font-10 price_down font-weight">
+                                                    {{ util.thousandSeparator(item[0], depthDecimal) }}
+                                                </text>
+                                                <text class="font-10 color-black font-weight">
+                                                    {{ util.thousandUnit(item[1], currentCurrency['decimals']) }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="data-center"
+                                          @click="setOrderPrice(ticker['c'])">
+                                        <text class="font-14 color-primary font-weight">
+                                            {{ util.thousandSeparator(currentCurrency['new_price'], depthDecimal) }}
+                                        </text>
+                                        <text class="font-10 color-gray">
+                                            ≈{{ fee_symbol }}{{ util.thousandSeparator(ticker['c'] * fee, 2) }}
+                                        </text>
+                                    </view>
+                                    <view class="data-list">
+                                        <view class="cell-box"
+                                              v-if="asks.length > 0"
+                                              v-for="(item, index) in asks"
+                                              :key="'asks' + index"
+                                              @click="setOrderPrice(item[0])">
+                                            <view class="cell-background bg-green"
+                                                  :style="`width:${item[1] * 234}rpx`">
+                                            </view>
+                                            <view class="cell-content">
+                                                <text class="font-10 price_up font-weight">
+                                                    {{ util.thousandSeparator(item[0], depthDecimal) }}
+                                                </text>
+                                                <text class="font-10 color-black font-weight">
+                                                    {{ util.thousandUnit(item[1], currentCurrency['decimals']) }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                                <view class="data-footer">
+                                    <fui-dropdown-menu :background="userTheme == 'light' ? '#f6f6f6' : '#282828'"
+                                                       :minWidth="160"
+                                                       :maxHeight="220"
+                                                       :size="22"
+                                                       :isCheckbox="false"
+                                                       :radius="8"
+                                                       :padding="'12rpx'"
+                                                       :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                                                       selectedColor="#03aac7"
+                                                       :options="showUnit"
+                                                       @click="decimalChange"
+                                                       ref="decimal">
+                                        <view class="number-box bg-gray"
+                                              @tap="decimalSubmenu">
+                                            <text class="font-11  color-black">
+                                                {{ showUnitValue }}
+                                            </text>
+                                            <image class="down-icon"
+                                                   :src="`/static/img/tactic/down-${userTheme}.png`"
+                                                   mode="widthFix">
+                                            </image>
+                                        </view>
+                                    </fui-dropdown-menu>
+                                    <view class="icon-box bg-gray">
+                                        <image class="toggle-icon"
+                                               src="/static/img/Br.png"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <!-- order warp  -->
+                        <view class="body-bottom">
+                            <!-- 选项卡 -->
+                            <view class="order-tabs">
+                                <view class="order-tabs-group">
+                                    <view class="item" @click="tabActive = 0">
+                                        <text class="font-14 font-weight"
+                                              :class="tabActive == 0 ? 'color-black' : 'color-gray'">
+                                            {{ $t('trade.cur_order') }}({{ orderList.length }})
+                                        </text>
+                                    </view>
+                                    <view class="item" @click="tabActive = 1">
+                                        <text class="font-14 font-weight"
+                                              :class="tabActive == 1 ? 'color-black' : 'color-gray'">
+                                            {{ $t('trade.assets') }}
+                                        </text>
+                                    </view>
+                                </view>
+                                <image class="order-icon"
+                                       :src="`/static/img/tactic/order-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="mroute.tradeList()">
+                                </image>
+                            </view>
+                            <!-- 列表 -->
+                            <swiper class="order-swiper"
+                                    :current="tabActive"
+                                    :duration="300"
+                                    :style="`height: ${windowHeight - navHeight - 60}px`"
+                                    @change="tabActive = $event.detail.current">
+                                <!-- 当前订单 -->
+                                <swiper-item class="order-swiper-item"
+                                             :style="`height: ${windowHeight - navHeight - 60}px`">
+                                    <!-- CHECKBOX / 撤销订单 -->
+                                    <view class="desc-box bg-gray">
+                                        <view class="desc-check"
+                                              @click="checked = !checked; showUOrder = !showUOrder">
+                                            <view class="checkbox"
+                                                  :class="checked ? 'bg-green' : 'bg-white'">
+                                                <image class="check-icon"
+                                                       src="/static/img/tactic/check-s.png"
+                                                       mode="widthFix"
+                                                       v-if="checked">
+                                                </image>
+                                            </view>
+                                            <text class="font-11 color-black font-weight">
+                                                {{ $t('trade.view') }}USDT{{ $t('trade.all_order') }}
+                                            </text>
+                                        </view>
+                                        <text class="font-11 font-weight color-primary"
+                                              v-if="orderList.length > 0"
+                                              @click="cancelOrder(0)">
+                                            {{ $t('trade.batch_wd') }}
+                                        </text>
+                                    </view>
+                                    <scroll-view scroll-y="true"
+                                                 class="order-scroll"
+                                                 :style="`height: ${windowHeight - navHeight - 108}px`">
+                                        <view class="list-content">
+                                            <view class="card-item border-bottom"
+                                                  v-for="(item,index) in orderList"
+                                                  :key="item.id">
+                                                <!-- 币名 -->
+                                                <view class="row">
+                                                    <view class="row-left">
+                                                        <fui-tag
+                                                            :text="item.direction == 1 ? $t('trade.buy') : $t('trade.sell')"
+                                                            size="22"
+                                                            :radius="4"
+                                                            :padding="['8rpx','10rpx']"
+                                                            :marginRight="10"
+                                                            :background="item.direction == 1 ? '#03aac7':'#f45f4f'"
+                                                            theme="dark">
+                                                        </fui-tag>
+                                                        <text class="font-14 font-weight color-black">
+                                                            {{ item.symbol }}/USDT
+                                                        </text>
+                                                    </view>
+                                                    <text class="font-11 color-primary "
+                                                          @click="cancelOrder(item.id)">
+                                                        {{ $t('trade.wd_order') }}
+                                                    </text>
+                                                </view>
+                                                <!-- 时间 -->
+                                                <view class="row">
+                                                    <view class="row-left">
+                                                        <text class="font-12  color-black">
+                                                            {{ item.created_at }}
+                                                        </text>
+                                                        <fui-tag
+                                                            :text="item.order_type == 1 ? $t('trade.mk_od') : $t('trade.lm_od')"
+                                                            size="22"
+                                                            :radius="4"
+                                                            :padding="['8rpx','10rpx']"
+                                                            :marginLeft="10"
+                                                            color="#b8b8b8"
+                                                            :background="userTheme == 'light' ? '#f6f6f6' : '#282828'"
+                                                            theme="dark">
+                                                        </fui-tag>
+                                                    </view>
+                                                </view>
+                                                <!-- 价格 -->
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.price') }}(USDT)
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ util.float(item.price) }}
+                                                    </text>
+                                                </view>
+                                                <!-- 数量/交易金额 -->
+                                                <view class="row">
+                                                    <text class="font-12 color-gray "
+                                                          v-if="item.direction == 2">
+                                                        {{ $t('trade.num') }}({{ item.symbol }})
+                                                    </text>
+                                                    <text class="font-12 color-gray "
+                                                          v-else>
+                                                        {{ $t('trade.vl_tan') }}(USDT)
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ util.thousandSeparator(item.amount, 2) }}
+                                                    </text>
+                                                </view>
+                                                <!-- 预估成交 -->
+                                                <view class="row"
+                                                      v-if="item.direction == 1">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.ex_tran') }}({{ item.symbol }})
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{
+                                                            util.thousandSeparator(item.amount / item.price, item.decimals)
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <!-- 已成交 -->
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.traded') }}
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        --
+                                                    </text>
+                                                </view>
+                                            </view>
+                                            <empty-view :visible="orderList.length === 0"
+                                                        :width="690"
+                                                        :height="400"
+                                                        :title="$t('trade.not_order')">
+                                            </empty-view>
+                                        </view>
+                                    </scroll-view>
+                                </swiper-item>
+                                <!-- 资产 -->
+                                <swiper-item class="order-swiper-item"
+                                             :style="`height: ${windowHeight - navHeight - 60}px`">
+                                    <view class="desc-box bg-gray">
+                                        <text class="font-11 color-black font-weight">
+                                            {{ $t('trade.ccpa') }}
+                                        </text>
+                                    </view>
+                                    <view class="assets-box">
+                                        <view class="coin-item">
+                                            <image class="coin-icon"
+                                                   :src="currentCurrency['icon']"
+                                                   mode="widthFix">
+                                            </image>
+                                            <view class="coin-info">
+                                                <view class="row">
+                                                    <text class="font-14 color-black font-weight">
+                                                        {{
+                                                            currentCurrency['symbol'] ? currentCurrency['symbol'] : '--'
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.frozen') }}
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ isLogin ? util.float(balance['lock_trade']) : '--' }}
+                                                    </text>
+                                                </view>
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.usable') }}
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ isLogin ? util.float(balance['trade_balance']) : '--' }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                        <view class="coin-item">
+                                            <image class="coin-icon"
+                                                   src="/static/coin/usdt.png"
+                                                   mode="widthFix">
+                                            </image>
+                                            <view class="coin-info">
+                                                <view class="row">
+                                                    <text class="font-14 color-black font-weight">USDT</text>
+                                                </view>
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.frozen') }}
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ isLogin ? util.float(balance['legal_lock']) : '--' }}
+                                                    </text>
+                                                </view>
+                                                <view class="row">
+                                                    <text class="font-12 color-gray ">
+                                                        {{ $t('trade.usable') }}
+                                                    </text>
+                                                    <text class="font-12 color-black font-weight">
+                                                        {{ isLogin ? util.float(balance['legal_balance']) : '--' }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </swiper-item>
+                            </swiper>
+                        </view>
+                    </cell>
+                </list>
+            </view>
+        </view>
+        <!-- drawer -->
+        <fui-drawer :show="show"
+                    :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                    :radius="0"
+                    direction="left"
+                    @close="closeDrawer"
+                    maskBackground="rgba(0, 0, 0, .8)">
+            <view class="drawer">
+                <view class="status_bar"
+                      :style="{'height':statusBarHeight + 'px'}">
+                </view>
+                <text class="title font-weight color-black">
+                    {{ $t('index.spot') }}
+                </text>
+                <view class="search_box bg-gray">
+                    <image class="search_icon"
+                           :src="`/static/newImage/search-${userTheme}.png`"
+                           mode="widthFix">
+                    </image>
+                    <input class="search_input color-black font-13"
+                           v-model="searchValue"
+                           type="text"
+                           :placeholder="$t('trade.search_cc')"
+                           placeholder-class="input_placeholder">
+                </view>
+                <view class="tab_box">
+                    <view class="_item"
+                          :class="popTab == 0 ? 'bg-gray' : ''"
+                          @click="popTab = 0;mindex = 0">
+                        <text class="font-12 font-weight"
+                              :class="popTab == 0 ? 'color-black' : 'color-gray'">
+                            {{ $t('index.tab_t1') }}
+                        </text>
+                    </view>
+                    <view class="_item" :class="popTab == 1 ? 'bg-gray' : ''" @click="popTab = 1;mindex = 1">
+                        <text class="font-12 font-weight"
+                              :class="popTab == 1 ? 'color-black' : 'color-gray'">
+                            {{ currency[0]['title'][lang] }}
+                        </text>
+                    </view>
+                </view>
+                <scroll-view scroll-y
+                             :show-scrollbar="false"
+                             class="tab_list"
+                             :style="{'height': windowHeight - statusBarHeight - 140 + 'px'}">
+                    <view class="list_top bg-white">
+                        <view class="_left top-item"
+                              @click="switchSort(0,'symbol')">
+                            <text class="font-11 color-gray">
+                                {{ $t('index.name') }}
+                            </text>
+                            <image class="change_icon"
+                                   :src="sort[0]['active']" mode="widthFix">
+                            </image>
+                        </view>
+                        <view class="_right top-item">
+                            <view class="ri">
+                                <text class="font-11 color-gray">
+                                    {{ $t('index.latest_price') }}
+                                </text>
+                            </view>
+                            <view class="ri">
+                                <text class="font-11 color-gray">/{{ $t('index.quote_change') }}</text>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="list_bottom">
+                        <template v-if="mindex == 0">
+                            <view class="coin_box"
+                                  v-for="(item,index) in mlist" :key="'mid'+index"
+                                  :class="currentCurrency['id'] == item.id ? 'bg-gray' : ''"
+                                  @click="switchCurrency(item.id,index)">
+                                <view class="left">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item['symbol'] }}/USDT
+                                    </text>
+                                </view>
+                                <view class="right">
+                                    <text class="font-13 font-weight color-black"
+                                          :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                        {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                    </text>
+                                    <text class="font-11  color-black"
+                                          :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                        {{ util.thousandSeparator(item['change_rate']) }}%
+                                    </text>
+                                </view>
+                            </view>
+                            <empty-view :visible="mlist.length == 0"
+                                        :width="540"
+                                        :height="600"
+                                        :title="$t('trade.nomlist')">
+                            </empty-view>
+                        </template>
+                        <template v-if="mindex != 0">
+                            <view class="coin_box"
+                                  v-for="(item,index) in currency ? currency[0]['currency']:[]" :key="'did'+index"
+                                  :class="currentCurrency['id'] == item.id ? 'bg-gray' : ''"
+                                  @click="switchCurrency(item.id,index)">
+                                <view class="left">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item['symbol'] }}/USDT
+                                    </text>
+                                </view>
+                                <view class="right">
+                                    <text class="font-13 font-weight color-black"
+                                          :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                        {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                    </text>
+                                    <text class="font-11  color-black"
+                                          :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                        {{ util.thousandSeparator(item['change_rate']) }}%
+                                    </text>
+                                </view>
+                            </view>
+                            <empty-view :visible="currency[0]['currency'].length == 0"
+                                        :width="540"
+                                        :height="600"
+                                        :title="$t('trade.nomlist')">
+                            </empty-view>
+                        </template>
+                    </view>
+                </scroll-view>
+            </view>
+        </fui-drawer>
+        <!-- 成交反馈弹窗 -->
+        <fui-top-popup ref="orderResult"
+                       :zIndex="99"
+                       :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                       radius="30"
+                       :show="showPop"
+                       @close="showPop = false">
+            <view class="orderResult">
+                <view class="status_bar" :style="{'height': statusBarHeight + 'px'}"></view>
+                <view class="close-icon">
+                    <fui-icon name="close"
+                              :size="56"
+                              :color="userTheme == 'light' ? '#111111' : '#ffffff'"
+                              @tap="showPop = false">
+                    </fui-icon>
+                </view>
+                <view class="image-box">
+                    <image class="type-img" src="/static/img/success-icon.png"></image>
+                </view>
+                <view class="context-box">
+                    <text class="font-14 color-black font-weight resultTitle">
+                        {{ $t('trade.your') }}
+                        {{ orderResult['symbol'] ? orderResult['symbol'] : '--' }}
+                        {{ orderResult['order_type'] == 1 ? $t('trade.mk_pr') : $t('trade.lm_pr') }}
+                        {{ orderResult['direction'] == 1 ? this.$t('trade.buy_on') : this.$t('trade.sell_on') }}
+                        {{ $t('trade.price_only') }}
+                        {{ orderResult['price'] ? orderResult['price'] : '--' }}
+                        {{ $t('trade.ddqu') }}
+                        {{ util.float(orderResult['amount']) }}
+                        {{ orderResult['direction'] == 1 ? orderResult['symbol'] : 'USDT' }}
+                        {{ $t('trade.tfee') }}
+                        {{ util.float(orderResult['charge']) }}
+                        {{ orderResult['direction'] == 1 ? orderResult['symbol'] : 'USDT' }}.
+                    </text>
+                    <text class="font-13 color-gray  content-text">{{ $t('trade.see_detail') }}</text>
+                </view>
+            </view>
+        </fui-top-popup>
+
+        <fui-toast ref="toast" background="rgba(0, 0, 0, .8)" size="24">
+            <fui-icon style="margin-bottom: 20rpx;" name="checkbox" color="#fff"></fui-icon>
+        </fui-toast>
+        <uni-popup type="center" ref="loading">
+            <fui-loading type="col" text="loading" :isFixed="false"></fui-loading>
+        </uni-popup>
+
+        <fui-dialog :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                    :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                    :contentColor="userTheme == 'light' ? '#898989' : '#7a7a7a'"
+                    radius="20"
+                    :show="alertShow"
+                    :buttons="dialogButton"
+                    :title="$t('login.tip_t2')" :content="content" maskClosable
+                    @click="confirm">
+        </fui-dialog>
+    </view>
+</template>
+
+<script>
+import service from './tradeNvue.js';
+
+export default service;
+</script>
+
+<style scoped>
+@import url("transaction.css");
+</style>

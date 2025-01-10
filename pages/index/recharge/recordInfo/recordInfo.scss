@@ -1,0 +1,86 @@
+.recordInfo {
+	width: 100%;
+	min-height: 100vh;
+	background: var(--background-primary);
+	
+	.record-container {
+		width: 100%;
+		height: auto;
+		padding: 30rpx;
+		box-sizing: border-box;
+		
+		.top-box {
+			width: 100%;
+			height: auto;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 60rpx 0;
+			box-sizing: border-box;
+			margin-bottom: 60rpx;
+			
+			image {
+				width: 70rpx;
+				height: 70rpx;
+				border-radius: 50%;
+				margin-bottom: 20rpx;
+			}
+			
+			text {
+				margin-bottom: 20rpx;
+			}
+			
+			.price_num {
+				margin-bottom: 30rpx;
+				font-size: 40rpx;
+			}
+			
+			.type-box {
+				display: flex;
+				align-items: center;
+				
+				.icon {
+					margin-right: 10rpx;
+				}
+			}
+		}
+		
+		.bottom-box {
+			width: 100%;
+			height: auto;
+			
+			.cell {
+				width: 100%;
+				height: auto;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				
+				.item {
+					display: flex;
+					align-items: flex-start;
+					margin: 20rpx 0;
+					
+					&:last-of-type {
+						width: 70%;
+						justify-content: flex-end;
+						
+						text {
+							text-align: right;
+							display: inline-block;
+							width: calc(100% - 46rpx);
+							word-break: break-all;
+						}
+					}
+					
+					image {
+						width: 32rpx;
+						height: 32rpx;
+						margin-left: 10rpx;
+					}
+				}
+			}
+		}
+	}
+}

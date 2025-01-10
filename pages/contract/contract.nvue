@@ -1,0 +1,1592 @@
+<template>
+    <view class="transaction bg-white" :class="userTheme">
+        <!-- 状态栏/导航栏 -->
+        <fui-nav-bar isFixed
+                     isOccupy
+                     zIndex="9"
+                     padding="0"
+                     :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                     custom
+                     @init="navInit">
+            <view class="title-bar bg-white" id="title-bar">
+                <view class="bar_con">
+                    <view class="bar_item bar_left" @click="showDrawer">
+                        <image class="toggle_icon" :src="`/static/newImage/toggle-${userTheme}.png`"></image>
+                        <text class="font-17 color-black font-weight">{{ currentCurrency['symbol'] }}/USDT</text>
+                        <fui-tag :isBorder="false"
+                                 :marginLeft="10"
+                                 :marginRight="10"
+                                 :text="$t('contract.p1')"
+                                 size="22"
+                                 radius="2"
+                                 :padding="['6rpx','10rpx']"
+                                 type="warning"
+                                 theme="light">
+                        </fui-tag>
+                        <text class="font-13 font-weight color-black"
+                              :class="[ticker['P'] > 0 ? 'price_up':'price_down']">{{
+                                util.thousandSeparator(ticker['P'], 2)
+                            }}%
+                        </text>
+                    </view>
+                    <fui-dropdown-menu :minWidth="140"
+                                       :left="100"
+                                       maxHeight="320"
+                                       :size="26"
+                                       :isCheckbox="false"
+                                       :radius="16"
+                                       :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                       :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                       :selectedColor="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                       :options="moreOptions"
+                                       @click="moreItemChange"
+                                       ref="moreDrop">
+                        <view class="bar_item bar_right">
+                            <!--                            <view class="bar_btn" @click="optionalChange">-->
+                            <!--								<image class="btn_icon"-->
+                            <!--									   :src="like ? '/static/newImage/collect-select.png' : `/static/newImage/collect-${userTheme}.png`"-->
+                            <!--									   mode="widthFix">-->
+                            <!--								</image>-->
+                            <!--							</view>-->
+                           <!-- <view class="bar_btn" @click="mroute.toTactic()">
+                                <image class="btn_icon"
+                                       src="@/static/img/tactic/AIk.png"
+                                       mode="widthFix">
+                                </image>
+                            </view> -->
+                            <view class="bar_btn" @click="toKline">
+                                <image class="btn_icon s-icon" :src="`/static/newImage/zd-${userTheme}.png`"
+                                       mode="widthFix"></image>
+                            </view>
+                            <view class="bar_btn" @click="klineToggle">
+                                <image class="btn_icon" :src="`/static/newImage/zdpl-${userTheme}.png`"
+                                       mode="widthFix"></image>
+                            </view>
+                            <view class="bar_btn" @tap="moreShow">
+                                <image class="btn_icon s-icon" :src="`/static/newImage/more-${userTheme}.png`"
+                                       mode="widthFix"></image>
+                            </view>
+                        </view>
+                    </fui-dropdown-menu>
+                </view>
+            </view>
+        </fui-nav-bar>
+        <!-- 内容 -->
+        <view class="body-wrap bg-white" :style="{'height': windowHeight - navHeight + 'px'}">
+            <view class="bg-white" :style="{'height': windowHeight - navHeight + 'px'}">
+                <list :show-scrollbar="false" :scrollable="true" class="container-wrap"
+                      :style="{'height': windowHeight - navHeight + 'px'}">
+                    <refresh @pullingdown='onpullingdown' @refresh="onrefresh" :display=" refreshing ? 'show' : 'hide' "
+                             class="refresh">
+                        <text class="font-14 font-weight color-gray" v-if="refText">{{ refreshText }}</text>
+                        <fui-load-ani color="#3070ec" type="3" v-else></fui-load-ani>
+                    </refresh>
+                    <cell>
+                        <!-- 图表嵌入区域 -->
+                        <view class="kline" v-if="klineShow">
+                            <web-view ref="webview" @pagefinish="onPageFinish" class="web-view"
+                                      src="/hybrid/html/trade.html"></web-view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <view class="content-wrap">
+                            <view class="content_left">
+                                <view class="row tag_row">
+                                    <view class="tag_btn bg-gray" @click="showPopup(0)">
+                                        <text class="font-12 font-weight color-black">
+                                            {{ margin_type === 1 ? $t('contract.pall') : margin_type === 2 ? $t('contruct.wbw') : $t('contract.fall') }}
+                                        </text>
+                                        <image class="icon_down" src="/static/img/h0.png" mode=""></image>
+                                    </view>
+                                    <view class="tag_btn bg-gray" @click="showPopup(1)">
+                                        <text class="font-12 font-weight color-black">{{ mutil }}X</text>
+                                        <image class="icon_down" src="/static/img/h0.png"></image>
+                                    </view>
+                                </view>
+                                <!-- 开/平 -->
+                                <view class="row row_buttons">
+                                    <view class="_button buy" @click="buttonToggle(0);direction = 1">
+                                        <image v-if="bgshow==0" class="bg_image" src="/static/img/buy_bg.webp"></image>
+                                        <image v-else class="bg_image"
+                                               :src="`/static/img/df_buy-${userTheme}.png`"></image>
+                                        <text class="txt" :class="[bgshow == 0 ? 'color-white' : 'color-gray']">
+                                            {{ $t('contruct.open_position') }}
+                                        </text>
+                                    </view>
+                                    <view class="_button sell" @click="buttonToggle(1);direction = 2">
+                                        <image v-if="bgshow==1" class="bg_image" src="/static/img/sell_bg.png"></image>
+                                        <image v-else class="bg_image"
+                                               :src="`/static/img/df_sell-${userTheme}.png`"></image>
+                                        <text class="txt" :class="[bgshow == 1 ? 'color-white' : 'color-gray']">
+                                            {{ $t('contruct.close_position') }}
+                                        </text>
+                                    </view>
+                                </view>
+                                <!--  -->
+                                <view class="row">
+                                    <text class="font-12 color-gray">{{ $t('contruct.available') }}</text>
+                                    <view class="row_right">
+                                        <text class="font-12 font-weight color-black" v-if="direction == 1">
+                                            {{ util.thousandSeparator(balance.legal_balance, 2) }} USDT
+                                        </text>
+                                        <text class="font-12 font-weight color-black" v-if="direction == 2">
+                                            {{ util.float(getCurrencyAmount())}} {{ currentCurrency['symbol'] }}
+                                        </text>
+
+                                        <image class="icon-change" @click="mroute.exchange()" src="/static/img/9i.png">
+                                        </image>
+                                    </view>
+                                </view>
+                                <!--  -->
+                                <view class="row">
+                                    <fui-dropdown-menu :minWidth="420"
+                                                       :maxHeight="245"
+                                                       :size="26"
+                                                       :isCheckbox="false"
+                                                       :radius="16"
+                                                       :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                                       :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                                       selectedColor="#3070ec"
+                                                       :options="options"
+                                                       @click="rangeItemClick"
+                                                       ref="ddmRange">
+                                        <view class="row_con bg-gray pd-lr-10" @tap="filterTap">
+                                            <text class="font-14 font-weight color-black">{{ range }}</text>
+                                            <image class="icon_down" src="/static/img/h0.png"></image>
+                                        </view>
+                                    </fui-dropdown-menu>
+                                </view>
+
+                                <!-- 限价显示 -->
+                                <view class="row" v-if="order_type >= 1">
+                                    <view class="row_con bg-gray pd-lr-10">
+                                        <input class="input color-black" v-model="order_price" type="digit"
+                                               :placeholder="order_price == 1 ?$t('contruct.price') : $t('contruct.com_pr')"
+                                               placeholder-class="input_placeholder">
+                                        <text class="font-13 color-gray">USDT</text>
+                                    </view>
+                                </view>
+
+                                <!-- 条件单显示 -->
+                                <view v-if="order_type == 2">
+                                    <!-- 触发价格 -->
+                                    <view class="row">
+                                        <view class="row_con bg-gray pd-lr-10">
+                                            <input class="input color-black" type="digit" v-model="t_price"
+                                                   :placeholder="$t('contruct.trigger_price')"
+                                                   placeholder-class="input_placeholder">
+                                            <text class="font-13 color-gray">USDT</text>
+                                        </view>
+                                    </view>
+                                </view>
+
+                                <!--  -->
+                                <view class="row_view">
+                                    <view class="row row_btn_box">
+                                        <view class="tag_btn bg-gray radius-left" @click="coninType = 0;amountType = 0">
+                                            <text class="font-12 font-weight"
+                                                  :class="coninType == 0 ? 'color-black' : 'color-gray'">
+                                                {{ currentCurrency['symbol'] }}
+                                            </text>
+                                        </view>
+                                        <view class="tag_btn bg-gray radius-right"
+                                              @click="coninType = 1;amountType = 1">
+                                            <text class="font-12 font-weight"
+                                                  :class="coninType == 1 ? 'color-black' : 'color-gray'">USDT
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <!--  -->
+                                    <view class="row">
+                                        <view class="row_con bg-gray pd-lr-10 radius-bottom" v-if="amountType == 0">
+                                            <input v-if="direction == 1" v-model="amount" class="input color-black"
+                                                   type="digit"
+                                                   :placeholder="$t('contruct.quantity')"
+                                                   placeholder-class="input_placeholder">
+
+                                            <input style="text-align: center;" v-else :value="rate + '%'"
+                                                   :disabled="true"
+                                                   class="input" type="text" :placeholder="$t('contruct.quantity')"
+                                                   placeholder-class="input_placeholder">
+                                            <text class="font-13 color-gray">{{
+                                                    currentCurrency['symbol']
+                                                }}
+                                            </text>
+                                        </view>
+                                        <view class="row_con bg-gray pd-lr-10 radius-bottom" v-else>
+                                            <input v-if="direction == 1" @input="inputAmount" v-model="inputAm"
+                                                   class="input color-black"
+                                                   type="digit" :placeholder="$t('contruct.quantity')"
+                                                   placeholder-class="input_placeholder">
+
+                                            <input v-else style="text-align: center;" :value="rate + '%'"
+                                                   :disabled="true"
+                                                   class="input color-black" type="digit"
+                                                   :placeholder="$t('contruct.quantity')"
+                                                   placeholder-class="input_placeholder">
+                                            <text class="font-13 color-gray">USDT</text>
+                                        </view>
+                                    </view>
+                                </view>
+                                <!--  -->
+                                <view class="slide-row">
+                                    <slider activeColor="#3070ec"
+                                            :backgroundColor="userTheme== 'light' ? '#f8f9f9' : '#202229'"
+                                            block-color="#3070ec"
+                                            block-size="15" :value="irate"
+                                            @change="sliderChange"
+                                            @changing="sliderChange" step="1"/>
+                                    <view class="slide-num">
+                                        <text class="font-10"
+                                              :class="rateVal >= i ? 'color-black' : 'color-gray'"
+                                              v-for="i in [0, 25, 50, 75, 100]">
+                                            {{ i }}%
+                                        </text>
+                                    </view>
+                                </view>
+                                <!--  -->
+                                <view class="row check_row" v-if="direction == 1">
+                                    <fui-label>
+                                        <view class="left">
+                                            <fui-checkbox @change="showHidenProfit"
+                                                          color="#3070ec"
+                                                          borderRadius="4"
+                                                          scaleRatio="0.7"
+                                                          value="1">
+                                            </fui-checkbox>
+                                            <text class="font-12 font-weight ml-5 color-gray">
+                                                {{ $t('contruct.tp_sl') }}
+                                            </text>
+                                        </view>
+                                    </fui-label>
+                                    <image @click="showPopup(2)" class="icon_qu" src="/static/img/e4.webp"></image>
+                                </view>
+                                <view class="row ys_view" v-if="stopProfit">
+                                    <view class="ys_input_box bg-gray">
+                                        <input class="ys_input font-weight color-black" v-model="price_up" type="number"
+                                               :placeholder="this.$t('contruct.t_price')"
+                                               placeholder-class="input_placeholder">
+                                    </view>
+                                    <view class="ys_input_box bg-gray">
+                                        <input class="ys_input font-weight color-black" v-model="price_down"
+                                               type="number"
+                                               :placeholder="this.$t('contruct.s_price')"
+                                               placeholder-class="input_placeholder">
+                                    </view>
+                                </view>
+                                <!-- todo 仓位限制增加 -->
+                                <view class="group" v-if="isLogin">
+                                    <!--  -->
+                                    <view class="row">
+                                        <view class="left">
+                                            <text class="font-12 color-gray">
+                                                {{
+                                                    direction == 1 ? $t('contruct.open_long') : $t('contruct.kepingduo')
+                                                }}
+                                            </text>
+                                            <image @click="showPopup(3)" class="icon_qu"
+                                                   src="/static/img/e4.webp">
+                                            </image>
+                                        </view>
+                                        <template v-if="direction === 1">
+                                            <text class="font-12 font-weight color-black" v-if="amountType == 0">
+                                                {{ getAvliAmount(1) }} {{ currentCurrency['symbol'] }}
+                                            </text>
+                                            <text class="font-12 font-weight color-black" v-else>
+                                                {{ util.thousandSeparator(getAvliAmount(1), 2) }} USDT
+                                            </text>
+                                        </template>
+                                        <template v-if="direction === 2">
+                                            <text class="font-12 font-weight color-black" v-if="amountType == 0">
+                                                {{
+                                                    getPositionAmount(currentCurrency['id'] ? currentCurrency['id'] : 0, 1)
+                                                }}
+                                                {{ currentCurrency['symbol'] }}
+                                            </text>
+                                            <text class="font-12 font-weight color-black" v-else>
+                                                {{
+                                                    getPositionAmount(currentCurrency['id'] ? currentCurrency['id'] : 0, 1)
+                                                }}
+                                                USDT
+                                            </text>
+                                        </template>
+
+                                    </view>
+
+                                    <view class="row" v-if="direction==1">
+                                        <view class="left">
+                                            <text class="font-12 color-gray">{{
+                                                    $t('contruct.margin')
+                                                }}
+                                            </text>
+                                        </view>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 0">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * ticker['c'] : inputAm, 2) : '0.00'
+                                            }} USDT
+                                        </text>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 1">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * util.str2number(order_price) : inputAm, 2) :
+                                                        '0.00'
+                                            }} USDT
+                                        </text>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 2">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * util.str2number(order_price) : inputAm, 2) :
+                                                        '0.00'
+                                            }} USDT
+                                        </text>
+                                    </view>
+
+                                    <view class="row">
+                                        <view class="btn_box buy_btn" v-if="direction == 1" @click="submit(1)">
+                                            <text class="font-14 font-weight color-white">
+                                                {{ $t('contruct.open_bullish') }}
+                                            </text>
+                                        </view>
+                                        <view class="btn_box buy_btn" v-else @click="stopOrderByButton(1)">
+                                            <text class="font-14 font-weight color-white">
+                                                {{ $t('contruct.pindo') }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <!--  -->
+                                    <view class="row">
+                                        <view class="left">
+                                            <text class="font-12 color-gray">
+                                                {{ direction == 2 ? $t('contruct.can_close') : $t('contruct.pl5') }}
+                                            </text>
+                                            <image v-if="direction == 1" @click="showPopup(4)" class="icon_qu"
+                                                   src="/static/img/e4.webp">
+                                            </image>
+                                        </view>
+                                        <template v-if="direction == 1">
+                                            <text class="font-12 color-black font-weight" v-if="amountType == 0">
+                                                {{ getAvliAmount(2) }} {{ currentCurrency['symbol'] }}
+                                            </text>
+                                            <text class="font-12 color-black font-weight" v-else>
+                                                {{ util.thousandSeparator(getAvliAmount(2), 2) }} USDT
+                                            </text>
+                                        </template>
+                                        <template v-if="direction == 2">
+                                            <text class="font-12 color-black font-weight" v-if="amountType == 0">
+                                                {{
+                                                    getPositionAmount(currentCurrency['id'] ? currentCurrency['id'] : 0, 2)
+                                                }}
+                                                {{ currentCurrency['symbol'] }}
+                                            </text>
+                                            <text class="font-12 color-black font-weight" v-else>
+                                                {{
+                                                    getPositionAmount(currentCurrency['id'] ? currentCurrency['id'] : 0, 2)
+                                                }}
+                                                USDT
+                                            </text>
+                                        </template>
+                                    </view>
+                                    <view class="row" v-if="direction == 1">
+                                        <view class="left">
+                                            <text class="font-12 color-gray">{{
+                                                    $t('contruct.margin')
+                                                }}
+                                            </text>
+                                        </view>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 0">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * ticker['c'] : inputAm, 2) : '0.00'
+                                            }} USDT
+                                        </text>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 1">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * util.str2number(order_price) : inputAm, 2) :
+                                                        '0.00'
+                                            }} USDT
+                                        </text>
+                                        <text class="font-12 font-weight color-black" v-if="order_type == 2">
+                                            {{
+                                                amount > 0 ? util.thousandSeparator(amountType === 0 ? amount / mutil * util.str2number(order_price) : inputAm, 2) :
+                                                        '0.00'
+                                            }} USDT
+                                        </text>
+                                    </view>
+                                    <view class="row lastBox">
+                                        <view class="btn_box sell_btn" v-if="direction == 1" @click="submit(2)">
+                                            <text class="font-14 font-weight color-white">{{
+                                                    $t('contruct.open_bear')
+                                                }}
+                                            </text>
+                                        </view>
+                                        <view class="btn_box sell_btn" v-else @click="stopOrderByButton(2)">
+                                            <text class="font-14 font-weight color-white">{{
+                                                    $t('contruct.empty')
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+
+                                <!-- not login -->
+                                <view class="row lastBox mt-15" v-if="!isLogin">
+                                    <view class="not-login" @click="mroute.login()">
+                                        <text class="font-14 font-weight color-white">
+                                            {{ $t('contruct.lg') }}
+                                        </text>
+                                    </view>
+                                </view>
+                            </view>
+                            <!-- 数据展示 -->
+                            <view class="content_right">
+                                <view class="right_top">
+                                    <view class="time_box">
+                                        <view class="_i">
+                                            <image @click="showPopup(5)" class="e_icon" src="/static/img/e4.webp">
+                                            </image>
+                                            <text class="font-10 color-gray">
+                                                {{ $t('contruct.funding_rate') }}/{{ $t('contruct.set_time') }}
+                                            </text>
+                                        </view>
+                                        <text class="font-10 color-black font-weight">
+                                            {{ util.float(market['r'] * 100) }}%
+                                            {{ time }}
+                                        </text>
+                                    </view>
+                                    <view class="title">
+                                        <view class="_i">
+                                            <text class="font-10 color-gray">{{ $t('contruct.price') }}</text>
+                                            <text class="font-10 color-gray">(USDT)</text>
+                                        </view>
+                                        <view class="_i i_r">
+                                            <text class="font-10 color-gray">{{ $t('contruct.quantity') }}</text>
+                                            <text class="font-10 color-gray">({{ currentCurrency['symbol'] }})</text>
+                                        </view>
+                                    </view>
+                                    <view class="row" v-for="(item, index) in asks" :key="'b' + index">
+                                        <text class="font-10 color-green">
+                                            {{ util.thousandSeparator(item[0], currentCurrency['decimals']) }}
+                                        </text>
+                                        <text class="font-10 color-black">
+                                            {{ util.thousandUnit(item[1], currentCurrency['decimals']) }}
+                                        </text>
+                                        <view class="bg_box bg_green" :style="{'width': 230 * item[2] + 'px'}"></view>
+                                    </view>
+
+                                    <view class="center_box">
+                                        <text class="font-14 font-weight color-green">
+                                            {{
+                                                util.thousandSeparator(currentCurrency['new_price'], currentCurrency['decimals'])
+                                            }}
+                                        </text>
+                                        <view class="_btm">
+                                            <text class="color-gray font-10 mr-5">{{ $t('contruct.mark_price') }}</text>
+                                            <text class="font-10 font-weight color-green">
+                                                {{ util.thousandSeparator(market['p']) }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="row" v-for="(item, index) in bids" :key="'a' + index">
+                                        <text class="font-10 color-red">
+                                            {{ util.thousandSeparator(item[0], currentCurrency['decimals']) }}
+                                        </text>
+                                        <text class="font-10 color-black">
+                                            {{ util.thousandUnit(item[1], currentCurrency['decimals']) }}
+                                        </text>
+                                        <view class="bg_box bg_red" :style="{'width': 230 * item[2] + 'rpx'}"></view>
+                                    </view>
+                                </view>
+                                <view class="row row_last_view">
+                                    <fui-dropdown-menu padding="10"
+                                                       :minWidth="165"
+                                                       :maxHeight="245"
+                                                       :size="26"
+                                                       :isCheckbox="false"
+                                                       :radius="16"
+                                                       :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                                       :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                                       selectedColor="#3070ec"
+                                                       :options="decimalOption"
+                                                       @click="decimalChange" ref="decimal">
+                                        <view class="row_con bg-gray" @tap="decimalSubmenu">
+                                            <text class="font-12 font-weight color-black">{{ decimalVal }}</text>
+                                            <image class="icon_down" src="/static/img/h0.png"></image>
+                                        </view>
+                                    </fui-dropdown-menu>
+                                    <view class="image_box bg-gray">
+                                        <image class="change_image" src="/static/img/Br.png"></image>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- <view style="width: 750rpx;height: 10px;"></view> -->
+                    </cell>
+                    <cell>
+                        <view class="line-view mt-15"></view>
+                    </cell>
+                    <cell>
+                        <view class="content-bottom">
+                            <view class="tab-box">
+                                <view class="tab_left">
+                                    <view class="item" @click="tabActive = 0">
+                                        <text class="font-15"
+                                              :class="tabActive == 0 ? 'font-weight color-black' : 'color-gray' ">
+                                            {{ $t('contruct.cur_pos') }}({{
+                                                position.position ? position.position.length : '0'
+                                            }})
+                                        </text>
+                                    </view>
+                                    <view class="item" @click="tabActive = 1">
+                                        <text class="font-15"
+                                              :class="tabActive == 1 ? 'font-weight color-black' : 'color-gray' ">
+                                            {{
+                                                $t('contruct.cur_od')
+                                            }}({{ position.entrust ? position.entrust.length : '0' }})
+                                        </text>
+                                    </view>
+                                    <view class="item" @click="tabActive = 2">
+                                        <text class="font-15"
+                                              :class="tabActive == 2 ? 'font-weight color-black' : 'color-gray' ">
+                                            {{ $t('contruct.plan_com') }}({{
+                                                position.entrustP ? position.entrustP.length : '0'
+                                            }})
+                                        </text>
+                                    </view>
+                                </view>
+                                <!--  @click="mroute.contractOrder()"  -->
+                                <view class="tab_right" @click="mroute.newOrders()">
+                                    <image class="icon-order" src="/static/img/order.webp"></image>
+                                </view>
+                            </view>
+                            <view class="list" :style="{'height': (listHeight - 70) + 'px'}">
+                                <view class="_top bg-gray">
+                                    <view class="left">
+                                        <view class="check" @click="checked = !checked">
+                                            <image v-if="checked == false" class="check_image"
+                                                   src="/static/img/qF1.png">
+                                            </image>
+                                            <image v-else class="check_image" src="/static/img/xA.png"></image>
+                                        </view>
+                                        <text class="font-12 color-gray" @click="checked = !checked">
+                                            {{ $t('contruct.only_cur') }}
+                                        </text>
+                                    </view>
+                                    <text class="font-12 font-weight color-blue"
+                                          v-if="tabActive == 0 && position.position.length > 0" @click="allPingcang()">
+                                        {{ $t('contruct.click_close') }}
+                                    </text>
+                                </view>
+                                <view class="_bottom" v-if="tabActive == 0">
+                                    <!-- 当前持仓 -->
+                                    <list v-if="position.position.length > 0"
+                                          :show-scrollbar="false" scroll-y
+                                          class="_bottom_list"
+                                          :style="{'height': (listHeight - 120) + 'px'}">
+                                        <cell v-for="(item, index) in position.position" :key="item.order_id">
+                                            <view class="date_item border-bottom">
+                                                <view class="item_row">
+                                                    <view class="item_row_left">
+                                                        <fui-tag
+                                                                :text="item.direction == 2?$t('tradeInfo.null'):$t('tradeInfo.many')"
+                                                                size="22" radius="4" :padding="['10rpx','10rpx']"
+                                                                :marginRight="10"
+                                                                :background="item.direction == 2 ? '#ea4337':'#56bd77'"
+                                                                theme="dark"></fui-tag>
+                                                        <text
+                                                                class="font-15 font-weight color-black ml-5">
+                                                            {{ item.symbol }}USDT
+                                                        </text>
+                                                        <fui-tag marginLeft="10" :text="$t('contruct.sustainable')"
+                                                                 size="22"
+                                                                 radius="4" :padding="['10rpx','10rpx']" type="warning"
+                                                                 originLeft
+                                                                 theme="light"></fui-tag>
+                                                        <fui-tag marginLeft="10"
+                                                                 :text="(item.margin_type == 1?this.$t('tradeInfo.full_w'):this.$t('contruct.wbw'))+item.muilt+'X'"
+                                                                 originLeft size="22" radius="4"
+                                                                 :padding="['10rpx','10rpx']"
+                                                                 type="warning" theme="light"></fui-tag>
+                                                    </view>
+                                                    <view class="item_row_right">
+                                                        <image class="df_icon"
+                                                               @click="showPoster(item,item.direction,item.price,item.symbol)"
+                                                               src="/static/img/FD.png"
+                                                               mode=""></image>
+                                                    </view>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.pp_los')
+                                                        }}(USDT)
+                                                    </text>
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.response_rate')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <!-- <fui-digital-roller :width="20" :fontWeight="500"
+                                                                        :color="item.p > 0 ? '#56bd77':'#ea4337'"
+                                                                        :size="32"
+                                                                        :height="32"
+                                                                        :value="item.p">
+                                                    </fui-digital-roller> -->
+                                                    <text class="font-16 color-green font-weight"
+                                                          :class="{'price_up':item.p>0,'price_down':item.p<=0}">
+                                                        {{ item.p > 0 ? '+' + util.thousandSeparator(item.p) : util.thousandSeparator(item.p) }}
+                                                    </text>
+
+                                                    <text class="font-16 color-green font-weight"
+                                                          :class="{'price_up':item.p>0,'price_down':item.p<=0}">
+                                                        <!-- {{ getProfitRate(item.currency_id, item.direction, item.amount, item.price, item.margin) }} -->
+                                                        {{ item.rate }}%
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{ $t('contruct.avp_price') }}
+                                                    </text>
+                                                    <view class="num-box" style="display: flex;align-items:center;">
+                                                        <text class="font-13 color-gray">
+                                                            {{ $t('contruct.margin') }}(USDT)
+                                                        </text>
+                                                        <image v-if="item.margin_type === 2"
+                                                               @click="showMarginTip();pindex=index"
+                                                               class="e_icon"
+                                                               style="width:13px;height: 13px;"
+                                                               src="/static/img/e4.webp">
+                                                        </image>
+                                                    </view>
+                                                    <text class="font-13 color-gray">{{ $t('contruct.ex_pr') }}</text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-14 font-weight color-black">
+                                                        {{
+                                                            util.thousandSeparator(item.price, currentCurrency['decimals'])
+                                                        }}
+                                                    </text>
+                                                    <text class="font-14 font-weight color-black mt-5">
+                                                        {{ util.thousandSeparator(item.margin, 2) }}
+                                                    </text>
+                                                    <text class="font-14 font-weight color-black">
+                                                        {{
+                                                            item.stopPrice <= 0 ? $t('contruct.nl_yp') : util.thousandSeparator(item.stopPrice, currentCurrency['decimals'])
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_column">
+                                                    <view class="column_item">
+                                                        <text class="font-13 color-gray">{{
+                                                                $t('contruct.mark_price')
+                                                            }}
+                                                        </text>
+                                                        <text class="font-14 font-weight color-black mt-5">
+                                                            {{
+                                                                util.thousandSeparator(getNewPrice(item.currency_id), currentCurrency['decimals'])
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="column_item align_center">
+                                                        <view class="num-box" style="display: flex;align-items:center;">
+                                                            <text class="font-13 color-gray">
+                                                                {{ $t('contruct.set_pl') }}
+                                                            </text>
+                                                            <image @click="plTip();pindex=index" class="e_icon"
+                                                                   src="/static/img/e4.webp" mode=""></image>
+
+                                                        </view>
+
+                                                        <text class="font-14 font-weight color-black mt-5">
+                                                            {{
+                                                                util.thousandSeparator(parseFloat(position.position[index].profit) -
+                                                                        parseFloat(position.position[index].charge) -
+                                                                        parseFloat(position.position[index].fund_charge), 2)
+                                                            }}
+                                                        </text>
+
+                                                    </view>
+                                                    <view class="column_item align_end">
+                                                        <text class="font-13 color-gray">{{
+                                                                $t('contruct.can_close')
+                                                            }}({{ item['symbol'] }})
+                                                        </text>
+                                                        <text class="font-14 font-weight color-black mt-5">
+                                                            {{
+                                                                util.float(util.thousandSeparator(parseFloat(item.amount) -
+                                                                        parseFloat(item.close), 8))
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+
+                                                <view class="item_row tag_group">
+                                                    <view class="tag_btn bg-gray" @click="mroute.entrust(item)">
+                                                        <text class="font-13 font-weight color-black">
+                                                            {{ $t('contruct.pl1') }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="tag_btn bg-gray" @click="pindex = index; showPopup(6)">
+                                                        <text class="font-13 font-weight color-black">
+                                                            {{ $t('contruct.close_position') }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="tag_btn bg-gray" @click="pindex = index; showPopup(7)">
+                                                        <text class="font-13 font-weight color-black">
+                                                            {{ $t('contruct.flash_close') }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                        </cell>
+                                    </list>
+                                    <!-- 没有订单 -->
+                                    <view class="not-orders" v-if="position.position.length == 0">
+                                        <fui-empty descrSize="26"
+                                                   :descrColor="userTheme == 'light' ? '#999999' : '#555555'"
+                                                   width="200"
+                                                   height="100"
+                                                   :src="`/static/newImage/notData-${userTheme}.png`"
+                                                   :descr="$t('contruct.no_od')">
+                                        </fui-empty>
+                                    </view>
+                                </view>
+                                <view class="_bottom" v-if="tabActive == 1">
+                                    <!-- 当前委托 -->
+                                    <list v-if="position.entrust.length > 0"
+                                          :show-scrollbar="false" scroll-y
+                                          class="_bottom_list"
+                                          :style="{'height': (listHeight - 120) + 'px'}">
+                                        <cell v-for="(item, index) in position.entrust" :key="'w' + index">
+                                            <view class="date_item border-bottom">
+                                                <view class="item_row">
+                                                    <view class="item_row_left">
+                                                        <fui-tag v-if="item.type == 1" :text="$t('contruct.buy_long')"
+                                                                 size="22"
+                                                                 :marginRight="10"
+                                                                 radius="2" :padding="['10rpx','10rpx']"
+                                                                 background="#56bd77"
+                                                                 theme="dark"></fui-tag>
+                                                        <fui-tag v-if="item.type == 2" :text="$t('contruct.sell_short')"
+                                                                 size="22" radius="2" :padding="['10rpx','10rpx']"
+                                                                 :marginRight="10"
+                                                                 background="#ea4337" theme="dark"></fui-tag>
+                                                        <fui-tag v-if="item.type == 3" :text="$t('contruct.sell_fl')"
+                                                                 size="22"
+                                                                 :marginRight="10"
+                                                                 radius="4" :padding="['10rpx','10rpx']"
+                                                                 background="#ea4337"
+                                                                 theme="dark"></fui-tag>
+                                                        <fui-tag v-if="item.type == 4" :text="$t('contruct.buy_short')"
+                                                                 size="22" radius="2" :padding="['10rpx','10rpx']"
+                                                                 :marginRight="10"
+                                                                 background="#56bd77" theme="dark"></fui-tag>
+                                                        <fui-tag v-if="item.type == 5" :text="$t('contruct.tp')"
+                                                                 size="22"
+                                                                 radius="4" :padding="['10rpx','10rpx']"
+                                                                 background="#56bd77"
+                                                                 :marginRight="10"
+                                                                 theme="dark"></fui-tag>
+                                                        <fui-tag v-if="item.type == 6" :text="$t('contruct.sl')"
+                                                                 size="22"
+                                                                 radius="2" :padding="['10rpx','10rpx']"
+                                                                 background="#56bd77"
+                                                                 :marginRight="10"
+                                                                 theme="dark"></fui-tag>
+                                                        <text class="font-15 font-weight color-black ml-5">
+                                                            {{ item.symbol }}USDT
+                                                        </text>
+                                                        <fui-tag marginLeft="10" :text="$t('contruct.sustainable')"
+                                                                 size="22"
+                                                                 radius="2" :padding="['10rpx','10rpx']" type="warning"
+                                                                 theme="light"></fui-tag>
+                                                    </view>
+                                                    <view class="item_row_right">
+                                                        <text class="font-weight color-blue font-13"
+                                                              @click="cancelOperation(item.id)">
+                                                            {{ $t('contruct.cancel_order') }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-12 color-gray"
+                                                          v-if="item.ttype == 1">{{ item.created_at }} {{
+                                                            $t('trade.mk_od')
+                                                        }}
+                                                    </text>
+                                                    <text class="font-12 color-gray"
+                                                          v-if="item.ttype == 2">{{ item.created_at }} {{
+                                                            $t('trade.lm_od')
+                                                        }}
+                                                    </text>
+                                                    <text class="font-12 color-gray"
+                                                          v-if="item.ttype == 3">{{ item.created_at }} {{
+                                                            $t('contruct.con_sheet')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.com_pr')
+                                                        }}(USDT)
+                                                    </text>
+                                                    <text
+                                                            class="font-13 color-black font-weight">
+                                                        {{ util.thousandSeparator(item.price, 2) }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.od_quan')
+                                                        }}({{ item.symbol }})
+                                                    </text>
+                                                    <text
+                                                            class="font-13 color-black font-weight">
+                                                        {{ util.float(item.amount) }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.aver_tp')
+                                                        }}(USDT)
+                                                    </text>
+                                                    <text class="font-13 font-weight color-black">--</text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{ $t('contruct.tp') }}/{{
+                                                            $t('contruct.sl')
+                                                        }}
+                                                    </text>
+                                                    <text class="font-13 font-weight color-black">--/--</text>
+                                                </view>
+                                            </view>
+                                        </cell>
+                                    </list>
+                                    <!-- 没有订单 -->
+                                    <view class="not-orders" v-if="position.entrust.length == 0">
+                                        <fui-empty descrSize="26"
+                                                   :descrColor="userTheme == 'light' ? '#999999' : '#555555'"
+                                                   width="200"
+                                                   height="200"
+                                                   :src="`/static/newImage/notData-${userTheme}.png`"
+                                                   :descr="$t('contruct.no_od')">
+                                        </fui-empty>
+                                    </view>
+                                </view>
+                                <view class="_bottom" v-if="tabActive == 2">
+                                    <!-- 没有订单 -->
+                                    <view class="not-orders" v-if="position.entrustP.length == 0">
+                                        <fui-empty descrSize="26"
+                                                   :descrColor="userTheme == 'light' ? '#999999' : '#555555'"
+                                                   width="200"
+                                                   height="200"
+                                                   :src="`/static/newImage/notData-${userTheme}.png`"
+                                                   :descr="$t('contruct.no_od')">
+                                        </fui-empty>
+                                    </view>
+                                    <!-- 计划委托 -->
+                                    <list v-else :show-scrollbar="false" scroll-y class="_bottom_list"
+                                          :style="{'height': (listHeight - 120) + 'px'}">
+                                        <cell v-for="(item, index) in position.entrustP" :key="'wp' + index">
+                                            <view class="date_item border-bottom">
+                                                <view class="item_row">
+                                                    <view class="item_row_left">
+                                                        <fui-tag
+                                                                :text="item.type == 5 ? $t('contruct.tp'):$t('contruct.sl')"
+                                                                size="22" radius="2" :padding="['10rpx','10rpx']"
+                                                                :marginRight="10"
+                                                                :background="item.type == 5 ? '#56bd77' : '#ea4337'"
+                                                                theme="dark"></fui-tag>
+                                                        <text class="font-15 font-weight color-black ml-5">
+                                                            {{ item.symbol }}USDT
+                                                        </text>
+                                                        <fui-tag marginLeft="10" :text="$t('contruct.sustainable')"
+                                                                 size="22"
+                                                                 radius="2" :padding="['10rpx','10rpx']" type="warning"
+                                                                 theme="light">
+                                                        </fui-tag>
+                                                    </view>
+                                                    <view class="item_row_right">
+                                                        <text class="font-weight color-blue font-13"
+                                                              @click="cancelOperation(item.id)">
+                                                            {{ $t('contruct.cancel_order') }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-12 color-gray">{{ item.created_at }}</text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{
+                                                            $t('contruct.trigger_price')
+                                                        }}
+                                                    </text>
+                                                    <text class="font-13 color-black font-weight">
+                                                        {{ util.float(item.wprice) }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text class="font-13 color-gray">{{ $t('contruct.com_pr') }}</text>
+                                                    <text class="font-13 color-black font-weight">
+                                                        {{
+                                                            item.price <= 0 ? $t('trade.mk_pr') : util.float(item.price)
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="item_row">
+                                                    <text
+                                                            class="font-13 color-gray">{{
+                                                            $t('contruct.od_quan')
+                                                        }}({{ item.symbol }})
+                                                    </text>
+                                                    <text class="font-13 font-weight color-black">
+                                                        {{ util.float(item.amount) }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </cell>
+                                    </list>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                </list>
+            </view>
+        </view>
+        <!--  -->
+        <fui-drawer :show="show"
+                    :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                    direction="left"
+                    @close="closeDrawer"
+                    maskBackground="rgba(0, 0, 0, .8)">
+            <view class="drawer">
+                <view class="status_bar" :style="{'height':statusBarHeight + 'px'}"></view>
+                <text class="title color-black">{{ $t('contruct.pl9') }}</text>
+                <view class="search_box bg-gray">
+                    <image class="search_icon" src="/static/img/search.png" mode=""></image>
+                    <input class="search_input color-black" v-model="searchValue" type="text"
+                           :placeholder="$t('contruct.pl10')"
+                           placeholder-class="input_placeholder">
+                </view>
+                <view class="tab_box">
+                    <view class="_item" :class="popTab == 0 ? 'bg-gray' : ''" @click="popTab = 0;mindex = 0">
+                        <text class="font-13 font-weight txt"
+                              :class="popTab == 0 ? 'color-black' : 'color-gray'">{{ $t('contruct.pl11') }}
+                        </text>
+                    </view>
+                    <view class="_item" :class="popTab == 1 ? 'bg-gray' : ''" @click="popTab = 1;mindex = 1">
+                        <text class="font-13 font-weight txt"
+                              :class="popTab == 1 ? 'color-black' : 'color-gray'">USDT-M
+                        </text>
+                    </view>
+                </view>
+                <scroll-view scroll-y :show-scrollbar="false" class="tab_list"
+                             :style="{'height': windowHeight - statusBarHeight - 140 + 'px'}">
+                    <view class="list_top bg-white">
+                        <view class="_left top-item" @click="switchSort(0)">
+                            <text class="font-12 color-gray">{{ $t('contruct.pl12') }}</text>
+                            <image class="change_icon" :src="sort[0]['active']" mode=""></image>
+                        </view>
+                        <view class="_right top-item">
+                            <view class="ri" @click="switchSort(1)">
+                                <text class="font-12 color-gray">{{ $t('contruct.pl13') }}</text>
+                                <image class="change_icon" :src="sort[1]['active']" mode=""></image>
+                            </view>
+                            <view class="ri" @click="switchSort(2)">
+                                <text class="font-12 color-gray">/{{ $t('contruct.pl14') }}</text>
+                                <image class="change_icon" :src="sort[2]['active']" mode=""></image>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="list_bottom">
+                        <template v-if="popTab == 0">
+                            <view class="not-list" v-if="mlist.length == 0">
+                                <fui-empty descrSize="26"
+                                           :descrColor="userTheme == 'light' ? '#999999' : '#555555'"
+                                           width="200"
+                                           height="200"
+                                           :src="`/static/newImage/notData-${userTheme}.png`"
+                                           :descr="$t('list.not_data')">
+                                </fui-empty>
+                            </view>
+                            <view class="coin_box" v-else v-for="(item,index) in mlist" :key="'m'+index"
+                                  @click="setCurrentCurrency(item.id)">
+                                <view class="left">
+                                    <text class="font-14 font-weight color-black mr-5">{{ item['symbol'] }}USDT</text>
+                                    <text class="font-12 color-gray">
+                                        {{ $t('contruct.pl15') }}
+                                    </text>
+                                </view>
+                                <view class="right">
+                                    <text class="font-14 font-weight color-black"
+                                          :class="{'price_up':item.change_rate>=0,'price_down':item.change_rate<0}">
+                                        {{ util.thousandSeparator(item.new_price, item.decimals) }}
+                                    </text>
+                                    <text class="font-12 color-black"
+                                          :class="{'price_up':item.change_rate>=0,'price_down':item.change_rate<0}">
+                                        {{ item.change_rate }}%
+                                    </text>
+                                </view>
+                            </view>
+                        </template>
+                        <template v-else>
+                            <view class="not-list" v-if="currency[0]['currency'].length == 0">
+                                <fui-empty descrSize="26"
+                                           :descrColor="userTheme == 'light' ? '#999999' : '#555555'"
+                                           width="200"
+                                           height="200"
+                                           :src="`/static/newImage/notData-${userTheme}.png`"
+                                           :descr="$t('list.not_data')">
+                                </fui-empty>
+                            </view>
+                            <view class="coin_box" v-else v-for="(item,index) in currency[0]['currency']"
+                                  :key="'c'+index" @click="setCurrentCurrency(item.id)">
+                                <view class="left">
+                                    <text class="font-14 color-black font-weight mr-5">{{ item['symbol'] }}USDT</text>
+                                    <text class="font-12 color-gray">
+                                        {{ $t('contruct.pl15') }}
+                                    </text>
+                                </view>
+                                <view class="right">
+                                    <text class="font-14 font-weight color-black"
+                                          :class="{'price_up':item.change_rate>=0,'price_down':item.change_rate<0}">
+                                        {{ util.thousandSeparator(item.new_price, item.decimals) }}
+                                    </text>
+                                    <text class="font-12 color-black"
+                                          :class="{'price_up':item.change_rate>=0,'price_down':item.change_rate<0}">
+                                        {{ item.change_rate }}%
+                                    </text>
+                                </view>
+                            </view>
+                        </template>
+                    </view>
+                </scroll-view>
+            </view>
+        </fui-drawer>
+        <fui-toast ref="toast" background="rgba(0, 0, 0, .8)" size="24">
+            <fui-icon style="margin-bottom: 20rpx;" name="checkbox" color="#fff"></fui-icon>
+        </fui-toast>
+        <!-- 弹窗 -->
+        <fui-bottom-popup @click="hideKeybord"
+                          maskBackground="rgba(0, 0, 0, .8)"
+                          :maskClosable="true"
+                          :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                          :show="fullPopup"
+                          :radius="30"
+                          @close="closePopup">
+            <!-- 全仓 -->
+            <view class="popup_wrap bg-white" v-if="popupType == 0">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.mt11') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="btn_group">
+                    <view class="btn bg-gray border-solid" :class="tmargin == 1 ? 'border_active' : ''"
+                          @click="tmargin = 1">
+                        <text class="font-14 color-black"
+                              :class="tmargin == 1 ? 'font-weight' : ''">{{ $t('contract.pall') }}
+                        </text>
+                    </view>
+                    <view class="btn bg-gray border-solid" :class="tmargin == 3 ? 'border_active' : ''"
+                          @click="tmargin = 3">
+                        <text class="font-14 color-black"
+                              :class="tmargin == 3 ? 'font-weight' : ''">{{ $t('contract.fall') }}
+                        </text>
+                    </view>
+                    <view class="btn bg-gray border-solid" :class="tmargin == 2 ? 'border_active' : ''"
+                          @click="tmargin = 2">
+                        <text class="font-14 color-black"
+                              :class="tmargin == 2 ? 'font-weight' : ''">{{ $t('contruct.wbw') }}
+                        </text>
+                    </view>
+                </view>
+                <!--                <view class="tip">-->
+                <!--                    <text class="font-13 color-green">{{ $t('contruct.mt1') }}</text>-->
+                <!--                </view>-->
+                <fui-collapse accordion>
+                    <fui-collapse-item :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                       :contentBg="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                       :animation="false"
+                                       :isBorder="false"
+                                       :arrowColor="userTheme == 'light' ? '#23262e' : '#ffffff'">
+                        <view class="coll_item_box">
+                            <text class="font-14 font-weight color-black">{{ $t('contruct.mt2') }}</text>
+                        </view>
+                        <template v-slot:content>
+                            <text class="font-13 color-gray">{{ $t('contruct.mt3') }}</text>
+                            <text class="font-13 color-gray">{{ $t('contruct.mt31') }}</text>
+                            <text class="font-13 color-gray mt-5">{{ $t('contruct.mt4') }}</text>
+                        </template>
+                    </fui-collapse-item>
+                </fui-collapse>
+                <view class="confirm bg-blue" @click="setMargin()">
+                    <text class="font-14 font-weight color-white">
+                        {{ $t('hand.confirm_t') }}
+                    </text>
+                </view>
+            </view>
+            <!-- 杠杆调整 -->
+            <view class="popup_wrap" v-if="popupType == 1">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.lt1') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <!-- 数字输入 -->
+                <view class="num_box">
+                    <fui-input-number custom v-model="tmutil" :size="28" :max="125" :signWidth="28" :width="500"
+                                      :height="78"
+                                      :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                      :backgroundColor="userTheme == 'light' ? '#f8f9f9' : '#202229'">
+                        <template v-slot:default>
+                            <view class="slot_box bg-gray">
+                                <fui-icon name="minus" :size="48"
+                                          :color="userTheme == 'light' ? '#23262e' : '#ffffff'"></fui-icon>
+                            </view>
+                        </template>
+                        <template v-slot:plus>
+                            <view class="slot_box bg-gray">
+                                <fui-icon name="plus" :size="48"
+                                          :color="userTheme == 'light' ? '#23262e' : '#ffffff'"></fui-icon>
+                            </view>
+                        </template>
+                    </fui-input-number>
+                </view>
+                <!-- 滑块 -->
+                <view class="slider_box">
+                    <slider activeColor="#3070ec" min="1" max="125"
+                            :backgroundColor="userTheme == 'light' ? '#f8f9f9' : '#202229'" block-color="#3070ec"
+                            block-size="20" :value="tmutil" step="1" @change="changeMutil" @changing="changeMutil"/>
+                    <view class="slide-num mt-5">
+                        <text class="font-11"
+                              :class="tmutil >= item ? 'color-black' : 'color-gray'"
+                              v-for="(item,index) in leverOption"
+                              :key="index">{{ item }}X
+                        </text>
+                    </view>
+                </view>
+                <view class="content-cell mt-10" style="display: flex;width: 750rpx">
+                    <view class="content-cell-column" style="width: 300rpx">
+                        <text class="font-12 color-gray">
+                            {{ $t('contruct.lt2') }}(USDT)
+                        </text>
+                        <text class="font-14 color-black font-weight">
+                            {{ util.float(currentCurrency['max_amount']) }}
+                        </text>
+                    </view>
+                    <view class="content-cell-column" style="align-items: flex-end;width: 300rpx">
+                        <view>
+                            <text class="font-12 color-gray">
+                                {{ $t('contruct.lt3') }}(USDT)
+                            </text>
+                        </view>
+                        <view style="align-items: flex-end">
+                            <text class="font-14 color-black font-weight">
+                                {{
+                                    util.thousandSeparator(balance.legal_balance ? balance.legal_balance : currentCurrency['max_amount'])
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+                <!--                <view class="tip" style="word-wrap: break-word;">-->
+                <!--                    <text class="font-13 color-green" style="word-wrap: break-word;">{{ $t('contruct.lt4') }}</text>-->
+                <!--                </view>-->
+                <view class="confirm button-active bg-blue" @click="setMutil">
+                    <text class="font-14 font-weight color-white">
+                        {{ $t('hand.confirm_t') }}
+                    </text>
+                </view>
+            </view>
+            <!-- 止盈止损 -->
+            <view class="popup_wrap popup_wrap_min" v-if="popupType == 2">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.pl1') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="content_box">
+                    <text class="font-14 color-gray txt_center">{{ $t('contruct.pl2') }}</text>
+                </view>
+            </view>
+            <!-- 可开空 -->
+            <view class="popup_wrap popup_wrap_min" v-if="popupType == 3">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{
+                            support == 0
+                                    ? $t('contruct.pl3') : $t('contruct.pl5')
+                        }}
+                    </text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="content_box">
+                    <text class="font-14 color-gray txt_center">{{ $t('contruct.pl4') }}</text>
+                </view>
+            </view>
+            <!-- 可开空 -->
+            <view class="popup_wrap popup_wrap_min" v-if="popupType == 4">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.pl5') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="content_box">
+                    <text class="font-14 color-gray txt_center">{{ $t('contruct.pl6') }}</text>
+                </view>
+            </view>
+            <!-- 资金费率/结算时间 -->
+            <view class="popup_wrap" v-if="popupType == 5">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.pl26') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="row_box mt-15">
+                    <text class="font-14 color-gray">{{ $t('contruct.pl27') }}</text>
+                    <text
+                            class="font-14 color-black font-weight">
+                        {{ util.dateFormatter(market['T'], $t('contruct.pl28'), 2) }}
+                        {{ time }}
+                    </text>
+                </view>
+                <view class="row_box">
+                    <text
+                            class="font-14 color-gray">
+                        {{ $t('contruct.pl29') }}（{{ market['r'] > 0 ? $t('contruct.pl30') : $t('contruct.pl31') }}）
+                    </text>
+                    <text
+                            class="font-14 color-black font-weight">{{ util.thousandSeparator(market['r'] * 100, 5) }}%
+                    </text>
+                </view>
+                <fui-collapse accordion>
+                    <fui-collapse-item open
+                                       :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                       :contentBg="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                       :animation="false"
+                                       :isBorder="false"
+                                       :arrowColor="userTheme == 'light' ? '#23262e' : '#ffffff'">
+                        <view class="coll_item_box">
+                            <text class="font-14 font-weight color-black">{{ $t('contruct.pl32') }}</text>
+                        </view>
+                        <template v-slot:content>
+                            <text class="font-13 color-gray">{{ $t('contruct.pl33') }}</text>
+                            <text class="font-13 color-gray mt-5"> {{ $t('contruct.pl34') }}</text>
+                            <text class="font-13 color-gray mt-5"> {{ $t('contruct.pl35') }}</text>
+                        </template>
+                    </fui-collapse-item>
+                </fui-collapse>
+            </view>
+            <!-- 平仓 -->
+            <view class="popup_wrap close_postion_wrap" @click="hideKeybord" v-if="popupType == 6">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.close_position') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <template v-if="position.position && position.position.length > 0">
+                    <view class="popup_wrap_container">
+                        <view class="row_item mt-5">
+                            <view class="_il">
+                                <text class="font-15 font-weight color-black">{{
+                                        position.position[pindex]['symbol']
+                                    }}USDT
+                                </text>
+                                <fui-tag marginLeft="10"
+                                         :text="position.position[pindex]['direction'] == 1 ? $t('tradeInfo.many') :  $t('tradeInfo.null')"
+                                         size="22" radius="2" :padding="['10rpx','10rpx']" type="warning"
+                                         theme="light"></fui-tag>
+                                <fui-tag marginLeft="10" :text="(position.position[pindex]['margin_type'] ==
+									1 ? $t('tradeInfo.full_w') : $t('contruct.wbw'))+position.position[pindex]['muilt']+'X'"
+                                         originLeft size="22"
+                                         radius="2" :padding="['10rpx','10rpx']" type="warning" theme="light"></fui-tag>
+                            </view>
+                        </view>
+                        <!-- 平仓价格 -->
+                        <view class="row_column mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.close_price') }}</text>
+                            <view class="_vbox mt-5">
+                                <view class="input_box bg-gray">
+                                    <input v-if="closeTypeVal" class="input color-black"
+                                           :type="!ptype ? 'text' : 'digit'"
+                                           :value="!ptype ? this.$t('contruct.bmp') : pprice" placeholder="0.00000"
+                                           placeholder-class="input_placeholder" :disabled="!ptype ? true : false"
+                                           @blur="priceInput = false" @focus="!ptype ? false : true"
+                                           @input="inputPprice">
+                                    <text v-else class="font-12 color-black font-weight">{{ $t('contruct.bmp') }}</text>
+                                    <text class="font-13 color-black">USDT</text>
+                                </view>
+                                <view class="btn_box bg-gray" @click="closeTypeChange();ptype = !ptype">
+                                    <text
+                                            class="font-13 color-black font-weight">
+                                        {{ ptype == true ? $t('contruct.marker_t') : $t('contruct.limit_t') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- 平仓数量 -->
+                        <view class="row_column num_column mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.close_num') }}</text>
+                            <view class="_vbox mt-5">
+                                <view class="input_box bg-gray">
+                                    <input class="input color-black" v-model="pamount" @focus="priceNum = true"
+                                           @blur="priceNum = false"
+                                           type="digit" :placeholder="$t('entrust.t20')"
+                                           placeholder-class="input_placeholder">
+                                    <text class="font-13 color-black">{{
+                                            position.position[pindex]['symbol']
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- 滑块 -->
+                        <view class="slider_box mt-5">
+                            <slider activeColor="#3070ec"
+                                    :max="100" :min="1"
+                                    @change="sliderPamount"
+                                    :backgroundColor="userTheme == 'light' ? '#f8f9f9' : '#202229'"
+                                    block-color="#3070ec"
+                                    block-size="20" step="1"/>
+                            <view class="slide-num">
+                                <text class="font-11 color-gray" v-for="(item,index) in [1,25,50,75,100]"
+                                      :key="index">{{ item }}%
+                                </text>
+                            </view>
+                        </view>
+                        <!-- 可平仓位 -->
+                        <view class="row_item mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.pt_cbc') }}</text>
+                            <text class="font-13 font-weight color-black">
+                                {{
+                                    util.thousandSeparator(position.position[pindex]['amount']
+                                            - position.position[pindex]['close'], 8)
+                                }}
+                                {{ position.position[pindex]['symbol'] }}
+                            </text>
+                        </view>
+                        <!-- 预估盈亏 -->
+                        <view class="row_item mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.ep_loss') }}</text>
+                            <text class="font-13 font-weight color-black">
+                                {{
+                                    pamount != '' ?
+                                            getProfit(position.position[pindex]['currency_id'], pindex, pamount, ptype) : '--'
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                    <view class="confirm button-active" @click="stopPosition(position.position[pindex]['id'])"
+                          :class="{ 'bg-blue': pamount != '' || pamount > 0, 'bg-gray': pamount == '' || pamount <= 0 }">
+                        <text class="font-14 font-weight "
+                              :class="{ 'color-white': pamount != '' || pamount > 0, 'color-gray': pamount == '' || pamount <= 0 }">
+                            {{
+                                $t('contruct.confirm_btntxt')
+                            }}
+                        </text>
+                    </view>
+                </template>
+            </view>
+            <!-- 闪电平仓 -->
+            <view class="popup_wrap flash_close_wrap" v-if="popupType == 7">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.flash_close') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <template v-if="position.position && position.position.length > 0">
+                    <view class="popup_wrap_container">
+                        <view class="row_item mt-5">
+                            <view class="_il">
+                                <fui-tag :text="position.position[pindex]['direction'] == 1 ?
+										$t('tradeInfo.many') : $t('tradeInfo.null')" size="22" radius="2"
+                                         :padding="['10rpx','10rpx']"
+                                         background="#ea4337" marginRight="10" theme="dark"></fui-tag>
+                                <text class="font-15 font-weight color-black">{{
+                                        position.position[pindex]['symbol']
+                                    }}USDT
+                                </text>
+                                <fui-tag marginLeft="10" :text="$t('contruct.sustainable')" size="22" radius="2"
+                                         :padding="['10rpx','10rpx']" type="warning" theme="light"></fui-tag>
+                                <fui-tag marginLeft="10" :text="(position.position[pindex]['margin_type'] == 1 ?
+										this.$t('tradeInfo.full_w') : this.$t('contruct.wbw'))+position.position[pindex]['muilt']+'X'"
+                                         originLeft
+                                         size="22" radius="2" :padding="['10rpx','10rpx']" type="warning"
+                                         theme="light"></fui-tag>
+                            </view>
+                        </view>
+                        <!-- 可平仓位 -->
+                        <view class="row_item mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.price') }}</text>
+                            <text class="font-13 font-weight color-black">{{ $t('trade.mk_pr') }}</text>
+                        </view>
+                        <!-- 预估盈亏 -->
+                        <view class="row_item mt-5">
+                            <text class="font-13 color-gray">{{ $t('contruct.quantity') }}</text>
+                            <text class="font-13 font-weight color-black">
+                                {{
+                                    getPositionCurrencyAmount(position.position[pindex]['currency_id'], position.position[pindex]['direction'])
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                    <view class="confirm bg-blue button-active" @click="stopLight(position.position[pindex]['id'])">
+                        <text class="font-14 font-weight color-white">{{
+                                $t('contruct.confirm_btntxt')
+                            }}
+                        </text>
+                    </view>
+                </template>
+            </view>
+        </fui-bottom-popup>
+        <!-- 撤单询问 -->
+        <fui-dialog :show="canceOrder"
+                    maskBackground="rgba(0, 0, 0, .8)"
+                    :title="$t('login.tip_t2')"
+                    :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                    :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                    :content="dialogContent"
+                    maskClosable
+                    @click="canceConfirm"
+                    @close="onClose">
+        </fui-dialog>
+        <uni-popup type="center" ref="loading">
+            <fui-loading type="col" text="loading" :isFixed="false"></fui-loading>
+        </uni-popup>
+        <fui-dialog :show="alertShow"
+                    :title="$t('login.tip_t2')"
+                    :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                    :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                    :content="content"
+                    :buttons="buttons"
+                    maskClosable
+                    @click="alertConfirm">
+        </fui-dialog>
+
+        <uni-popup ref="showPoster" type="center" @change="postEvent">
+            <view class="poster-wrap">
+                <view class="image-box">
+                    <image class="painter-image" v-if="path != ''" :src="path" mode="widthFix"></image>
+                    <l-painter :hidden="!isLogin" ref="dpainter" :hidpi="true" hybrid
+                               custom-style="position: fixed; left: 750rpx" isCanvasToTempFilePath
+                               @success="renderSuccess" :pixel-ratio="2"/>
+                </view>
+                <button @click="sharePoster" v-if="path != ''" class="poster-button" hover-class="none">
+                    <text class="font-14 color-white">{{ $t('contract.pt8') }}</text>
+                </button>
+            </view>
+        </uni-popup>
+        <!--保证金弹窗-->
+        <fui-bottom-popup :background="userTheme == 'light' ? '#ffffff' : '#17181e'" :show="marginTip"
+                          @close="closePopup">
+            <view class="popup_wrap margin-warp" @click="hideKeybord">
+                <view class="title_box">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.margin') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="row_item margin-tab">
+                    <view class="tab-item" :class="mtabIndex == 0 ? 'bg-gray' : '' "
+                          @click="mtabIndex = 0;numVal=''">
+                        <text class="font-13 color-gray font-weight" :class="mtabIndex==0?'color-blue':''">
+                            {{ $t('contract.tt1') }}
+                        </text>
+                    </view>
+                    <view class="tab-item" :class="mtabIndex == 1 ? 'bg-gray' : '' "
+                          @click="mtabIndex = 1;numVal=''">
+                        <text class="font-13 color-gray font-weight" :class="mtabIndex==1?'color-blue':''">
+                            {{ $t('contract.tt2') }}
+                        </text>
+                    </view>
+                </view>
+                <view class="margin-container">
+                    <view class="input-box bg-gray">
+                        <input class="_input color-black" type="digit" v-model="numVal" :cursor-spacing="120"
+                               :placeholder="$t('financing.t40')"/>
+                        <text class="i_text color-gray font-13 font-weight">USDT</text>
+                        <text class="i_text color-blue font-13 font-weight"
+                              @click="mtabIndex === 0 ? numVal=balance.legal_balance* 0.95:numVal=position.position[pindex]['margin']*0.9">
+                            {{ $t('financing.t89') }}
+                        </text>
+                    </view>
+                    <view class="cell_row">
+                        <text class="font-13 color-gray">
+                            {{ mtabIndex === 0 ? $t('contract.tt3') : $t('contract.tt33') }}
+                        </text>
+                        <text class="font-13 color-black font-weight ml-10" v-if="mtabIndex===0">
+                            {{ util.thousandSeparator(balance.legal_balance * 0.95, 2) }} USDT
+                        </text>
+                        <text class="font-13 color-black font-weight ml-10" v-else>
+                            {{ util.thousandSeparator(position.position[pindex]['margin'] * 0.9, 2) }} USDT
+                        </text>
+                    </view>
+                    <view class="cell_row">
+                        <text class="font-13 color-gray">{{ $t('contract.tt4') }}</text>
+                        <text class="font-13 color-black font-weight ml-10">
+                            {{ util.thousandSeparator(calacStopPrice(pindex), currentCurrency['decimals']) }} USDT
+                        </text>
+                    </view>
+                    <view class="button-box">
+                        <fui-button @click="changeMargin()" class="margin-button"
+                                    :background="numVal!='' ? '#3070ec' : userTheme == 'light' ? '#f8f9f9' : '#202229'">
+                            <text class="font-14 font-weight color-gray" :class="numVal!=''?'#f5f5f5':''">
+                                {{ $t('确定') }}
+                            </text>
+                        </fui-button>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--已结算盈亏-->
+        <fui-bottom-popup :background="userTheme == 'light' ? '#ffffff' : '#17181e'" :show="plpopup"
+                          @close="closePopup">
+            <view class="popup_wrap pl_wrap" type="plwrap">
+                <view class="title_box pl_title">
+                    <text class="font-16 font-weight color-black">{{ $t('contruct.set_pl') }}</text>
+                    <image @click="closePopup" class="close_image" src="/static/img/close2.png" mode=""></image>
+                </view>
+                <view class="row_item mt-5">
+                    <text class="font-13 color-black font-weight">{{ $t('contruct.pl21') }}</text>
+                    <view class="row-item-right">
+                        <text class="font-13 font-weight price_down">
+                            {{
+                                util.float(parseFloat(position.position[pindex].profit) -
+                                        parseFloat(position.position[pindex].charge) -
+                                        parseFloat(position.position[pindex].fund_charge))
+                            }}
+                        </text>
+                        <text class="font-13 font-weight color-black"> USDT</text>
+                    </view>
+                </view>
+                <view class="row_item mt-5">
+                    <text class="font-13 color-gray">{{ $t('contruct.pl22') }}</text>
+                    <text class="font-13 font-weight color-black">-{{ util.float(position.position[pindex].charge) }}
+                        USDT
+                    </text>
+                </view>
+                <view class="row_item mt-5">
+                    <text class="font-13 color-gray">{{ $t('contruct.pl23') }}</text>
+                    <text class="font-13 font-weight color-black">{{ util.float(position.position[pindex].profit) }}
+                        USDT
+                    </text>
+                </view>
+                <view class="row_item mt-5">
+                    <text class="font-13 color-gray">{{ $t('contruct.pl24') }}</text>
+                    <text class="font-13 font-weight color-black">{{
+                            util.float(position.position[pindex].fund_charge)
+                        }}
+                        USDT
+                    </text>
+                </view>
+                <view class="pl_content_box">
+                    <text class="font-13 color-gray pl_content_text">{{ $t('contruct.pl25') }}</text>
+                </view>
+            </view>
+        </fui-bottom-popup>
+    </view>
+</template>
+<script>
+    import service from './contractNvue.js';
+
+    export default service;
+</script>
+<style scoped>
+    @import url("contractNvue.css");
+</style>
+
+<style scoped>
+    /deep/ .fui-dialog__title {
+        font-size: 32rpx !important;
+    }
+
+    /deep/ .fui-dialog__btn {
+        font-size: 30rpx !important;
+    }
+</style>

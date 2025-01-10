@@ -1,0 +1,1270 @@
+{
+    //  配置FistUI
+    "easycom": {
+        "autoscan": true,
+        "custom": {
+            "fui-(.*)": "@/components/firstui/fui-$1/fui-$1.vue"
+        }
+    },
+    "pages": [
+        {
+            "path": "pages/newindex/newindex",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "navigationBarTextStyle": "black",
+                "app-plus": {
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/store/store",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/trade/trade",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "scrollIndicator": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/newContract/newContract",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "softinputMode": "adjustPan"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/wallet",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColorTop": "@backgroundPrimary",
+                "backgroundColorBottom": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/opening/opening",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "#000000",
+                    "safearea": {
+                        "bottom": "none"
+                    }
+                }
+            }
+        },
+        {
+            "path": "pages/contract/contract",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColorTop": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none",
+                    "scrollIndicator": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/home/home",
+            "style": {
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "#121417"
+                }
+            }
+        },
+        {
+            "path": "pages/login/login",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "disableScroll": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "s",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "disableScroll": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none",
+                    "softinputMode": "adjustResize"
+                }
+            }
+        },
+        {
+            "path": "pages/index/index",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "navigationBarTextStyle": "white"
+            }
+        },
+        {
+            "path": "pages/auth/register/register",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+        },
+        {
+            "path": "pages/auth/forget/forget",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/auth/verify/verify",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/auth/setpwd/setpwd",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/auth/stoter/stoter",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/auth/userauth/userauth",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/userauth/baseauth/baseauth",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/userauth/baseauth/authsetp2",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/userauth/baseauth/authing",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/secrety",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/phoneAuth",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/googleAuth",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/newpwd",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/secretlog",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "background": "@backgroundPrimary",
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/common/setting/setting/setting",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/contact/contact",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/about/about",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/index/message/message",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/recharge/recharge",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColorTop": "@backgroundColor",
+                "backgroundColorBottom": "@backgroundColor",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/recharge/record",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "disableScroll": true,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/index/recharge/recordInfo/recordInfo",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "#ffffff",
+                "enablePullDownRefresh": false
+            }
+        },
+        {
+            "path": "pages/store/editMine/editMine",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColor": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/store/search/search",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/trade/kline",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColorTop": "@backgroundGray",
+                "backgroundColorBottom": "@backgroundColor",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundGray"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/entrust/entrust",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "popGesture": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/info/info",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/contract/calculator/calculator",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "popGesture": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/order/order",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColorTop": "@backgroundGray",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/withdraw/withdraw",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColorTop": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/exchange/exchange",
+            "style": {
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none",
+                    "softinputMode": "adjustResize"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/cashflow/cashflow",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "popGesture": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/info/info",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/notice/notice",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/wallet/info/content/content",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/invaite/invaite",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "enablePullDownRefresh": false,
+                "disableScroll": true,
+                "backgroundColorTop": "#161819",
+                "backgroundColorBottom": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "#161819"
+                }
+            }
+        },
+        {
+            "path": "pages/index/invaite/setlink/setlink",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "enablePullDownRefresh": false,
+                "app-plus": {
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/index/invaite/setlink/addlink/addlink",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "enablePullDownRefresh": false
+            }
+        },
+        {
+            "path": "pages/index/invaite/myrebate/myrebate",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "enablePullDownRefresh": false,
+                "app-plus": {
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/index/invaite/rules/rules",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/finance/finance",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/finance/info/info",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColorTop": "#dfeaff",
+                "backgroundColorBottom": "@backgroundColor",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/index/finance/confirm/confirm",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/finance/confirm/result",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/finance/help/help",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/more/more",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/index/simulation/simulation",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        //         {
+        //           "path": "pages/index/simulation/contruct/contruct",
+        //           "style": {
+        //             "navigationBarTitleText": "",
+        //             "enablePullDownRefresh": false,
+        //             "navigationStyle": "custom",
+        //               "app-plus": {
+        //                   "background": "@backgroundColor"
+        //               }
+        //           }
+        //         },
+        {
+            "path": "pages/index/simulation/wallet/wallet",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "enablePullDownRefresh": false,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/floworder",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/traderinfo/traderinfo",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/confirm/confirm",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/mine/mine",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/focus/focus",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/apply/apply",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/floworder/apply/applyForm/applyForm",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/floworder/traderorder/traderorder",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/blindbox/blindbox",
+            "style": {
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "navigationBarTextStyle": "white",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/index/futures/futures",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/profile/profile",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/userauth/baseauth/authhight/authhight",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/common/secrety/secrety/handPwd",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/common/webview/webview",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/trade/list/list",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColor": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/download/download",
+            "style": {
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "#121417"
+                }
+            }
+        },
+        {
+            "path": "pages/index/livecoin/livecoin",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/livecoin/auto/auto",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/livecoin/eaorders/eaorders",
+            "style": {
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/livecoin/subscribe/subscribe",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/flesta/flesta",
+            "style": {
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "#ffffff"
+                }
+            }
+        },
+        {
+            "path": "pages/index/livecoin/result",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/livecoin/recored/recored",
+            "style": {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/index/livecoin/eaorders/info/info",
+            "style": {
+                "navigationStyle": "custom",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/withdraw/record",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "navigationBarTextStyle": "black",
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/index/welfare/welfare",
+            "style": {
+                "navigationStyle": "custom",
+                "enablePullDownRefresh": false,
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "#121417"
+                }
+            }
+        },
+        {
+            "path": "pages/index/welfare/rewards/rewards",
+            "style": {
+                "navigationStyle": "custom",
+                "enablePullDownRefresh": false,
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "#121417"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/calculator/selectcoin/selectcoin",
+            "style": {
+                "navigationStyle": "custom",
+                "enablePullDownRefresh": false,
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/quickly",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/myorder/myorder",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/merchants/merchants",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "#ffffff",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/payment/payment",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundColor",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/payment/addmethod/addmethod",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundColor",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/payment/addmethod/detail/detail",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundColor",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundColor"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/paystatus/paystatus",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/quickly/selldetail/selldetail",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "#ffffff",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/ice/ice",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@icePageBg",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@icePageBg"
+                }
+            }
+        },
+        {
+            "path": "pages/common/setting/setting/thememode/thememode",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/index/onlineService/onlineService",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "softinputMode": "adjustResize"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/tactic/tactic",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "backgroundColor": "@backgroundPrimary",
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/tactic/myStrategy/policyDetails/policyDetails",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary"
+            }
+        },
+        {
+            "path": "pages/contract/tactic/createPolicy/creation/creation",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "disableSwipeBack": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "popGesture": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/tactic/policyParameter/policyParameter",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableSwipeBack": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "popGesture": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/orders/orders",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/contract/orders/orderDetails/orderDetails",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary"
+            }
+        },
+        {
+            "path": "pages/scanLogin/scanLogin",
+            "style": {
+                "navigationStyle": "custom",
+                "backgroundColor": "@backgroundPrimary",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/analyze/analyze",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/analyze/datedetails/datedetails",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/registerBlindbox/registerBlindbox",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/withdraw/addressBook/addressBook",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },
+        {
+            "path": "pages/wallet/withdraw/addressBook/addAddress/addAddress",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        },{
+            "path": "pages/instant-exchange/instant-exchange",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        }, {
+            "path": "pages/jumpstart/jumpstart",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundPrimary"
+                }
+            }
+        }, {
+            "path": "pages/jumpstart/event-details/event-details",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundGray"
+                }
+            }
+        },{
+            "path": "pages/jumpstart/view-more/view-more",
+            "style": {
+                "navigationStyle": "custom",
+                "disableScroll": true,
+                "app-plus": {
+                    "bounce": "none",
+                    "background": "@backgroundGray"
+                }
+            }
+        }
+    ],
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "ABT",
+        "backgroundColor": "@backgroundPrimary",
+        "app-plus": {
+            "scrollIndicator": "none",
+            "background": "@backgroundPrimary"
+        }
+    },
+    "uniIdRouter": {},
+    "tabBar": {
+        "color": "@tabBarColor",
+        "selectedColor": "@tabBarSelectedColor",
+        "borderStyle": "@tabBarBorderStyle",
+        "backgroundColor": "@backgroundPrimary",
+        "iconWidth": "20px",
+        "fontSize": "12px",
+        "spacing": "6px",
+        "list": [
+            {
+                "pagePath": "pages/newindex/newindex",
+                "iconPath": "@home_d",
+                "selectedIconPath": "@home_s",
+                "text": ""
+            },
+            {
+                "pagePath": "pages/store/store",
+                "iconPath": "@market_d",
+                "selectedIconPath": "@market_s",
+                "text": ""
+            },
+            {
+                "pagePath": "pages/trade/trade",
+                "iconPath": "@trade_d",
+                "selectedIconPath": "@trade_s",
+                "text": ""
+            },
+            {
+                "pagePath": "pages/newContract/newContract",
+                "iconPath": "@contract_d",
+                "selectedIconPath": "@contract_s",
+                "text": ""
+            },
+            {
+                "pagePath": "pages/wallet/wallet",
+                "iconPath": "@asset_d",
+                "selectedIconPath": "@asset_s",
+                "text": ""
+            }
+        ]
+    }
+}

@@ -1,0 +1,117 @@
+.terminationStrategy {
+  width: 100%;
+  height: auto;
+
+  .title-box {
+    width: 100%;
+    height: 88rpx;
+    padding: 0 30rpx;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2rpx solid var(--border-strength-100);
+
+    text {
+      font-size: 28rpx;
+      font-weight: 500;
+      color: var(--text-black);
+    }
+  }
+
+  .container {
+    width: 100%;
+    height: auto;
+    padding: 30rpx;
+    box-sizing: border-box;
+
+    .warning-title {
+      font-size: 28rpx;
+      font-weight: 500;
+      color: var(--content-primary);
+      margin-bottom: 30rpx;
+    }
+
+    .checkbox-group {
+      width: 100%;
+      height: auto;
+      margin-top: 30rpx;
+
+      .checkbox-label {
+        width: 100%;
+        height: auto;
+        padding: 24rpx;
+        box-sizing: border-box;
+        border-radius: 16rpx;
+        border: 2rpx solid var(--border-strength-100);
+        margin-bottom: 30rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+        background-repeat: no-repeat;
+        background-size: 40rpx 40rpx;
+        background-position: bottom right;
+
+        &:last-child {
+          ._desc {
+            height: 0;
+            margin-top: 0;
+          }
+        }
+
+        radio {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        text {
+          text-align: left;
+
+          &._title {
+            font-size: 28rpx;
+            font-weight: 500;
+            color: var(--content-primary);
+          }
+
+          &._desc {
+            font-size: 20rpx;
+            font-weight: 500;
+            color: var(--content-tertiary);
+            margin-top: 8rpx;
+          }
+        }
+      }
+
+      .checkbox-active {
+        border-color: var(--content-primary);
+        background-image: var(--background-image);
+      }
+    }
+
+    .footer {
+      width: 100%;
+      height: auto;
+      padding: 30rpx 0 0;
+      box-sizing: border-box;
+
+      text {
+        font-size: 20rpx;
+        color: var(--content-tertiary);
+      }
+
+      .button {
+        margin-top: 30rpx;
+        width: 100%;
+        height: 78rpx;
+        border-radius: 78rpx;
+        background: var(--content-primary);
+        color: var(--background-primary);
+        font-size: 26rpx;
+        font-weight: 500;
+        line-height: 78rpx;
+      }
+    }
+  }
+}

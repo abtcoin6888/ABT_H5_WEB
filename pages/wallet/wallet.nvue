@@ -1,0 +1,1720 @@
+<template>
+    <view class="wallet"
+          :class="userTheme">
+        <fui-nav-bar statusBar
+                     isFixed
+                     isOccupy
+                     custom
+                     zIndex="9"
+                     padding="0"
+                     :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                     @init="navInit">
+            <view class="nav-bar">
+                <fui-tabs scroll
+                          alignLeft
+                          :tabs="tabOption"
+                          :current="tabCurrent"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          :size="30"
+                          :color="userTheme == 'light' ? '#898989' : '#7a7a7a'"
+                          :selectedSize="30"
+                          :selectedColor="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                          selected-font-weight="600"
+                          :isSlider="false"
+                          :short="false"
+                          font-weight="500"
+                          @change="tabChange">
+                </fui-tabs>
+            </view>
+        </fui-nav-bar>
+        <swiper class="wallet-swiper"
+                :duration="duration"
+                :current="tabCurrent"
+                :disable-touch="!isLogin"
+                :style="`height: ${bodyHeight}px`"
+                @change="swiperChange">
+            <!--      总览      -->
+            <swiper-item class="wallet-swiper-item"
+                         :style="`height: ${bodyHeight}px`">
+                <list class="scroll-list bg-white"
+                      :scrollable="true"
+                      :show-scrollbar="false"
+                      :style="`height: ${bodyHeight}px`">
+                    <refresh class="refresh-box"
+                             @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display="refreshing ? 'show' : 'hide'">
+                        <fui-icon class="refresh-icon"
+                                  name="loading"
+                                  size="34"
+                                  v-if="refreshing == false">
+                        </fui-icon>
+                        <view class="spin-box"
+                              v-else>
+                            <fui-spin>
+                                <fui-icon name="loading" size="34"></fui-icon>
+                            </fui-spin>
+                        </view>
+                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+                    </refresh>
+                    <cell class="asset-val">
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-11 font-weight color-black">
+                                    {{ $t('wallete.t1') }}
+                                    {{ profit ? $t('contract.ppt1') : '' }} (USDT)
+                                </text>
+                                <image class="see-icon"
+                                       :src="`/static/wallet/eye-${assetsDisplay ? 's' : 'h'}-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="assetsDisplay = !assetsDisplay">
+                                </image>
+                                <view class="safe-box bg-primary border-solid">
+                                    <image class="safe-icon"
+                                           src="/static/wallet/safe-icon.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <text class="font-10  color-primary">
+                                        {{ $t('wallete.t2') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-24 font-bold color-black">
+                                    {{
+                                        assetsDisplay ? util.thousandSeparator(total + (profit ? profit : 0)) : '******'
+                                    }}
+                                </text>
+                                <view class="rang-button"
+                                      @click="preferenceVisble = true"
+                                      v-if="assetsDisplay">
+                                    <text class="font-12 color-black  font-bold rang-text">
+                                        {{ range }}
+                                    </text>
+                                    <image class="down-icon"
+                                           :src="`/static/img/tactic/down-${userTheme}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <text class="font-11  color-gray"
+                                  v-if="assetsDisplay">
+                                ≈{{ symbol }}{{
+                                    util.thousandSeparator((total + (profit ? profit : 0)) * symbol_rate)
+                                }}
+                            </text>
+                            <text class="font-11  color-gray"
+                                  v-else>
+                                ******
+                            </text>
+                        </view>
+                    </cell>
+                    <cell class="menu">
+                        <view class="item" @click="mroute.recharge()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/cz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.desposit') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.withdraw()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/tx-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.withdraw') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.exchange()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/hz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.transfer') }}</text>
+                        </view>
+                    </cell>
+                    <cell class="nil-assets"
+                          v-if="total <= 0 || !isLogin">
+                        <view class="content-box border-solid">
+                            <image class="banner-image"
+                                   src="/static/wallet/nil-assets.webp"
+                                   mode="widthFix">
+                            </image>
+                            <text class="font-14 color-black font-weight context">
+                                {{ $t('wallete.t26') }}{{ $t('wallete.t27') }}
+                            </text>
+                            <view class="button button-active bg-black"
+                                  @click="isLogin ? mroute.recharge() : mroute.login()">
+                                <text class="font-13 font-weight color-white">
+                                    {{ isLogin ? $t('wallete.t7') : $t('index.banner_con') }}
+                                </text>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="asset-distribution" v-if="isLogin && total > 0">
+                        <view class="title-box">
+                            <text class="font-14 font-weight color-black">
+                                {{ distribution ? $t('wallete.t3') : $t('wallete.t4') }}
+                            </text>
+                            <view class="chart-button bg-gray">
+                                <view class="button-item"
+                                      :class="{'bg-light-gray': chartShow}"
+                                      @click="chartToggle(0)">
+                                    <image class="chart-icon"
+                                           :src="`/static/wallet/pillar-${chartShow ? `s-${userTheme}` : 'n'}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                                <view class="button-item"
+                                      :class="{'bg-light-gray': distribution}"
+                                      @click="chartToggle(1)">
+                                    <image class="chart-icon"
+                                           :src="`/static/wallet/ring-${distribution ? `s-${userTheme}` : 'n'}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="chart-time"
+                              v-if="chartShow">
+                            <view class="item"
+                                  :class="timeActive == index ? 'bg-black' : 'bg-gray'"
+                                  v-for="(item,index) in timeGroup" :key="index"
+                                  @click="timeActive = index">
+                                <text class="font-11 color-black "
+                                      :class="timeActive == index ? 'color-white' : 'color-gray'">
+                                    {{ item }}{{ $t('financing.t10') }}
+                                </text>
+                            </view>
+                        </view>
+                        <view class="chart-box"
+                              v-if="chartShow">
+                            <web-view class="webview"
+                                      ref="assetsWebview"
+                                      src="/hybrid/html/wallet.html">
+                            </web-view>
+                        </view>
+                        <view class="chart-box"
+                              v-if="distribution">
+                            <web-view class="webview"
+                                      ref="rateWebview"
+                                      src="/hybrid/html/fenbu.html">
+                            </web-view>
+                        </view>
+                    </cell>
+                    <cell class="my-account" v-if="isLogin">
+                        <view class="title-box border-bottom">
+                            <text class="font-14 font-weight color-black">{{ $t('wallete.t5') }}</text>
+                            <view class="hide-assets"
+                                  v-if="false"
+                                  @click="showZero = !showZero">
+                                <view class="check-box bg-gray border-solid"
+                                      :class="{'border-primary': showZero}">
+                                    <image class="check-icon"
+                                           src="/static/img/tactic/check-s.png"
+                                           mode="widthFix"
+                                           v-if="showZero">
+                                    </image>
+                                </view>
+                                <text class=" color-gray font-10">
+                                    {{ $t('wallete.hide') }} 0 {{ $t('wallete.t20') }}
+                                </text>
+                            </view>
+                        </view>
+                        <view class="account-list">
+                            <view class="cell"
+                                  @click="tabCurrent = 1">
+                                <view class="left">
+                                    <view class="row row-first">
+                                        <text class="font-13 font-weight color-black">
+                                            {{ $t('wallete.capital_acc') }}
+                                        </text>
+                                        <text class="font-13 font-weight color-black">
+                                            {{ assetsDisplay ? util.thousandSeparator(balance, 2) : '******' }} USDT
+                                        </text>
+                                    </view>
+                                    <view class="row row-last">
+                                        <text class=" font-11 color-gray"
+                                              v-if="assetsDisplay">
+                                            ≈{{ symbol }}{{ util.thousandSeparator(balance * symbol_rate) }}
+                                        </text>
+                                        <text class=" font-11 color-gray"
+                                              v-else>
+                                            ******
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="right-icon">
+                                    <fui-icon name="arrowright"
+                                              :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                              size="30">
+                                    </fui-icon>
+                                </view>
+                            </view>
+                            <view class="cell"
+                                  @click="tabCurrent = 2">
+                                <view class="left">
+                                    <view class="row row-first">
+                                        <text class="font-13 font-weight color-black">
+                                            {{ $t('wallete.spot_acc') }}
+                                        </text>
+                                        <text class="font-13 font-weight color-black">
+                                            {{ assetsDisplay ? util.thousandSeparator(trade, 2) : '******' }} USDT
+                                        </text>
+                                    </view>
+                                    <view class="row row-last">
+                                        <text class=" font-11 color-gray"
+                                              v-if="assetsDisplay">
+                                            ≈{{ symbol }}{{ util.thousandSeparator(trade * symbol_rate) }}
+                                        </text>
+                                        <text class=" font-11 color-gray"
+                                              v-else>
+                                            ******
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="right-icon">
+                                    <fui-icon name="arrowright"
+                                              :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                              size="30">
+                                    </fui-icon>
+                                </view>
+                            </view>
+                            <view class="cell"
+                                  @click="tabCurrent = 3">
+                                <view class="left">
+                                    <view class="row row-first">
+                                        <text class="font-13 font-weight color-black">
+                                            {{ $t('wallete.contract_acc') }}
+                                        </text>
+                                        <text class="font-13 font-weight color-black">
+                                            {{
+                                                assetsDisplay ? util.thousandSeparator(contract + (profit !== false ? profit : 0), 2) : '******'
+                                            }} USDT
+                                        </text>
+                                    </view>
+                                    <view class="row row-last">
+                                        <text class=" font-11 color-gray"
+                                              v-if="assetsDisplay">
+                                            ≈{{ symbol }}{{
+                                                util.thousandSeparator((contract + (profit !== false ? profit : 0)) * symbol_rate)
+                                            }}
+                                        </text>
+                                        <text class=" font-11 color-gray"
+                                              v-else>
+                                            ******
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="right-icon">
+                                    <fui-icon name="arrowright"
+                                              :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                              size="30">
+                                    </fui-icon>
+                                </view>
+                            </view>
+                            <view class="cell"
+								  @click="tabCurrent = 4">
+								<view class="left">
+									<view class="row row-first">
+										<text class="font-13 font-weight color-black">
+											{{ $t('wallete.options_acc') }}
+										</text>
+										<text class="font-13 font-weight color-black">
+											{{ assetsDisplay ? util.thousandSeparator(future, 2) : '******' }} USDT
+										</text>
+									</view>
+									<view class="row row-last">
+										<text class=" font-11 color-gray"
+											  v-if="assetsDisplay">
+											≈{{ symbol }}{{ util.thousandSeparator(future * symbol_rate) }}
+										</text>
+										<text class=" font-11 color-gray"
+											  v-else>
+											******
+										</text>
+									</view>
+								</view>
+								<view class="right-icon">
+									<fui-icon name="arrowright"
+											  :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+											  size="30">
+									</fui-icon>
+								</view>
+							</view>
+                            <view class="cell"
+                                  @click="tabCurrent = 3">
+                                <view class="left">
+                                    <view class="row row-first">
+                                        <text class="font-13 font-weight color-black">
+                                            {{ $t('wallete.fin_acc') }}
+                                        </text>
+                                        <text class="font-13 font-weight color-black">
+                                            {{ assetsDisplay ? util.thousandSeparator(finance, 2) : '******' }} USDT
+                                        </text>
+                                    </view>
+                                    <view class="row row-last">
+                                        <text class=" font-11 color-gray"
+                                              v-if="assetsDisplay">
+                                            ≈{{ symbol }}{{ util.thousandSeparator(finance * symbol_rate) }}
+                                        </text>
+                                        <text class=" font-11 color-gray"
+                                              v-else>
+                                            ******
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="right-icon">
+                                    <fui-icon name="arrowright"
+                                              :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                              size="30">
+                                    </fui-icon>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                </list>
+            </swiper-item>
+            <!--      资金      -->
+            <swiper-item class="wallet-swiper-item"
+                         :style="`height: ${bodyHeight}px`">
+                <list class="scroll-list bg-white"
+                      :scrollable="true"
+                      :show-scrollbar="false"
+                      :style="`height: ${bodyHeight}px`">
+                    <refresh class="refresh-box"
+                             @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display="refreshing ? 'show' : 'hide'">
+                        <fui-icon class="refresh-icon"
+                                  name="loading"
+                                  size="34"
+                                  v-if="refreshing == false">
+                        </fui-icon>
+                        <view class="spin-box"
+                              v-else>
+                            <fui-spin>
+                                <fui-icon name="loading" size="34"></fui-icon>
+                            </fui-spin>
+                        </view>
+                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+                    </refresh>
+                    <cell class="asset-val">
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-11 font-weight color-black">
+                                    {{ $t('wallete.t18') }}
+                                </text>
+                                <image class="see-icon"
+                                       :src="`/static/wallet/eye-${assetsDisplay ? 's' : 'h'}-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="assetsDisplay = !assetsDisplay">
+                                </image>
+                            </view>
+                            <view class="order-box"
+                                  @click="mroute.cashflow()">
+                                <image class="order-icon"
+                                       :src="`/static/img/tactic/order-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <text class="font-24 font-bold color-black">
+                                {{ assetsDisplay ? util.thousandSeparator(balance) : '******' }}
+                            </text>
+                        </view>
+                        <view class="row">
+                            <text class="font-11  color-gray"
+                                  v-if="assetsDisplay">
+                                ≈{{ symbol }}{{ util.thousandSeparator(balance * symbol_rate) }}
+                            </text>
+                            <text class="font-11  color-gray"
+                                  v-else>
+                                ******
+                            </text>
+                        </view>
+                    </cell>
+                    <cell class="menu">
+                        <view class="item" @click="mroute.recharge()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/cz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.desposit') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.withdraw()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/tx-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.withdraw') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.exchange()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/hz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.transfer') }}</text>
+                        </view>
+                    </cell>
+                    <cell class="coin-list">
+                        <view class="title-box">
+                            <view class="title-bottom">
+                                <view class="search bg-gray">
+                                    <image class="search-icon"
+                                           src="/static/newImage/search-gray.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <input class="input color-black"
+                                           type="text"
+                                           @input="search"
+                                           @confirm="search"
+                                           :placeholder="$t('wallete.search')"
+                                           placeholder-class="input_placeholder">
+                                </view>
+                                <view class="check-label" @click="showZero = !showZero">
+                                    <view class="check-box border-solid bg-gray"
+                                          :class="{'border-primary': showZero}">
+                                        <image class="check-image"
+                                               src="/static/img/tactic/check-s.png"
+                                               mode="widthFix"
+                                               v-if="showZero">
+                                        </image>
+                                    </view>
+                                    <text class="font-10 color-gray">
+                                        {{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="coin-body">
+                        <view class="coin-item"
+                              v-for="(item, index) in list" :key="index">
+                            <view class="image-box">
+                                <image class="coin-image"
+                                       :src="item.icon"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="center-box">
+                                <view class="row">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item.symbol }}
+                                    </text>
+                                    <text class="font-13 font-weight color-black">
+                                        {{
+                                            assetsDisplay ? util.str2number(item.balance) : '******'
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="row">
+                                    <text class="font-10 color-gray ">
+                                        {{ item.chain_text }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-if="assetsDisplay">
+                                        ≈{{
+                                            symbol
+                                        }}
+                                        {{
+                                            util.float(util.str2number(util.thousandSeparator(item.balance * item.new_price * symbol_rate)))
+                                        }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-else>
+                                        ******
+                                    </text>
+                                </view>
+                            </view>
+                            <view class="right-icon">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                          size="30">
+                                </fui-icon>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <empty-view :visible="list.length == 0"
+                                    :width="750"
+                                    :height="700"
+                                    :title="$t('list.not_data')">
+                        </empty-view>
+                    </cell>
+                </list>
+            </swiper-item>
+            <!--      现货      -->
+            <swiper-item class="wallet-swiper-item"
+                         :style="`height: ${bodyHeight}px`">
+                <list class="scroll-list bg-white"
+                      :scrollable="true"
+                      :show-scrollbar="false"
+                      :style="`height: ${bodyHeight}px`">
+                    <refresh class="refresh-box"
+                             @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display="refreshing ? 'show' : 'hide'">
+                        <fui-icon class="refresh-icon"
+                                  name="loading"
+                                  size="34"
+                                  v-if="refreshing == false">
+                        </fui-icon>
+                        <view class="spin-box"
+                              v-else>
+                            <fui-spin>
+                                <fui-icon name="loading" size="34"></fui-icon>
+                            </fui-spin>
+                        </view>
+                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+                    </refresh>
+                    <cell class="asset-val">
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-11 font-weight color-black">
+                                    {{ $t('wallete.t15') }}
+                                </text>
+                                <image class="see-icon"
+                                       :src="`/static/wallet/eye-${assetsDisplay ? 's' : 'h'}-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="assetsDisplay = !assetsDisplay">
+                                </image>
+                            </view>
+                            <view class="order-box"
+                                  @click="mroute.cashflow()">
+                                <image class="order-icon"
+                                       :src="`/static/img/tactic/order-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <text class="font-24 font-bold color-black">
+                                {{ assetsDisplay ? util.thousandSeparator(trade) : '******' }}
+                            </text>
+                        </view>
+                        <view class="row">
+                            <text class="font-11  color-gray"
+                                  v-if="assetsDisplay">
+                                ≈{{ symbol }}{{ util.thousandSeparator(trade * symbol_rate) }}
+                            </text>
+                            <text class="font-11  color-gray"
+                                  v-else>
+                                ******
+                            </text>
+                        </view>
+                        <!--                       <template v-if="false">-->
+                        <!--                            <view class="row mt-10">-->
+                        <!--                                <text class=" font-11 color-black">-->
+                        <!--                                    {{ $t('wallete.t8') }}-->
+                        <!--                                </text>-->
+                        <!--                            </view>-->
+                        <!--                            <view class="row mt-5">-->
+                        <!--                                <view class="row-left">-->
+                        <!--                                    <text class=" font-11 color-black">￥0.00</text>-->
+                        <!--                                    <fui-icon name="arrowright"-->
+                        <!--                                              :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"-->
+                        <!--                                              size="30">-->
+                        <!--                                    </fui-icon>-->
+                        <!--                                </view>-->
+                        <!--                            </view>-->
+                        <!--                        </template> -->
+                    </cell>
+                    <cell class="menu">
+                        <view class="item" @click="mroute.recharge()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/cz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.desposit') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.withdraw()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/tx-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.withdraw') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.exchange()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/hz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black font-weight">{{ $t('wallet.transfer') }}</text>
+                        </view>
+                    </cell>
+                    <cell class="mini-card">
+                        <view class="item bg-gray" v-if="false">
+                            <view class="item-left">
+                                <view class="row">
+                                    <text class="font-11 color-black ">
+                                        {{ $t('wallete.t21') }}
+                                    </text>
+                                </view>
+                                <view class="row">
+                                    <text class="font-11 color-black ">
+                                        0.00000000 USDT
+                                    </text>
+                                </view>
+                            </view>
+                            <fui-icon name="arrowright"
+                                      :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                      size="30">
+                            </fui-icon>
+                        </view>
+                        <!-- <view class="item bg-primary mt-10">
+                            <view class="item-left">
+                                <view class="row">
+                                    <image class="exchange-icon"
+                                           src="/static/img/tactic/tran-icon.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <text class="font-11 color-primary ">
+                                        {{ $t('wallete.t22') }} USDT
+                                    </text>
+                                </view>
+                            </view>
+                            <fui-icon name="arrowright"
+                                      :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                      size="30">
+                            </fui-icon>
+                        </view> -->
+                    </cell>
+                    <cell class="coin-list">
+                        <view class="title-box">
+                            <view class="title-top">
+                                <text class="font-14 font-weight color-black">{{ $t('trade.assets') }}</text>
+                                <view class="mini-button">
+                                    <view class="item">
+
+                                    </view>
+                                    <view class="item">
+
+                                    </view>
+                                </view>
+                            </view>
+                            <view class="title-bottom">
+                                <view class="search bg-gray">
+                                    <image class="search-icon"
+                                           src="/static/newImage/search-gray.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <input class="input color-black "
+                                           type="text"
+                                           @input="search"
+                                           @confirm="search"
+                                           :placeholder="$t('wallete.search')"
+                                           placeholder-class="input_placeholder">
+                                </view>
+                                <view class="check-label" @click="showZero = !showZero">
+                                    <view class="check-box bg-gray border-solid"
+                                          :class="{'border-primary': showZero}">
+                                        <image class="check-image"
+                                               src="/static/img/tactic/check-s.png"
+                                               mode="widthFix"
+                                               v-if="showZero">
+                                        </image>
+                                    </view>
+                                    <text class="font-10 color-gray ">
+                                        {{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="coin-body">
+                        <view class="coin-item"
+                              v-for="(item, index) in list" :key="index">
+                            <view class="image-box">
+                                <image class="coin-image"
+                                       :src="item.icon"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="center-box">
+                                <view class="row">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item.symbol }}
+                                    </text>
+                                    <text class="font-13 font-weight color-black">
+                                        {{
+                                            assetsDisplay ? util.float(util.str2number(util.thousandSeparator(item.trade_balance, 8))) : '******'
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="row">
+                                    <text class="font-10 color-gray ">
+                                        {{ item.chain_text }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-if="assetsDisplay">
+                                        ≈{{
+                                            symbol
+                                        }}{{
+                                            util.float(util.str2number(util.thousandSeparator(item.trade_balance * item.new_price * symbol_rate, 8)))
+                                        }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-else>
+                                        ******
+                                    </text>
+                                </view>
+                            </view>
+                            <view class="right-icon">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                          size="30">
+                                </fui-icon>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <empty-view :visible="list.length == 0"
+                                    :width="750"
+                                    :height="700"
+                                    :title="$t('list.not_data')">
+                        </empty-view>
+                    </cell>
+                </list>
+            </swiper-item>
+            <!--      合约      -->
+            <swiper-item class="wallet-swiper-item"
+                         :style="`height: ${bodyHeight}px`">
+                <list class="scroll-list bg-white"
+                      :scrollable="true"
+                      :show-scrollbar="false"
+                      :style="`height: ${bodyHeight}px`">
+                    <refresh class="refresh-box"
+                             @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display="refreshing ? 'show' : 'hide'">
+                        <fui-icon class="refresh-icon"
+                                  name="loading"
+                                  size="34"
+                                  v-if="refreshing == false">
+                        </fui-icon>
+                        <view class="spin-box"
+                              v-else>
+                            <fui-spin>
+                                <fui-icon name="loading" size="34"></fui-icon>
+                            </fui-spin>
+                        </view>
+                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+                    </refresh>
+                    <cell class="asset-val">
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-11 font-weight color-black">
+                                    {{ $t('wallete.asset_val') }}
+                                    {{ profit !== false ? $t('contract.ppt1') : '' }}
+                                </text>
+                                <image class="see-icon"
+                                       :src="`/static/wallet/eye-s-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="assetsDisplay = !assetsDisplay">
+                                </image>
+                            </view>
+                            <view class="order-box"
+                                  @click="mroute.cashflow()">
+                                <image class="order-icon"
+                                       :src="`/static/img/tactic/order-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-24 font-bold color-black">
+                                    {{
+                                        assetsDisplay ? util.thousandSeparator(contract + (profit !== false ? profit : 0)) : '******'
+                                    }}
+                                </text>
+                                <view class="rang-button"
+                                      @click="preferenceVisble = true"
+                                      v-if="assetsDisplay">
+                                    <text class="font-12 color-black  font-bold rang-text">
+                                        {{ range }}
+                                    </text>
+                                    <image class="down-icon"
+                                           :src="`/static/img/tactic/down-${userTheme}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <text class="font-11  color-gray"
+                                  v-if="assetsDisplay">
+                                ≈{{ symbol }}{{
+                                    util.thousandSeparator((contract + (profit !== false ? profit : 0)) * symbol_rate)
+                                }}
+                            </text>
+                            <text class="font-11  color-gray"
+                                  v-else>
+                                ******
+                            </text>
+                        </view>
+                        <view class="row mt-10">
+                            <view class="row-left">
+                                <text class=" font-11 color-black">
+                                    {{ $t('wallete.t8') }}
+                                </text>
+                                <view class="tag-button bg-gray" v-if="false">
+                                    <text class="font-10 color-black ">{{ $t("newcontract.t72") }}</text>
+                                    <image class="down-icon"
+                                           :src="`/static/img/tactic/down-${userTheme}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="row mt-5" @click="toAnalyze()">
+                            <view class="row-left">
+                                <text class="font-weight font-11 color-black">
+									{{symbol}}{{util.thousandSeparator(dayProfit * symbol_rate,2)}}
+								</text>
+                                <fui-icon name="arrowright"
+                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                          size="30">
+                                </fui-icon>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="menu">
+                        <view class="menu-button button-active bg-black"
+                              @click="mroute.exchange()">
+                            <text class="font-13 font-weight color-white">
+                                {{ $t('wallete.t10') }}
+                            </text>
+                        </view>
+                    </cell>
+                    <cell class="coin-list">
+                        <view class="title-box">
+                            <view class="title-bottom">
+                                <view class="search bg-gray">
+                                    <image class="search-icon"
+                                           src="/static/newImage/search-gray.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <input class="input color-black "
+                                           type="text"
+                                           @input="search"
+                                           @confirm="search"
+                                           :placeholder="$t('wallete.search')"
+                                           placeholder-class="input_placeholder">
+                                </view>
+                                <view class="check-label"
+                                      @click="showZero = !showZero">
+                                    <view class="check-box bg-gray border-solid"
+                                          :class="{'border-primary': showZero}">
+                                        <image class="check-image"
+                                               src="/static/img/tactic/check-s.png"
+                                               mode="widthFix"
+                                               v-if="showZero">
+                                        </image>
+                                    </view>
+                                    <text class="font-10 color-gray">
+                                        {{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="coin-body">
+                        <view class="coin-item"
+                              v-for="(item, index) in list.filter(item=>item.symbol=='USDT')"
+                              :key="index"
+                              @click="mroute.walletInfo(item)">
+                            <view class="image-box">
+                                <image class="coin-image"
+                                       :src="item.icon"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="center-box">
+                                <view class="row">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item.symbol }}
+                                    </text>
+                                    <text class="font-13 font-weight color-black">
+                                        {{
+                                            assetsDisplay ? util.float(util.str2number(util.thousandSeparator(item.contract_balance, 8))) : '******'
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="row">
+                                    <text class="font-10 color-gray ">{{ $t('wallete.t10s') }}</text>
+                                    <text class="font-10 color-gray "
+                                          v-if="assetsDisplay">
+                                        ≈{{
+                                            symbol
+                                        }}{{
+                                            util.float(util.str2number(util.thousandSeparator(item.contract_balance * item.new_price * symbol_rate, 8)))
+                                        }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-else>
+                                        ******
+                                    </text>
+                                </view>
+                            </view>
+                            <view class="right-icon">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                          size="30">
+                                </fui-icon>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <empty-view :visible="list.length == 0"
+                                    :width="750"
+                                    :height="700"
+                                    :title="$t('list.not_data')">
+                        </empty-view>
+                    </cell>
+                </list>
+            </swiper-item>
+            <!--      策略      -->
+            <!--            <swiper-item class="wallet-swiper-item"-->
+            <!--                         :style="`height: ${bodyHeight}px`"-->
+            <!--            v-if="false">-->
+            <!--                <list class="scroll-list bg-white"-->
+            <!--                      :scrollable="true"-->
+            <!--                      :show-scrollbar="false"-->
+            <!--                      :style="`height: ${bodyHeight}px`">-->
+            <!--                    <refresh class="refresh-box"-->
+            <!--                             @pullingdown='onpullingdown'-->
+            <!--                             @refresh="onrefresh"-->
+            <!--                             :display="refreshing ? 'show' : 'hide'">-->
+            <!--                        <fui-icon class="refresh-icon"-->
+            <!--                                  name="loading"-->
+            <!--                                  size="34"-->
+            <!--                                  v-if="refreshing == false">-->
+            <!--                        </fui-icon>-->
+            <!--                        <view class="spin-box"-->
+            <!--                              v-else>-->
+            <!--                            <fui-spin>-->
+            <!--                                <fui-icon name="loading" size="34"></fui-icon>-->
+            <!--                            </fui-spin>-->
+            <!--                        </view>-->
+            <!--                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>-->
+            <!--                    </refresh>-->
+            <!--                    <cell class="asset-val">-->
+            <!--                        <view class="row">-->
+            <!--                            <view class="row-left">-->
+            <!--                                <text class="font-11 font-weight color-black">-->
+            <!--                                    {{ $t('wallete.t17') }}-->
+            <!--                                </text>-->
+            <!--                                <image class="see-icon"-->
+            <!--                                       :src="`/static/wallet/eye-s-${userTheme}.png`"-->
+            <!--                                       mode="widthFix"-->
+            <!--                                       @click="assetsDisplay = !assetsDisplay">-->
+            <!--                                </image>-->
+            <!--                            </view>-->
+            <!--                        </view>-->
+            <!--                        <view class="row">-->
+            <!--                            <view class="row-left">-->
+            <!--                                <text class="font-24 font-bold color-black">-->
+            <!--                                    {{ assetsDisplay ? util.thousandSeparator(strategy) : '******' }}-->
+            <!--                                </text>-->
+            <!--                                <view class="rang-button"-->
+            <!--                                      @click="preferenceVisble = true"-->
+            <!--                                      v-if="assetsDisplay">-->
+            <!--                                    <text class="font-12 color-black  font-bold rang-text">-->
+            <!--                                        {{ range }}-->
+            <!--                                    </text>-->
+            <!--                                    <image class="down-icon"-->
+            <!--                                           :src="`/static/img/tactic/down-${userTheme}.png`"-->
+            <!--                                           mode="widthFix">-->
+            <!--                                    </image>-->
+            <!--                                </view>-->
+            <!--                            </view>-->
+            <!--                        </view>-->
+            <!--                        <view class="row">-->
+            <!--                            <text class="font-11  color-gray"-->
+            <!--                                  v-if="assetsDisplay">-->
+            <!--                                ≈{{ symbol }} {{util.thousandSeparator(strategy * symbol_rate)}}-->
+            <!--                            </text>-->
+            <!--                            <text class="font-11  color-gray"-->
+            <!--                                  v-else>-->
+            <!--                                ******-->
+            <!--                            </text>-->
+            <!--                        </view>-->
+            <!--                    </cell>-->
+            <!--                    <cell class="strategy-tabs">-->
+            <!--                        <fui-tabs scroll-->
+            <!--                                  alignLeft-->
+            <!--                                  :height="78"-->
+            <!--                                  :tabs="strategyTabs"-->
+            <!--                                  :current="strategyTabIndex"-->
+            <!--                                  :background="userTheme == 'light' ? '#ffffff' : '#111111'"-->
+            <!--                                  :size="28"-->
+            <!--                                  :color="userTheme == 'light' ? '#898989' : '#7a7a7a'"-->
+            <!--                                  :selectedSize="28"-->
+            <!--                                  :selectedColor="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"-->
+            <!--                                  :slider-background="userTheme == 'light' ? '#111111' : '#ffffff'"-->
+            <!--                                  :isSlider="true"-->
+            <!--                                  :short="false"-->
+            <!--                                  @change="strategyTabIndex = $event.index">-->
+            <!--                        </fui-tabs>-->
+            <!--                    </cell>-->
+            <!--                    <cell class="sub-swiper-warp">-->
+            <!--                        <swiper class="sub-swiper"-->
+            <!--                                :current="strategyTabIndex"-->
+            <!--                                :style="`height: ${bodyHeight - 63}px`"-->
+            <!--                                @change="strategyTabIndex = $event.detail.current">-->
+            <!--                            <swiper-item class="sub-swiper-item"-->
+            <!--                                         :style="`height: ${bodyHeight - 63}px`"-->
+            <!--                                         v-for="item in strategyTabs.length">-->
+            <!--                                <scroll-view class="sub-swiper-scroll"-->
+            <!--                                             :style="`height: ${bodyHeight - 63}px`">-->
+            <!--                                    <view class="header">-->
+            <!--                                        <view class="row">-->
+            <!--                                            <text class="font-11 color-black font-weight">-->
+            <!--                                                {{ $t('wallete.t23') }}-->
+            <!--                                            </text>-->
+            <!--                                        </view>-->
+            <!--                                        <view class="row mt-5">-->
+            <!--                                            <text class="font-14 color-black font-weight">0.00000000 USDT</text>-->
+            <!--                                        </view>-->
+            <!--                                        <view class="button-group">-->
+            <!--                                            <view class="button bg-black button-active">-->
+            <!--                                                <text class="font-13 font-weight color-white">-->
+            <!--                                                    {{ $t('wallete.t13') }}-->
+            <!--                                                </text>-->
+            <!--                                            </view>-->
+            <!--&lt;!&ndash;                                            <view class="button bg-white button-active border-solid">&ndash;&gt;-->
+            <!--&lt;!&ndash;                                                <text class="font-13 font-weight color-black">&ndash;&gt;-->
+            <!--&lt;!&ndash;                                                    {{ $t('wallete.t14') }}&ndash;&gt;-->
+            <!--&lt;!&ndash;                                                </text>&ndash;&gt;-->
+            <!--&lt;!&ndash;                                            </view>&ndash;&gt;-->
+            <!--                                        </view>-->
+            <!--                                    </view>-->
+            <!--                                    <view class="list-tabs border-bottom">-->
+            <!--                                        <view class="search bg-gray">-->
+            <!--                                            <image class="search-icon"-->
+            <!--                                                   src="/static/newImage/search-gray.png"-->
+            <!--                                                   mode="widthFix">-->
+            <!--                                            </image>-->
+            <!--                                            <input class="input color-black "-->
+            <!--                                                   type="text"-->
+            <!--                                                   @input="search"-->
+            <!--                                                   @confirm="search"-->
+            <!--                                                   :placeholder="$t('wallete.search')"-->
+            <!--                                                   placeholder-class="input_placeholder">-->
+            <!--                                        </view>-->
+            <!--                                        <view class="check-label"-->
+            <!--                                              @click="showZero = !showZero">-->
+            <!--                                            <view class="check-box bg-gray border-solid"-->
+            <!--                                                  :class="{'border-primary': showZero}">-->
+            <!--                                                <image class="check-image"-->
+            <!--                                                       src="/static/img/tactic/check-s.png"-->
+            <!--                                                       mode="widthFix"-->
+            <!--                                                       v-if="showZero">-->
+            <!--                                                </image>-->
+            <!--                                            </view>-->
+            <!--                                            <text class="font-10 color-gray">-->
+            <!--                                                {{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}-->
+            <!--                                            </text>-->
+            <!--                                        </view>-->
+            <!--                                    </view>-->
+            <!--                                    <view class="coin-body">-->
+            <!--                                        <view class="coin-item"-->
+            <!--                                              v-for="(item, index) in list.filter(item=>item.symbol=='USDT')"-->
+            <!--                                              :key="index"-->
+            <!--                                              @click="mroute.walletInfo(item)">-->
+            <!--                                            <view class="image-box">-->
+            <!--                                                <image class="coin-image"-->
+            <!--                                                       :src="item.icon"-->
+            <!--                                                       mode="widthFix">-->
+            <!--                                                </image>-->
+            <!--                                            </view>-->
+            <!--                                            <view class="center-box">-->
+            <!--                                                <view class="row">-->
+            <!--                                                    <text class="font-13 font-weight color-black">-->
+            <!--                                                        {{ item.symbol }}-->
+            <!--                                                    </text>-->
+            <!--                                                    <text class="font-13 font-weight color-black">-->
+            <!--                                                        {{-->
+            <!--                                                            assetsDisplay ? util.float(util.str2number(util.thousandSeparator(item.strategy_balance, 8))) : '******'-->
+            <!--                                                        }}-->
+            <!--                                                    </text>-->
+            <!--                                                </view>-->
+            <!--                                                <view class="row">-->
+            <!--                                                    <text class="font-10 color-gray ">{{item.chain_text}}</text>-->
+            <!--                                                    <text class="font-10 color-gray "-->
+            <!--                                                          v-if="assetsDisplay">-->
+            <!--                                                        ≈{{-->
+            <!--                                                            symbol-->
+            <!--                                                        }}{{-->
+            <!--                                                            util.float(util.str2number(util.thousandSeparator(item.strategy_balance * item.new_price * symbol_rate, 8)))-->
+            <!--                                                        }}-->
+            <!--                                                    </text>-->
+            <!--                                                    <text class="font-10 color-gray "-->
+            <!--                                                          v-else>-->
+            <!--                                                        ******-->
+            <!--                                                    </text>-->
+            <!--                                                </view>-->
+            <!--                                            </view>-->
+            <!--                                            <view class="right-icon">-->
+            <!--                                                <fui-icon name="arrowright"-->
+            <!--                                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"-->
+            <!--                                                          size="30">-->
+            <!--                                                </fui-icon>-->
+            <!--                                            </view>-->
+            <!--                                        </view>-->
+            <!--                                    </view>-->
+            <!--                                    <empty-view :visible="list.length == 0"-->
+            <!--                                                :width="750"-->
+            <!--                                                :height="700"-->
+            <!--                                                :title="$t('list.not_data')">-->
+            <!--                                    </empty-view>-->
+            <!--                                </scroll-view>-->
+            <!--                            </swiper-item>-->
+            <!--                        </swiper>-->
+            <!--                    </cell>-->
+            <!--                </list>-->
+            <!--            </swiper-item>-->
+            <!--      期权      -->
+            <swiper-item class="wallet-swiper-item"
+            	:style="`height: ${bodyHeight}px`">
+            	<list class="scroll-list bg-white" 
+            		:scrollable="true"
+            		:show-scrollbar="false"
+            		:style="`height: ${bodyHeight}px`">
+            		<refresh class="refresh-box" 
+            			@pullingdown='onpullingdown'
+            			@refresh="onrefresh"
+            			:display="refreshing ? 'show' : 'hide'">
+            			<fui-icon class="refresh-icon" 
+            				name="loading"
+            				size="34"
+            				v-if="refreshing == false">
+            			</fui-icon>
+            			<view class="spin-box" 
+            				v-else>
+            				<fui-spin>
+            					<fui-icon name="loading" size="34"></fui-icon>
+            				</fui-spin>
+            			</view>
+            			<text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+            		</refresh>
+            		<cell class="asset-val">
+            			<view class="row">
+            				<view class="row-left">
+            					<text class="font-11 font-weight color-black">
+            						{{ $t('wallete.t23') }}
+            						{{ profit !== false ? $t('contract.ppt1') : '' }}
+            					</text>
+            					<image class="see-icon" 
+            						:src="`/static/wallet/eye-s-${userTheme}.png`"
+            						mode="widthFix"
+            						@click="assetsDisplay = !assetsDisplay">
+            					</image>
+            				</view>
+            				<view class="order-box" 
+            					@click="mroute.cashflow()">
+            					<image class="order-icon" 
+            						:src="`/static/img/tactic/order-${userTheme}.png`"
+            						mode="widthFix">
+            					</image>
+            				</view>
+            			</view>
+            			<view class="row">
+            				<view class="row-left">
+            					<text class="font-24 font-bold color-black">
+            						{{ assetsDisplay ? util.thousandSeparator(future) : '******' }}
+            					</text>
+            					<view class="rang-button" 
+            						@click="preferenceVisble = true"
+            						v-if="assetsDisplay">
+            						<text class="font-12 color-black  font-bold rang-text">
+            							{{ range }}
+            						</text>
+            						<image class="down-icon" 
+            							:src="`/static/img/tactic/down-${userTheme}.png`"
+            							mode="widthFix">
+            						</image>
+            					</view>
+            				</view>
+            			</view>
+            			<view class="row">
+            				<text class="font-11  color-gray" 
+            					v-if="assetsDisplay">
+            					≈{{ symbol }}{{ util.thousandSeparator(future * symbol_rate) }}
+            				</text>
+            				<text class="font-11  color-gray" 
+            					v-else>
+            					******
+            				</text>
+            			</view>
+            		</cell>
+            		<cell class="menu">
+            			<view class="menu-button bg-black button-active" 
+            				@click="mroute.exchange()">
+            				<text class="font-13 font-weight color-white">
+            					{{ $t('wallete.t10') }}
+            				</text>
+            			</view>
+            		</cell>
+            		<cell class="coin-list">
+            			<view class="title-box">
+            				<view class="title-bottom">
+            					<view class="search bg-gray">
+            						<image class="search-icon" 
+            							src="/static/newImage/search-gray.png"
+            							mode="widthFix">
+            						</image>
+            						<input class="input color-black " 
+            						type="text"
+            						@input="search"
+            						@confirm="search"
+            						:placeholder="$t('wallete.search')"
+            						placeholder-class="input_placeholder">
+            					</view>
+            					<view class="check-label" 
+            						@click="showZero = !showZero">
+            						<view class="check-box bg-gray border-solid" 
+            							:class="{'border-primary': showZero}">
+            							<image class="check-image" 
+            								src="/static/img/tactic/check-s.png"
+            								mode="widthFix"
+            								v-if="showZero">
+            							</image>
+            						</view>
+            						<text class="font-10 color-gray">
+            							{{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}
+            						</text>
+            					</view>
+            				</view>
+            			</view>
+            		</cell>
+            		<cell class="coin-body">
+            			<view class="coin-item" 
+            				v-for="(item, index) in list"
+            				:key="index"
+            				@click="mroute.walletInfo(item)">
+            				<view class="image-box">
+            					<image class="coin-image" 
+            						:src="item.icon"
+            						mode="widthFix">
+            					</image>
+            				</view>
+            				<view class="center-box">
+            					<view class="row">
+            						<text class="font-13 font-weight color-black">
+            							{{ item.symbol }}
+            						</text>
+            						<text class="font-13 font-weight color-black">
+            							{{
+                                                                    assetsDisplay ? util.float(util.str2number(util.thousandSeparator(item.future_balance, 8))) : '******'
+                                                                }}
+            						</text>
+            					</view>
+            					<view class="row">
+            						<text class="font-10 color-gray ">
+            							{{item.chain_text}}
+            						</text>
+            						<text class="font-10 color-gray " 
+            							v-if="assetsDisplay">
+            							≈{{
+                                                                    symbol
+                                                                }}{{
+                                                                    util.float(util.str2number(util.thousandSeparator(item.future_balance * item.new_price * symbol_rate, 8)))
+                                                                }}
+            						</text>
+            						<text class="font-10 color-gray " 
+            							v-else>
+            							******
+            						</text>
+            					</view>
+            				</view>
+            				<view class="right-icon">
+            					<fui-icon name="arrowright" 
+            						:color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+            						size="30">
+            					</fui-icon>
+            				</view>
+            			</view>
+            		</cell>
+            		<cell>
+            			<empty-view :visible="list.length == 0" 
+            				:width="750"
+            				:height="700"
+            				:title="$t('list.not_data')">
+            			</empty-view>
+            		</cell>
+            	</list>
+            </swiper-item>
+            <!--      理财      -->
+            <swiper-item class="wallet-swiper-item"
+                         :style="`height: ${bodyHeight}px`">
+                <list class="scroll-list bg-white"
+                      :scrollable="true"
+                      :show-scrollbar="false"
+                      :style="`height: ${bodyHeight}px`">
+                    <refresh class="refresh-box"
+                             @pullingdown='onpullingdown'
+                             @refresh="onrefresh"
+                             :display="refreshing ? 'show' : 'hide'">
+                        <fui-icon class="refresh-icon"
+                                  name="loading"
+                                  size="34"
+                                  v-if="refreshing == false">
+                        </fui-icon>
+                        <view class="spin-box"
+                              v-else>
+                            <fui-spin>
+                                <fui-icon name="loading" size="34"></fui-icon>
+                            </fui-spin>
+                        </view>
+                        <text class="font-13 color-gray font-weight">{{ $t('common.refer') }}</text>
+                    </refresh>
+                    <cell class="asset-val">
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-11 font-weight color-black">
+                                    {{ $t('wallete.t19') }}
+                                </text>
+                                <image class="see-icon"
+                                       :src="`/static/wallet/eye-${assetsDisplay ? 's' : 'h'}-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="assetsDisplay = !assetsDisplay">
+                                </image>
+                            </view>
+                            <view class="order-box"
+                                  @click="mroute.cashflow()">
+                                <image class="order-icon"
+                                       :src="`/static/img/tactic/order-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <view class="row-left">
+                                <text class="font-24 font-bold color-black">
+                                    {{ assetsDisplay ? util.thousandSeparator(finance) : '******' }}
+                                </text>
+                                <view class="rang-button"
+                                      @click="preferenceVisble = true"
+                                      v-if="assetsDisplay">
+                                    <text class="font-12 color-black  font-bold rang-text">
+                                        {{ range }}
+                                    </text>
+                                    <image class="down-icon"
+                                           :src="`/static/img/tactic/down-${userTheme}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="row">
+                            <text class="font-11  color-gray"
+                                  v-if="assetsDisplay">
+                                ≈{{ symbol }}{{ util.thousandSeparator(finance * symbol_rate) }}
+                            </text>
+                            <text class="font-11  color-gray"
+                                  v-else>
+                                ******
+                            </text>
+                        </view>
+                    </cell>
+					<!--   -->
+                    <cell class="nil-assets" v-if="finance == 0">
+                        <view class="content-box border-solid">
+                            <image class="banner-image"
+                                   src="/static/wallet/nil-assets.webp"
+                                   mode="widthFix">
+                            </image>
+                            <text class="font-14 color-black font-weight context">
+                                {{ $t('wallete.t28') }}
+                            </text>
+                            <!-- <view class="button button-active bg-black">
+                                <text class="font-13 font-weight color-white">
+                                    {{ $t('wallete.t24') }}
+                                </text>
+                            </view> -->
+                            <view class="button button-active dark-primary" @click="mroute.recharge">
+                                <text class="font-13 font-weight always-white">
+                                    {{ $t('wallete.t25') }}
+                                </text>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell class="menu">
+                        <view class="item" @click="mroute.exchange()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/hz-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-10 color-black ">{{ $t('wallet.transfer') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.indexFinance()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/lc-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-10 color-black ">{{ $t('wallete.earn') }}</text>
+                        </view>
+                        <view class="item" @click="mroute.eaorderPage()">
+                            <view class="image-box">
+                                <image class="menu-image"
+                                       :src="`/static/wallet/lcjl-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-10 color-black ">{{ $t('wallete.sub_record') }}</text>
+                        </view>
+                    </cell>
+					<!-- v-if="finance != 0" -->
+                    <cell class="coin-list">
+                        <view class="title-box">
+                            <view class="title-top">
+                                <text class="font-14 font-weight color-black">{{ $t('trade.assets') }}</text>
+                            </view>
+                            <view class="title-bottom">
+                                <view class="search bg-gray">
+                                    <image class="search-icon"
+                                           src="/static/newImage/search-gray.png"
+                                           mode="widthFix">
+                                    </image>
+                                    <input class="input color-black"
+                                           type="text"
+                                           @input="search"
+                                           @confirm="search"
+                                           :placeholder="$t('wallete.search')"
+                                           placeholder-class="input_placeholder">
+                                </view>
+                                <view class="check-label" @click="showZero = !showZero">
+                                    <view class="check-box bg-gray border-solid"
+                                          :class="{'border-primary': showZero}">
+                                        <image class="check-image"
+                                               src="/static/img/tactic/check-s.png"
+                                               mode="widthFix"
+                                               v-if="showZero">
+                                        </image>
+                                    </view>
+                                    <text class="font-10 color-gray">
+                                        {{ $t('wallete.hide') }} 0 {{ $t('wallete.balances') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+					<!-- v-if="finance != 0" -->
+                    <cell class="coin-body">
+                        <view class="coin-item"
+                              v-for="(item, index) in list"
+                              :key="index"
+                              @click="mroute.walletInfo(item)">
+                            <view class="image-box">
+                                <image class="coin-image"
+                                       :src="item.icon"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="center-box">
+                                <view class="row">
+                                    <text class="font-13 font-weight color-black">
+                                        {{ item.symbol }}
+                                    </text>
+                                    <text class="font-13 font-weight color-black">
+                                        {{
+                                            assetsDisplay ? util.float(util.str2number(util.thousandSeparator(item.finance_balance, 8))) : '******'
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="row">
+                                    <text class="font-10 color-gray ">
+                                        {{ item.chain_text }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-if="assetsDisplay">
+                                        ≈{{
+                                            symbol
+                                        }}{{
+                                            util.thousandSeparator(parseFloat(item.finance_balance) * parseFloat(item.new_price) * symbol_rate, 2)
+                                        }}
+                                    </text>
+                                    <text class="font-10 color-gray "
+                                          v-else>
+                                        ******
+                                    </text>
+                                </view>
+                            </view>
+                            <view class="right-icon">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+                                          size="30">
+                                </fui-icon>
+                            </view>
+							<view class="coin-item">
+							    <view class="image-box">
+							    </view>
+							    <view class="center-box">
+							        <view class="row">
+							            <text class="font-13 font-weight color-black">
+							                {{ $t('more.rich_man') }}
+							            </text>
+							            <text class="font-13 font-weight color-black">
+							                {{ util.float(item.finance_pro) }}
+							            </text>
+							        </view>
+							    </view>
+							    <view class="right-icon">
+							        <fui-icon name="arrowright"
+							                  :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+							                  size="30">
+							        </fui-icon>
+							    </view>
+							</view>
+							<view class="coin-item">
+							    <view class="image-box">
+							    </view>
+							    <view class="center-box">
+							        <view class="row">
+							            <text class="font-13 font-weight color-black">
+							                {{ $t('financing.t2') }}
+							            </text>
+							            <text class="font-13 font-weight color-black">
+							                {{ util.float(item.finance_dep) }}
+							            </text>
+							        </view>
+							    </view>
+							    <view class="right-icon">
+							        <fui-icon name="arrowright"
+							                  :color="userTheme == 'light' ? '#898989 ' : '#7a7a7a'"
+							                  size="30">
+							        </fui-icon>
+							    </view>
+							</view>
+                        </view>
+                        
+                    </cell>
+                </list>
+            </swiper-item>
+        </swiper>
+        <!-- 弹出层/tendTip -->
+        <fui-bottom-popup :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          :show="tendTip"
+                          @close="closePopup">
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 color-black font-weight">
+                        {{ $t('wallet.qs') }}
+                    </text>
+                    <fui-icon class="close-icon"
+                              :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                              name="close"
+                              size="48"
+                              @click="closePopup">
+                    </fui-icon>
+                </view>
+                <view class="popup-context">
+                    <text class="context font-13 color-black ">
+                        {{ $t("wallet.t003") }}
+                    </text>
+                    <text class="context font-13 color-black ">
+                        {{ $t("wallet.t004") }}
+                    </text>
+                </view>
+            </view>
+        </fui-bottom-popup>
+
+        <fui-bottom-popup :show="preferenceVisble"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="closePopup">
+            <view class="preference-warp">
+                <view class="title-box border-bottom">
+                    <text class="font-15 font-weight color-black">
+                        {{ $t("wallet.t001") }}
+                    </text>
+                    <view class="close"
+                          @click="closePopup">
+                        <fui-icon name="close"
+                                  :color="userTheme == 'light' ? '#1f1f1f ' : '#ffffff'"
+                                  size="48">
+                        </fui-icon>
+                    </view>
+                </view>
+                <view class="search-box bg-gray">
+                    <image class="search-icon"
+                           src="/static/newImage/search-gray.png"
+                           mode="widthFix">
+                    </image>
+                    <input class="input color-black "
+                           type="text"
+                           :placeholder="$t('wallete.search')"
+                           placeholder-class="input_placeholder">
+                </view>
+                <scroll-view class="currency-list"
+                             :style="`height: ${bodyHeight - 150}px`">
+                    <view class="desc-box bg-gray">
+                        <text class="font-12 color-gray ">
+                            {{ $t("wallet.t002") }}
+                        </text>
+                    </view>
+                    <view class="cell border-bottom"
+                          v-for="(item,index) in downMenu" :key="index"
+                          @click="rangeItemClick(item)">
+                        <view class="cell-left">
+                            <image class="coin-image"
+                                   :src="`/static/exchangeRate/${item.text.toLowerCase()}.png`"
+                                   mode="widthFix">
+                            </image>
+                            <text class="font-13 color-black font-weight">
+                                {{ item.value }}
+                            </text>
+                        </view>
+                        <image class="select-icon"
+                               src="/static/img/tactic/check-select.png"
+                               mode="widthFix"
+                               v-if="range == item.value">
+                        </image>
+                    </view>
+                </scroll-view>
+            </view>
+        </fui-bottom-popup>
+
+        <uni-popup type="center" ref="loading">
+            <fui-loading type="col" text="loading" :isFixed="false"></fui-loading>
+        </uni-popup>
+    </view>
+</template>
+
+<script>
+    import waaletService from './wallet.js';
+
+    export default waaletService;
+</script>
+
+<style scoped>
+    @import url("nwallet.css");
+</style>

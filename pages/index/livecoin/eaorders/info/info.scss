@@ -1,0 +1,47 @@
+.ed_info {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    .container-wrap {
+        width: 100%;
+        height: auto;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+
+        .row {
+            width: 100%;
+            height: 78rpx;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .footer {
+        width: 100%;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20rpx 30rpx;
+        box-sizing: border-box;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9;
+        background: var(--background-primary);
+
+        .button {
+            width: 100%;
+            height: 88rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26rpx;
+            color: var(--background-primary);
+            background: var(--content-primary);
+            border-radius: 16rpx;
+        }
+    }
+}

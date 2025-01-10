@@ -1,0 +1,559 @@
+/* ========= Margin =========*/
+.mt-5 {
+    margin-top: 10rpx;
+}
+
+.mt-10 {
+    margin-top: 20rpx;
+}
+
+.mr-3 {
+    margin-right: 6rpx;
+}
+
+.mr-5 {
+    margin-right: 10rpx;
+}
+
+.mr-10 {
+    margin-right: 20rpx;
+}
+
+.mb-5 {
+    margin-bottom: 10rpx;
+}
+
+.mb-10 {
+    margin-bottom: 20rpx;
+}
+
+/* ========= FONT =========*/
+.text-center {
+    text-align: center;
+}
+
+.font-10 {
+    font-size: 20rpx;
+}
+
+.font-11 {
+    font-size: 22rpx;
+}
+
+.font-12 {
+    font-size: 24rpx;
+}
+
+.font-13 {
+    font-size: 26rpx;
+}
+
+.font-14 {
+    font-size: 28rpx;
+}
+
+.font-15 {
+    font-size: 30rpx;
+}
+
+.font-16 {
+    font-size: 32rpx;
+}
+
+.font-17 {
+    font-size: 34rpx;
+}
+
+.font-18 {
+    font-size: 36rpx;
+}
+
+.font-20 {
+    font-size: 40rpx;
+}
+
+.font-22 {
+    font-size: 44rpx;
+}
+
+.font-24 {
+    font-size: 48rpx;
+}
+
+.font-26 {
+    font-size: 52rpx;
+}
+
+.font-27 {
+    font-size: 54rpx;
+}
+
+.font-28 {
+    font-size: 56rpx;
+}
+
+.font-30 {
+    font-size: 60rpx;
+}
+
+.font-32 {
+    font-size: 64rpx;
+}
+
+.font-34 {
+    font-size: 68rpx;
+}
+
+/* ========= FONT WEIGHT =========*/
+.font-weight {
+    font-weight: 500;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+/* ========= FONT COLOR ['light'] =========*/
+.always-white {
+    color: #ffffff;
+}
+
+.light .color-black {
+    color: #1f1f1f;
+}
+
+.light .color-primary {
+    color: #03aac7;
+}
+
+.light .black-button-text {
+    color: #ffffff;
+}
+
+.light .color-blue {
+    color: #3070EC;
+}
+
+.light .color-white {
+    color: #FFFFFF;
+}
+
+.light .color-gray {
+    color: #898989;
+}
+
+.light .color-dark {
+    color: #50535E;
+}
+
+.light .color-light {
+    color: #B8BCC3;
+}
+
+.light .price_down {
+    color: #f1493f;
+}
+
+.light .price_up {
+    color: #03aac7;
+}
+
+.light .color-red {
+    color: #f1493f;
+}
+
+.light .color-green {
+    color: #03aac7;
+}
+
+.light .color-warring {
+    color: #FB9833;
+}
+
+/* ========= FONT COLOR ['dark'] =========*/
+.dark .color-black {
+    color: #ffffff;
+}
+
+.dark .color-primary {
+    color: #4d9eb1;
+}
+
+.dark .color-blue {
+    color: #3070EC;
+}
+
+.dark .color-white {
+    color: #111111;
+}
+
+.dark .color-gray {
+    color: #898989;
+}
+
+.dark .color-dark {
+    color: #85898e;
+}
+
+.dark .color-light {
+    color: #50535b;
+}
+
+.dark .price_down {
+    color: #f45f4f;
+}
+
+.dark .black-button-text {
+    color: #1f1f1f;
+}
+
+.dark .price_up {
+    color: #03aac7;
+}
+
+.dark .color-red {
+    color: #f45f4f;
+}
+
+.dark .color-green {
+    color: #03aac7;
+}
+
+.dark .color-warring {
+    color: #fb9833;
+}
+
+.light .new-button-bg {
+    background-color: #111111;
+}
+
+.dark .new-button-bg {
+    background-color: #ffffff;
+}
+
+
+/* ========= ELLIPSIS =========*/
+.text-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    lines: 1;
+}
+
+.text-ellipsis-2 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    lines: 2;
+}
+
+/* ========= BACKGROUND-COLOR ['light'] =========*/
+.light .bg-white {
+    background-color: #ffffff;
+}
+
+.light .bg-primary {
+    background-color: rgba(3, 170, 199, 0.1);
+}
+
+.light .dark-primary {
+    background-color: #03aac7;
+}
+
+.light .bg-dark {
+    background-color: #f6f6f6;
+}
+
+.light .after-bg {
+    background-color: #565656;
+}
+
+.light .bg-light-gray {
+    background-color: #ffffff;
+}
+
+.light .bg-black {
+    background-color: #111111;
+}
+
+.light .bg-gray {
+    background-color: #f6f6f6;
+}
+
+.light .bg-blue {
+    background-color: #3070ec;
+}
+
+.light .bg-red {
+    background-color: #f1493f;
+}
+
+.light .bg-disabled {
+    background-color: #eae9eb;
+}
+
+.light .bg-green {
+    background-color: #03aac7;
+}
+
+.real-suc {
+    background-color: rgba(188, 141, 100, .1);
+}
+
+.light .gradient-theme {
+    background: linear-gradient(to right, #ffffff, #ffffff, #f6f6f6);
+}
+
+/* ========= BACKGROUND-COLOR ['dark'] =========*/
+.dark .bg-white {
+    background-color: #111111;
+}
+
+.dark .bg-primary {
+    background-color: rgba(77, 158, 177, 0.1);
+}
+
+.dark .dark-primary {
+    background-color: #4d9eb1;
+}
+
+.dark .bg-dark {
+    background-color: #000000;
+}
+
+.dark .bg-gray {
+    background-color: #282828;
+}
+
+.dark .bg-disabled {
+    background-color: #27292a;
+}
+
+.dark .bg-light-gray {
+    background-color: #363636;
+}
+
+.dark .after-bg {
+    background-color: #363636;
+}
+
+.dark .bg-black {
+    background-color: #ffffff;
+}
+
+.dark .bg-blue {
+    background-color: #3070ec;
+}
+
+.dark .bg-red {
+    background-color: #f45f4f;
+}
+
+.dark .bg-green {
+    background-color: #4d9eb1;
+}
+
+.dark .gradient-theme {
+    background: linear-gradient(to right, #111111, #111111, #282828);
+}
+
+.bg-light-green {
+    background-color: rgba(53, 173, 122, .1);
+}
+
+.bg-light-red {
+    background-color: rgba(255, 92, 81, .1);
+}
+
+/* ========= 边框【白天模式】 =========*/
+.light .border-solid {
+    border: 1rpx solid #e3e3e3;
+}
+
+.light .border-4 {
+    border: 8rpx solid #e3e3e3;
+}
+
+.light .border-top {
+    border-top: 1rpx solid #e3e3e3;
+}
+
+.light .border-bottom {
+    border-bottom: 1rpx solid #e3e3e3;
+}
+
+.light .border-right {
+    border-right: 1rpx solid #e3e3e3;
+}
+
+.light .border-black {
+    border-color: #1f1f1f !important;
+}
+
+.light .line-view {
+    height: 10rpx;
+    background-color: #f6f6f6;
+}
+
+.light .ver-line {
+    width: 4rpx;
+    height: 20rpx;
+    background-color: #d7d8da;
+}
+
+.border-primary {
+    border: 1rpx solid #03aac7 !important;
+}
+
+/* ========= 边框【暗黑模式】 =========*/
+.dark .border-solid {
+    border: 1rpx solid #363636;
+}
+
+.dark .border-4 {
+    border: 8rpx solid #363636;
+}
+
+
+.dark .border-top {
+    border-top: 1rpx solid #363636;
+}
+
+.dark .border-bottom {
+    border-bottom: 1rpx solid #363636;
+}
+
+.dark .border-right {
+    border-right: 1rpx solid #363636;
+}
+
+.dark .border-black {
+    border-color: #ffffff !important;
+}
+
+.dark .line-view {
+    height: 10rpx;
+    background-color: #282828;
+}
+
+.dark .ver-line {
+    background-color: #37383a;
+}
+
+/* ========= 修改部分组件样式 =========*/
+
+
+.box-radius {
+    border-radius: 30rpx 30rpx 0 0 !important;
+    overflow: hidden;
+}
+
+/*模拟文字下滑虚线*/
+.light .dashed-solid {
+    border-bottom: 2rpx dashed #898989;
+}
+
+.dark .dashed-solid {
+    border-bottom: 2rpx dashed #7a7a7a;
+}
+
+/* =======  按钮点击态 ======= */
+.button-active:active {
+    opacity: .95;
+}
+
+.input_placeholder {
+    font-size: 26rpx !important;
+    color: #898989 !important;
+}
+
+.light .black-button {
+    background-color: #1f1f1f;
+}
+
+.dark .black-button {
+    background-color: #ffffff;
+}
+
+/* =======  FUI下拉菜单样式 ======= */
+/deep/ .fui-dropdown__menu-list {
+    padding: 8rpx !important;
+    border-radius: 20rpx !important;
+}
+
+/deep/ .fui-dropdown__menu-item {
+    height: 68rpx !important;
+    padding: 0 8rpx !important;
+    border-radius: 8rpx !important;
+}
+
+/deep/ .dark .fui-dropdown__menu-list .fui-dropdown__menu-item:active {
+    background-color: #111111 !important;
+}
+
+/deep/ .light .fui-dropdown__menu-list .fui-dropdown__menu-item:active {
+    background-color: #ffffff !important;
+}
+
+/deep/ .fui-ddm__item-text {
+    font-weight: 500 !important;
+    padding-left: 6rpx !important;
+}
+
+/deep/ .dark .fui-dialog__footer:after,
+/deep/ .dark .fui-dialog__btn:after {
+    border-color: #282828 !important;
+}
+
+/deep/ .light .fui-collapse__wrap {
+    background-color: #ffffff;
+}
+
+/deep/ .dark .fui-collapse__wrap {
+    background-color: #111111;
+}
+
+
+/deep/ .fui-dialog__inner {
+    width: 600rpx !important;
+}
+
+/deep/ .fui-dialog__title {
+    padding: 34rpx 30rpx !important;
+    font-size: 32rpx !important;
+    font-weight: 500 !important;
+}
+
+/deep/ .fui-dialog__body {
+    padding: 20rpx 30rpx !important;
+}
+
+/deep/ .fui-dialog__descr {
+    font-size: 26rpx !important;
+}
+
+/deep/ .fui-dialog__footer:after {
+    border-top: 1px solid rgba(255, 255, 255, .2) !important;
+}
+
+/deep/ .fui-dialog__footer {
+    height: 96rpx !important;
+    border-top: 1px solid rgba(255, 255, 255, .2) !important;
+}
+
+/deep/ .fui-dialog__btn {
+    height: 96rpx !important;
+    font-size: 26rpx !important;
+    line-height: 96rpx !important;
+    border-left-color: rgba(255, 255, 255, .2) !important;
+}
+
+/deep/ .fui-dialog__btn::after {
+    border-left: 1px solid rgba(255, 255, 255, .2) !important;
+}
+
+/deep/ .dark .fui-dialog__btn:active {
+    background-color: #282828;
+}
+
+/deep/ .light .fui-dialog__btn:active {
+    background-color: #f6f6f6;
+}

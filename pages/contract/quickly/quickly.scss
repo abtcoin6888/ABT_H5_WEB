@@ -1,0 +1,496 @@
+.buyCoinsQuickly {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--background-primary);
+
+  .nav-bar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    &-select {
+      display: flex;
+      align-items: center;
+
+      .toggle-image {
+        width: 26rpx;
+        height: 30rpx;
+        margin-left: 6rpx;
+      }
+    }
+
+    .fui-icon {
+      margin-left: 6rpx;
+    }
+  }
+
+  .quickly-container {
+    width: 100%;
+    height: auto;
+
+    .quickly-container-tabs {
+      width: 100%;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30rpx 30rpx 20rpx 30rpx;
+      box-sizing: border-box;
+
+      image {
+        width: 45rpx;
+        height: 45rpx;
+      }
+    }
+
+    &-cointab {
+      padding: 30rpx 22rpx;
+      box-sizing: border-box;
+    }
+
+    .input-label {
+      margin-top: 40rpx;
+      width: 100%;
+      height: auto;
+      padding: 0 30rpx;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .input-label-box {
+        width: 100%;
+        height: 78rpx;
+        padding: 0 16rpx;
+        box-sizing: border-box;
+        border-radius: 8rpx;
+        margin-top: 16rpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--background-secondary);
+        border: 2rpx solid transparent;
+        position: relative;
+
+        &:focus-within {
+          border-color: var(--color-primary);
+        }
+
+        input {
+          width: 100%;
+          height: 88rpx;
+          position: absolute;
+          font-size: 26rpx;
+          color: var(--content-primary);
+        }
+
+        .desc,
+        .desc-box{
+          position: absolute;
+          right: 16rpx;
+        }
+      }
+    }
+
+    .tip {
+      width: 100%;
+      height: auto;
+      padding: 20rpx 30rpx;
+      box-sizing: border-box;
+    }
+
+    .cell-toggle-icon {
+      width: 30rpx;
+      height: 30rpx;
+      margin-right: 6rpx;
+    }
+
+    .quickly-container-button {
+      width: 100%;
+      height: auto;
+      margin-top: 60rpx;
+      padding: 0 30rpx;
+      box-sizing: border-box;
+    }
+  }
+
+  //menu-wrap
+  .menu-wrap {
+    padding: 0 16rpx;
+    box-sizing: border-box;
+    border-radius: 16rpx;
+    box-shadow: 0 0 10rpx 5rpx var(--shadow-color);
+    background: var(--background-secondary-100);
+    position: fixed;
+    right: 30rpx;
+    z-index: 99;
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: right top;
+
+    .menu-item {
+      min-width: 140rpx;
+      height: 66rpx;
+      margin: 16rpx 0;
+      border-radius: 8rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .menuShow {
+    animation: ddmDownShow 0.25s forwards;
+  }
+
+  .menuHide {
+    animation: ddDownHide 0.25s forwards;
+  }
+
+  @keyframes ddDownHide {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+
+  @keyframes ddmDownShow {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    75% {
+      opacity: 1;
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // bottom-popup-wrap
+  .bottom-popup-wrap {
+    width: 100%;
+    height: auto;
+    background-color: var(--background-primary);
+    border-radius: 16rpx;
+
+    &-title {
+      width: 100%;
+      height: 88rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 30rpx;
+      box-sizing: border-box;
+      position: relative;
+      border-bottom: 2rpx solid var(--border-strength-100);
+
+      .close-icon {
+        position: absolute;
+        right: 30rpx;
+      }
+    }
+
+    &-container {
+      width: 100%;
+      height: auto;
+      padding: 30rpx;
+      box-sizing: border-box;
+
+      .real-name-label {
+        width: 100%;
+        height: 88rpx;
+        margin: 30rpx 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &-left {
+          .fui-icon {
+            margin-right: 16rpx;
+          }
+        }
+
+        &-left,
+        &-right {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .beginner-tutorial-wrap-head {
+        width: 100%;
+        height: auto;
+
+        .beginner-tutorial-wrap-swiper {
+          width: 100%;
+          height: 500rpx;
+
+          swiper-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+
+            &:first-of-type {
+              image {
+                width: 380rpx;
+              }
+            }
+
+            image {
+              width: 500rpx;
+            }
+
+            text {
+              display: inline-block;
+              width: 100%;
+              line-height: 40rpx;
+            }
+          }
+        }
+      }
+
+      .beginner-tutorial-wrap-bottom {
+        width: 100%;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .left {
+          display: flex;
+          align-items: center;
+
+          .dots {
+            display: inline-block;
+            width: 10rpx;
+            height: 10rpx;
+            border-radius: 50%;
+            background: var(--background-secondary);
+            margin: 0 10rpx;
+          }
+
+          .dot-active {
+            width: 50rpx;
+            height: 10rpx;
+            border-radius: 10rpx;
+            background: var(--content-primary);
+            transition: width 0.25s linear;
+          }
+        }
+
+        .right {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+
+          .button {
+            height: 68rpx;
+            padding: 10rpx 30rpx;
+            box-sizing: border-box;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10rpx;
+
+            image {
+              width: 45rpx;
+              height: 45rpx;
+            }
+          }
+        }
+      }
+
+      .advertising-label {
+        width: 100%;
+        height: auto;
+
+        .advertising-label-box {
+          width: 100%;
+          height: 88rpx;
+          padding: 0 20rpx;
+          box-sizing: border-box;
+          border-radius: 10rpx;
+          margin-top: 16rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: var(--background-secondary);
+          border: 2rpx solid var(--background-secondary);
+
+          &:focus-within {
+            border-color: var(--color-primary);
+          }
+
+          input {
+            width: 100%;
+            height: 78rpx;
+            font-size: 26rpx;
+            color: var(--content-primary);
+          }
+        }
+      }
+
+      .seller-defalut {
+        opacity: .7;
+      }
+
+      .seller-item {
+        width: 100%;
+        height: 106rpx;
+        border-radius: 10rpx;
+        padding: 10rpx 20rpx;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 2rpx solid var(--background-secondary);
+        background: var(--background-secondary);
+        margin-top: 30rpx;
+        overflow: hidden;
+        position: relative;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
+
+        .left {
+          image {
+            width: 30rpx;
+            height: 30rpx;
+
+            &[type='unionpay'] {
+              width: 35rpx;
+            }
+          }
+        }
+
+        .right {
+          width: calc(100% - 50rpx);
+          height: auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .right-column {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .right-end {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+          }
+        }
+      }
+
+      .item-active {
+        border-color: var(--color-primary);
+        background-color: var(--background-secondary);
+        background-image: url("@/static/img/tactic/select-primary.png");
+        background-size: 40rpx 40rpx;
+        background-repeat: no-repeat;
+        background-position: calc(100% + 2rpx) 100%;
+      }
+
+      .pay-item {
+        width: 100%;
+        height: 106rpx;
+        border-radius: 10rpx;
+        padding: 10rpx 20rpx;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--background-secondary);
+        border: 2rpx solid var(--background-secondary);
+        margin-top: 30rpx;
+        overflow: hidden;
+        position: relative;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
+
+        .left {
+          display: flex;
+          align-items: center;
+
+          image {
+            width: 35rpx;
+            height: 35rpx;
+            margin-right: 16rpx;
+          }
+        }
+      }
+
+      .pay-item-active {
+        border-color: var(--color-primary);
+        background-color: var(--background-primary);
+        background-image: url("@/static/img/tactic/select-primary.png");
+        background-size: 40rpx 40rpx;
+        background-repeat: no-repeat;
+        background-position: calc(100% + 2rpx) 100%;
+      }
+
+      .advertising-button {
+        width: 100%;
+        height: auto;
+        margin-top: 60rpx;
+      }
+    }
+  }
+
+  //  modal-wrap
+  .modal-wrap {
+    width: 600rpx;
+    height: auto;
+    background: var(--background-primary);
+    padding: 30rpx;
+    box-sizing: border-box;
+    border-radius: 16rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .describe {
+      line-height: 44rpx;
+    }
+
+    &-content {
+      width: 100%;
+      margin-top: 30rpx;
+      padding: 20rpx;
+      box-sizing: border-box;
+      border-radius: 8rpx;
+      background: var(--background-secondary);
+
+      .item {
+        width: 100%;
+        height: 54rpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    &-button {
+      width: 100%;
+      height: auto;
+      margin-top: 30rpx;
+    }
+  }
+}

@@ -1,0 +1,71 @@
+$radius-10: 20rpx;
+$radius-8: 16rpx;
+
+.userAuth {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    &-container {
+        width: 100%;
+        height: auto;
+        padding: 30rpx;
+        box-sizing: border-box;
+
+        .label {
+            width: 100%;
+            margin-bottom: 50rpx;
+
+            &-title {
+                width: 100%;
+                margin-bottom: 16rpx;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                &-right {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    image {
+                        width: 28rpx;
+                        height: 28rpx;
+                        margin-right: 8rpx;
+                    }
+                }
+            }
+
+            &-card {
+                width: 100%;
+                @extend .userAuth-container;
+                border-radius: $radius-8;
+                background: var(--background-secondary);
+
+                .description {
+                    line-height: 42rpx;
+                }
+
+                &-button {
+                    width: 100%;
+                    height: auto;
+                    margin-top: 30rpx;
+                }
+            }
+
+            &-content {
+                width: 100%;
+                height: auto;
+                padding: 20rpx 0;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+
+                text {
+                    line-height: 38rpx;
+                    margin-bottom: 16rpx;
+                }
+            }
+        }
+    }
+}

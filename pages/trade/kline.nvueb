@@ -1,0 +1,412 @@
+<template>
+    <view class="kline_nvue" :class="userTheme">
+        <!-- nav -->
+        <fui-nav-bar :background="userTheme == 'light' ? '#f8f9f9' : '#202229'" isFixed isOccupy custom @init="navInit">
+            <view class="nav-bar">
+                <view class="left">
+                    <view class="image-box" @click="onBack">
+                        <fui-icon name="arrowleft" size="56" :color="userTheme == 'light' ? '#23262e' : '#ffffff'"></fui-icon>
+                    </view>
+                </view>
+                <view class="center" @click="drawerShow = true">
+                    <image class="change-image" :src="`/static/newImage/toggle-${userTheme}.png`" mode="widthFix"></image>
+                    <text class="font-17 color-black font-weight">
+                        {{ currencyInfo['symbol'] ? currencyInfo['symbol'] : '--/' }}USDT
+                    </text>
+                </view>
+                <view class="right">
+                    <view class="image-box" @click="optionalChange">
+                        <image class="btn-image" :src="like ? '/static/newImage/collect-s.png' : `/static/newImage/collect-${userTheme}.png`" mode="widthFix"></image>
+                    </view>
+                    <view class="image-box">
+                        <image class="btn-image" :src="`/static/newImage/share-${userTheme}.png`" mode="widthFix"></image>
+                    </view>
+                </view>
+            </view>
+        </fui-nav-bar>
+        <view class="bg-gray" :style="{'height': scrollHeight + 'px'}">
+            <view class="bg-white box-radius" :style="{'height': scrollHeight + 'px'}">
+                <!--    container scroll    -->
+                <list :scrollable="true" :show-scrollbar="false" class="scroll-list bg-white"
+                      :style="{'height': scrollHeight + 'px'}">
+                    <cell>
+                        <view class="list-top">
+                            <view class="left item">
+                                <view class="_row">
+                                    <text class="font-17 font-weight mr-5" :class="{ 'price_up': currencyInfo.change_rate >= 0, 'price_down': currencyInfo.change_rate < 0 }">
+                                        {{ util.thousandSeparator(currencyInfo['new_price'], currencyInfo['decimals']) }}
+                                    </text>
+                                    <text class="font-12 font-weight" :class="{ 'price_up': currencyInfo.change_rate >= 0, 'price_down': currencyInfo.change_rate < 0 }">
+                                        {{ currencyInfo['change_rate'] }}%
+                                    </text>
+                                </view>
+                                <view class="_row mt-3">
+                                    <text class="font-10 color-black font-weight">≈{{symbol}}{{ util.thousandSeparator(currencyInfo['new_price'] * symbol_rate, currencyInfo['decimals']) }}</text>
+                                </view>
+                                <view class="_row mt-3" v-if="false">
+                                    <text class="font-10 color-dark mr-5">标记价格</text>
+                                    <text class="font-10 color-black font-weight">26,706,1</text>
+                                </view>
+                                <view class="_row mt-3" v-if="false">
+                                    <text class="font-10 color-dark mr-5">指数价格</text>
+                                    <text class="font-10 color-black font-weight">26,716.5</text>
+                                </view>
+                            </view>
+                            <view class="right item">
+                                <!-- 24h max price-->
+                                <view class="_row">
+                                    <text class="font-10 width color-dark">{{ $t('kline.max_price') }}</text>
+                                    <text class="font-10 font-weight last-width color-black">
+                                        {{ util.thousandSeparator(currencyInfo['high_price'], currencyInfo['decimals']) }}
+                                    </text>
+                                </view>
+                                <!-- 24h min price-->
+                                <view class="_row mt-3">
+                                    <text class="font-10 width color-dark">{{ $t('kline.min_price') }}</text>
+                                    <text class="font-10 font-weight last-width color-black">
+                                        {{ util.thousandSeparator(currencyInfo['low_price'], currencyInfo['decimals']) }}
+                                    </text>
+                                </view>
+                                <!-- 24h h_vol-->
+                                <view class="_row mt-3">
+                                    <text class="font-10 width color-dark">{{ $t('kline.h_vol') }}</text>
+                                    <text class="font-10 font-weight last-width color-black">
+                                        {{ util.thousandSeparator(currencyInfo['quantity'], currencyInfo['decimals']) }}
+                                    </text>
+                                </view>
+                                <!-- 24h h_tur-->
+                                <view class="_row mt-3">
+                                    <text class="font-10 width color-dark">{{ $t('kline.h_tur') }}</text>
+                                    <text class="font-10 font-weight last-width color-black">
+                                        {{ util.bigNumberToString(currencyInfo['quota'], currencyInfo['decimals']) }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </cell>
+                    <!-- kline time tab -->
+                    <cell>
+                        <view class="time-tab">
+                            <fui-tabs :selectedColor="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                      sliderBackground="#3070ec"
+                                      color="#85898e"
+                                      :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                      height="66"
+                                      :size="24" selectedSize="24" padding="0" fontWeight="500" :scroll="true" :alignLeft="true"
+                                      :center="true"
+                                      :short="false" :tabs="timeIndex['time']" @change="timerChange"></fui-tabs>
+                        </view>
+                    </cell>
+                    <!-- kline box -->
+                    <cell>
+                        <view class="kline">
+                            <web-view ref="webview" class="kline-webview" src="/hybrid/html/local.html"></web-view>
+                        </view>
+                    </cell>
+                    <!-- kline average -->
+                    <cell>
+                        <view class="kline-average">
+                            <view class="item" @click="ma=!ma">
+                                <text class="font-11 font-weight" :class="ma ? 'color-black' : 'color-gray'">MA</text>
+                            </view>
+                            <view class="item" @click="ema=!ema">
+                                <text class="font-11 font-weight" :class="ema ? 'color-black' : 'color-gray'" >EMA</text>
+                            </view>
+                            <view class="item" @click="boll=!boll">
+                                <text class="font-11 font-weight" :class="boll ? 'color-black' : 'color-gray'">BOLL</text>
+                            </view>
+                            <view class="line"></view>
+                            <view class="item">
+                                <text class="font-11 color-black font-weight">VOL</text>
+                            </view>
+                            <view class="item">
+                                <text class="font-11 color-black font-weight">MACD</text>
+                            </view>
+                            <view class="item">
+                                <text class="font-11 color-gray font-weight">KDJ</text>
+                            </view>
+                            <view class="item">
+                                <text class="font-11 color-gray font-weight">RSI</text>
+                            </view>
+                        </view>
+                    </cell>
+                    <!-- list tab -->
+                    <cell>
+                        <view class="order-tabs">
+                            <fui-tabs :current="odActive"
+                                      :selectedColor="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                                      sliderBackground="#3070ec"
+                                      :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                                      color="#85898e"
+                                      height="88"
+                                      :size="28"
+                                      :sliderHeight="6"
+                                      padding="0"
+                                      selectedSize="28"
+                                      fontWeight="500" :center="true" :short="false" :tabs="orderTab"
+                                      @change="orderChange"></fui-tabs>
+                        </view>
+                    </cell>
+                    <!-- list title -->
+                    <cell>
+                        <view class="list-title" v-if="odActive == 0">
+                            <view class="item item-left">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.buy_nm') }}({{ currencyInfo['symbol'] }})</text>
+                            </view>
+                            <view class="item item-center">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.price') }}(USDT)</text>
+                            </view>
+                            <view class="item item-right">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.sell_nm') }}({{ currencyInfo['symbol'] }})</text>
+                            </view>
+                        </view>
+                        <view class="list-title" v-if="odActive == 1">
+                            <view class="item item-left">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.time') }}</text>
+                            </view>
+                            <view class="item item-center">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.price') }}(USDT)</text>
+                            </view>
+                            <view class="item item-right">
+                                <text class="font-11 color-gray font-weight">{{ $t('kline.num') }}({{ currencyInfo['symbol'] }})</text>
+                            </view>
+                        </view>
+                    </cell>
+
+                    <cell>
+                        <view class="content-box-wrap" :style="{'height': scrollHeight - 150 + 'px'}">
+                            <!-- list con / 委托订单 -->
+                            <view v-if="odActive == 0" class="list-con" :style="{'height': scrollHeight - 150 + 'px'}">
+                                <view class="list-cell" v-for="i in 10">
+                                    <view class="_item _item-left">
+                                        <view class="bg-box bg-light-green" :style="{'width': (bids[i - 1] ? util.float(bids[i - 1][1]):0) * 170 + 'rpx' }"></view>
+                                        <text class="font-11 color-black font-weight">{{ bids[i - 1] ? util.float(bids[i - 1][1]) : '--' }}</text>
+                                        <text class="font-11 font-weight price_up">{{bids[i - 1] ? util.thousandSeparator(bids[i - 1][0], currencyInfo['decimals']) : '--'}}</text>
+                                    </view>
+                                    <view class="_item _item-right">
+                                        <view class="bg-box bg-light-red" :style="{'width': (asks[i - 1] ? util.thousandSeparator(asks[i - 1][1], currencyInfo['decimals']):0) * 170 + 'rpx' }"></view>
+                                        <text class="font-11 font-weight price_down">{{ asks[i - 1] ? util.float(asks[i - 1][0]) : '--' }}</text>
+                                        <text class="font-11 color-black font-weight">{{ asks[i - 1] ? util.thousandSeparator(asks[i - 1][1], currencyInfo['decimals']) : '--' }}</text>
+                                    </view>
+                                </view>
+                            </view>
+
+                            <!-- list con / 实时成交 -->
+                            <view v-if="odActive == 1" class="list-con" :style="{'height': scrollHeight - 150 + 'px'}">
+                                <view class="_list-cell list-title" v-for="(item,index) in trades" :key="'trade'+index">
+                                    <view class="item item-left">
+                                        <text class="font-11 color-black font-weight">{{ item.time }}</text>
+                                    </view>
+                                    <view class="item item-center">
+                                        <text class="font-11 price_down font-weight">{{ util.thousandSeparator(item.price, currencyInfo['decimals']) }}</text>
+                                    </view>
+                                    <view class="item item-right">
+                                        <text class="font-11 color-black font-weight">{{ item.vol }}</text>
+                                    </view>
+                                </view>
+                            </view>
+
+                            <!-- list con / 币种信息 -->
+                            <view class="coin-info-warp" v-if="odActive == 2">
+                                <scroll-view scroll-y class="coin-info" :style="{'height': scrollHeight - 150 + 'px'}">
+                                    <view class="coin-card" v-if="info">
+                                        <view class="coin-row coin-row-image">
+                                            <image class="coin-img" :src="currencyInfo['icon']" mode=""></image>
+                                            <text class="font-16 color-black font-weight">{{ currencyInfo['symbol'] }}</text>
+                                        </view>
+                                        <view class="coin-row">
+                                            <text class="font-13 color-sub">{{ $t('kline.rank') }}</text>
+                                            <text class="font-13 color-black font-weight">No.{{ info['marketSort'] ? info['marketSort'] : '--' }}</text>
+                                        </view>
+                                        <view class="coin-row">
+                                            <text class="font-13 color-sub">{{ $t('kline.mk_val') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ symbol }}{{ info['marketValue'] ? info['marketValue'] : '--' }}</text>
+                                        </view>
+                                        <view class="coin-row border-bottom">
+                                            <text class="font-13 color-sub">{{ $t('kline.occupancy') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ info['marketShare'] ? info['marketShare'] : '--' }}%</text>
+                                        </view>
+                                        <view class="coin-row">
+                                            <text class="font-13 color-sub">{{ $t('kline.flow_rate') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ info['CirculationRate'] ? info['CirculationRate'] : '--' }}%</text>
+                                        </view>
+                                        <view class="coin-row">
+                                            <text class="font-13 color-sub">{{ $t('kline.issue_date') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ info['issueDate'] ? info['issueDate'] : '--' }}</text>
+                                        </view>
+                                        <view class="coin-row border-bottom">
+                                            <text class="font-13 color-sub">{{ $t('kline.issue_price') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ symbol }}{{ info['IssuePrice'] ? info['IssuePrice'] * symbol_rate : '--'}}</text>
+                                        </view>
+                                        <view class="coin-row">
+                                            <text class="font-13 color-sub">{{ $t('kline.high_price') }}</text>
+                                            <text class="font-13 color-black font-weight">{{ symbol }}{{info['hightPrice'] ? info['hightPrice'] * symbol_rate : '--'}}</text>
+                                        </view>
+                                    </view>
+                                    <view class="line-view"></view>
+                                    <view class="coin-card">
+                                        <view class="coin-row">
+                                            <text class="font-16 color-black font-weight">{{ $t('kline.about_t') }}{{ currencyInfo['symbol'] }}</text>
+                                        </view>
+                                        <view class="coin-context">
+                                            <text class="font-13 color-sub">{{ info['about'] }}</text>
+                                        </view>
+                                    </view>
+                                    <view class="line-view"></view>
+                                    <view class="coin-card last-card">
+                                        <view class="coin-row">
+                                            <text class="font-16 color-black font-weight">{{ $t('kline.official_link') }}</text>
+                                        </view>
+                                        <view class="coin-row" @click="mroute.webview(2,info['websiteLink'],'',200)">
+                                            <text class="font-13 color-blue font-weight">{{ $t('kline.official_web') }}</text>
+                                        </view>
+                                        <view class="coin-row"  @click="mroute.webview(2,info['browserLink'],'',200)">
+                                            <text class="font-13 color-blue font-weight">{{ $t('kline.block_bro') }}</text>
+                                        </view>
+                                    </view>
+                                </scroll-view>
+                            </view>
+                        </view>
+                    </cell>
+                    <cell>
+                        <view class="zw-view" :style="{'height': odActive != 2 ? '100rpx' : '180rpx'}"></view>
+                    </cell>
+                    <!--footer buttons-->
+                    <cell>
+                        <view class="footer bg-white" @click="onBack()">
+                            <view class="btn bg-red">
+                                <text class="font-15 font-weight color-white">{{ $t('trade.buy') }}</text>
+                            </view>
+                            <view class="btn bg-green">
+                                <text class="font-15 font-weight color-white">{{ $t('trade.sell') }}</text>
+                            </view>
+                        </view>
+                    </cell>
+                </list>
+            </view>
+        </view>
+
+        <fui-toast ref="toast" background="rgba(0, 0, 0, .8)" size="24">
+            <fui-icon style="margin-bottom: 20rpx;" name="checkbox" color="#fff"></fui-icon>
+        </fui-toast>
+        <!-- 抽屉 -->
+        <fui-drawer :background="userTheme == 'light' ? '#ffffff' : '#17181e'" radius="30" maskBackground="rgba(0, 0, 0, .8)" direction="left" :show="drawerShow" @close="closeDrawer">
+            <view class="drawer bg-white">
+                <view class="status_bar" :style="{'height':statusBarHeight + 'px'}"></view>
+                <text class="title color-black">{{ type === 0 ? $t('index.spot') : $t('index.popup_c') }}</text>
+                <view class="search_box bg-gray">
+                    <image class="search_icon" src="/static/img/search.png" mode=""></image>
+                    <input class="search_input color-black" type="text" :placeholder="$t('trade.search_cc')" placeholder-class="input_placeholder">
+                </view>
+                <view class="tab_box">
+                    <view class="_item" :class="drawerTab == 0 ? 'bg-gray' : ''" @click="drawerTab = 0">
+                        <text class="font-13 font-weight" :class="drawerTab == 0 ? 'color-black' : 'color-dark'">{{ $t('index.tab_t1') }}</text>
+                    </view>
+                    <view class="_item" :class="drawerTab == 1 ? 'bg-gray' : ''" @click="drawerTab = 1">
+                        <text class="font-13 font-weight" :class="drawerTab == 1 ? 'color-black' : 'color-dark'">USDT</text>
+                    </view>
+                </view>
+                <scroll-view scroll-y :show-scrollbar="false" class="tab_list"
+                             :style="{'height': windowHeight - statusBarHeight - 140 + 'px'}">
+                    <view class="list_top bg-white">
+                        <view class="_left top-item">
+                            <text class="font-11 font-weight color-dark">{{ $t('contruct.pl12') }}</text>
+<!--                            <image class="change_icon" src="/static/img/z-nomal.png" mode=""></image>-->
+                        </view>
+                        <view class="_right top-item">
+                            <view class="ri">
+                                <text class="font-11 font-weight color-dark">{{ $t('contruct.pl13') }}</text>
+<!--                                <image class="change_icon" src="/static/img/z-nomal.png" mode=""></image>-->
+                            </view>
+                            <view class="ri">
+                                <text class="font-11 font-weight color-dark">/{{ $t('contruct.pl14') }}</text>
+<!--                                <image class="change_icon" src="/static/img/z-nomal.png" mode=""></image>-->
+                            </view>
+                        </view>
+                    </view>
+                    <view class="list_bottom">
+                        <template v-if="drawerTab === 0">
+                            <template v-if="mlist.length > 0">
+                                <view class="coin_box" :class="selectCoinIndex == index ? 'coin-select' : ''" v-for="(item,index) in mlist" :key="'m'+index"
+                                      @click="switchCurrency(item.id,index)">
+                                    <view class="left">
+                                        <text class="font-14 font-weight color-black">{{ item['symbol'] }}</text>
+                                        <text class="font-11 color-dark font-weight ml-4">/USDT</text>
+                                    </view>
+                                    <view class="right">
+                                        <text class="font-13 font-weight"
+                                              :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                            {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                        </text>
+                                        <text class="font-10 font-weight mt-4"
+                                              :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                            {{ util.thousandSeparator(item['change_rate']) }}%
+                                        </text>
+                                    </view>
+                                </view>
+                            </template>
+                            <template v-else>
+                                <view class="not-list">
+                                    <image class="not-img" src="/static/newImage/not-order.png" mode="widthFix"></image>
+                                    <text class="font-12 color-dark">{{ $t('list.not_data') }}</text>
+                                </view>
+                            </template>
+                        </template>
+                        <template v-else>
+                            <template v-if="currency.length > 0">
+                                <view class="coin_box" :class="selectCoinIndex == index ? 'bg-gray' : ''" v-for="(item,index) in currency[0]['currency']"
+                                      :key="'did'+index"
+                                      @click="switchCurrency(item.id,index)">
+                                    <view class="left">
+                                        <text class="font-14 font-weight color-black">{{ item['symbol'] }}</text>
+                                        <text class="font-11 color-dark font-weight ml-4">/USDT</text>
+                                    </view>
+                                    <view class="right">
+                                        <text class="font-13 font-weight"
+                                              :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                            {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                        </text>
+                                        <text class="font-10 font-weight mt-4"
+                                              :class="{ 'price_up': item['change_rate'] >= 0, 'price_down': item['change_rate'] < 0 }">
+                                            {{ util.thousandSeparator(item['change_rate']) }}%
+                                        </text>
+                                    </view>
+                                </view>
+                            </template>
+                            <template v-else>
+                                <view class="not-list">
+                                    <image class="not-img" src="/static/newImage/not-order.png" mode="widthFix"></image>
+                                    <text class="font-12 color-dark">{{ $t('list.not_data') }}</text>
+                                </view>
+                            </template>
+                        </template>
+                        <!-- <view class="coin_box" v-for="i in 1">
+                            <view class="left">
+                                <text class="font-14 font-weight color-black">{{currencyInfo['symbol']}}</text>
+                                <text class="font-12 color-gray">/USDT</text>
+                            </view>
+                            <view class="right">
+                                <text class="font-12 font-weight price_up _text">29,884,84</text>
+                                <text class="font-12 price_up _text">+33%</text>
+                            </view>
+                        </view>
+                        <view class="not-list">
+                            <image class="not-img" src="/static/img/noorder.png" mode="widthFix"></image>
+                            <text class="font-12 color-gray">{{$t('list.not_data')}}</text>
+                        </view> -->
+                    </view>
+                </scroll-view>
+            </view>
+        </fui-drawer>
+    </view>
+</template>
+
+<script>
+    import service from "./kline.js";
+
+    export default service;
+</script>
+
+<style scoped>
+    @import url("klinenvue.css");
+</style>

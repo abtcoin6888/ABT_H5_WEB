@@ -1,0 +1,177 @@
+.cta-warp {
+  width: 100%;
+  height: auto;
+  padding: 30rpx;
+  box-sizing: border-box;
+
+  .head {
+    width: 100%;
+    height: auto;
+    padding-bottom: 30rpx;
+    box-sizing: border-box;
+
+    .tabs {
+      width: 100%;
+      height: auto;
+      padding: 8rpx;
+      box-sizing: border-box;
+      background: var(--background-secondary);
+      border-radius: 16rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .item {
+        width: calc(100% / 3);
+        height: 58rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8rpx;
+
+        text {
+          font-size: 26rpx;
+          color: var(--content-tertiary);
+        }
+
+        &-active {
+          background: var(--background-primary);
+
+          text {
+            color: var(--content-primary);
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .tip-box {
+      width: 100%;
+      height: auto;
+      margin-top: 16rpx;
+
+      text {
+        font-size: 24rpx;
+        color: var(--content-tertiary);
+      }
+    }
+  }
+
+  .swiper {
+    &-item {
+      width: 100%;
+      height: 100%;
+
+      .scroll-list {
+        width: inherit;
+        height: inherit;
+
+        .card-item {
+          width: 100%;
+          height: auto;
+          border-radius: 16rpx;
+          padding: 0 30rpx;
+          box-sizing: border-box;
+          border: 1rpx solid var(--border-strength-100);
+          margin-bottom: 30rpx;
+
+          .item-head {
+            width: 100%;
+            height: auto;
+            padding: 30rpx 0;
+            box-sizing: border-box;
+            border-bottom: 1rpx solid var(--border-strength-100);
+
+            ._title {
+              width: 100%;
+              height: auto;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 16rpx;
+
+              text {
+                &:first-child {
+                  font-size: 32rpx;
+                  color: var(--content-primary);
+                  font-weight: 500;
+                }
+
+                &:last-child {
+                  font-size: 24rpx;
+                  color: var(--content-primary);
+                }
+              }
+            }
+          }
+
+          .item-content {
+            width: 100%;
+            height: auto;
+            padding: 30rpx 0;
+            box-sizing: border-box;
+
+            &-left {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+
+              text {
+                &:first-child {
+                  font-size: 38rpx;
+                  font-weight: 600;
+                  margin-bottom: 10rpx;
+                }
+                &:last-child {
+                  font-size: 24rpx;
+                  color: var(--content-tertiary);
+                }
+              }
+            }
+          }
+
+          .item-footer {
+            width: 100%;
+            height: auto;
+            padding: 30rpx 0;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .row {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+
+              image {
+                width: 38rpx;
+                height: 38rpx;
+                margin-right: 16rpx;
+              }
+
+              text {
+                font-size: 26rpx;
+                font-weight: 500;
+                color: var(--content-primary);
+              }
+            }
+
+            .button {
+              height: 58rpx;
+              margin: 0;
+              padding: 0 30rpx;
+              box-sizing: border-box;
+              font-size: 26rpx;
+              color: var(--background-primary);
+              background: var(--content-primary);
+              border-radius: 58rpx;
+              line-height: 58rpx;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+  }
+}

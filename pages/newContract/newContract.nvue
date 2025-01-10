@@ -1,0 +1,2668 @@
+<template>
+    <view class="newContract bg-white"
+          :class="userTheme"
+          id="contractPage">
+        <view class="page-nav bg-white"
+              :style="`height: ${statusBarHeight + navContentHeight}px`">
+            <view class="status-bar bg-white"
+                  :style="`height: ${statusBarHeight}px`">
+            </view>
+            <view class="page-nav-content bg-white">
+                <view class="nc-scroll-warp"
+                      :class="navHideType ? 'scroll-transform-hide': 'scroll-transform-show'">
+                    <scroll-view :scroll-x="true"
+                                 class="scroll-view"
+                                 :show-scrollbar="false"
+                                 :scroll-with-animation="true"
+                                 :scroll-into-view="`navTab${scrollTabIndex}`">
+                        <view class="item"
+                              :id="`navTab${index+1}`"
+                              v-for="(item,index) in navScrollTab"
+                              :key="index"
+                              @click="scrollTabIndex = index">
+                            <text class="font-15 font-weight"
+                                  :class="scrollTabIndex === index ? 'color-black' : 'color-gray'">
+                                {{
+                                    item
+                                }}
+                            </text>
+                        </view>
+                    </scroll-view>
+                    <!-- <view class="image-group" @click="mroute.toTactic">
+                        <image class="button-icon"
+                               :src="`/static/img/newContract/apo-${userTheme}.png`"
+                               mode="widthFix">
+                        </image>
+                    </view> -->
+                </view>
+                <view class="title-bar"
+                      :class="navHideType ? 'transform-hide': 'transform-show'">
+                    <view class="coin-box">
+                        <view class="cell">
+                            <view class="cell-left"
+                                  @click="drawerVisible = true">
+                                <text class="font-16 font-bold  color-black">
+                                    {{
+                                        currentCurrency['symbol']
+                                    }}/USDT
+                                </text>
+                                <image class="down-icon"
+                                       :src="`/static/img/tactic/down-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="cell-right">
+                                <image class="button-icon"
+                                       :src="`/static/img/newContract/kline-icon-${userTheme}.webp`"
+                                       mode="widthFix"
+                                       @click="mroute.toKline(0,currentCurrency['id'],2)">
+                                </image>
+                                <image class="button-icon"
+                                       :src="`/static/img/newContract/more-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click="moreVisible = true">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="cell">
+                            <view class="cell-left"
+                                  @click="drawerVisible = true">
+                                <text class="font-11 tag-box color-gray ">
+                                    {{
+                                        $t('contract.p1')
+                                    }}
+                                </text>
+                                <text class="font-11 "
+                                      :class="{'price_down':currentCurrency['change_rate']<=0,'price_up':currentCurrency['change_rate']>0}">
+                                    {{
+                                        currentCurrency['change_rate'] > 0 ? '+' : ''
+                                    }}{{
+                                        util.thousandSeparator(currentCurrency['change_rate'])
+                                    }}%
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="body-scroll-warp">
+            <scroll-view class="bs-box"
+                         :scroll-y="true"
+                         :scroll-anchoring="true"
+                         :style="`height: ${bodyScrollHeight}px`"
+                         @scroll="bodyScroll">
+                <refresh @pullingdown='onpullingdown'
+                         @refresh="onrefresh"
+                         :display=" refreshing ? 'show' : 'hide' "
+                         class="refresh">
+                    <text class="font-13  color-gray"
+                          v-if="refText">
+                        {{ refreshText }}
+                    </text>
+                    <fui-load-ani color="#03aac7"
+                                  type="3"
+                                  v-else>
+                    </fui-load-ani>
+                </refresh>
+                <view class="header-box">
+                    <view class="hb-toggle">
+                        <!-- 保证金模式/杠杆 -->
+                        <view class="row-box margin-leverage">
+                            <view class="ml-item bg-gray"
+                                  @click="marginModel = true">
+                                <text class="font-11 color-black ">
+                                    {{
+                                        marginModelOption[modelActive]
+                                    }}
+                                </text>
+                                <image class="down-icon"
+                                       :src="`/static/img/tactic/down-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <view class="ml-item bg-gray"
+                                  @click="leverVisible = true">
+                                <text class="font-11  color-black">
+                                    {{
+                                        leverValue
+                                    }}X
+                                </text>
+                                <image class="down-icon"
+                                       :src="`/static/img/tactic/down-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                        <!-- 开仓/平仓 -->
+                        <view class="row-box oc-position bg-gray"
+                              id="controlBox">
+                            <view class="oc-background bg-light-gray"
+                                  :style="`left: ${buttonActive == 0 ? '4rpx' : '206rpx'}`">
+                            </view>
+                            <view class="oc-item"
+                                  v-for="(item,index) in buttonArray"
+                                  @click="buttonActive = index">
+                                <text class="font-12 "
+                                      :class="buttonActive == index ? 'color-black' : 'color-gray'">
+                                    {{
+                                        item
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                        <!--  下单模式      -->
+                        <fui-dropdown-menu :size="24"
+                                           :minWidth="395"
+                                           :maxHeight="orderMode.length * 72"
+                                           :radius="8"
+                                           padding="8rpx"
+                                           :isCheckbox="false"
+                                           :options="orderMode"
+                                           :background="userTheme === 'light' ? '#ffffff' : '#282828'"
+                                           :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                                           :selectedColor="userTheme === 'light' ? '#03aac7' : '#4d9eb1'"
+                                           @click="orderModeClick"
+                                           ref="ddmRange">
+                            <view class="row-box order-mode bg-gray"
+                                  @click="$refs.ddmRange.show()">
+                                <image class="hint-icon"
+                                       :src="`/static/img/newContract/tip-${userTheme}.png`"
+                                       mode="widthFix"
+                                       @click.stop="orderModeVisible = true">
+                                </image>
+                                <text class="tip-text font-12 color-black ">
+                                    {{
+                                        orderMode[orderModeIndex]['text']
+                                    }}
+                                </text>
+                                <image class="down-icon"
+                                       :src="`/static/img/tactic/down-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </fui-dropdown-menu>
+                        <!-- (市价单显示) -->
+                        <view v-if="orderModeIndex == 1">
+                            <view class="row-box disabled-box bg-disabled border-solid">
+                                <text class="font-13 color-gray">
+                                    {{
+                                        $t('newcontract.t1')
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                        <!-- (委托显示) -->
+                        <view v-if="orderModeIndex == 2">
+                            <view class="row-box trust-warp">
+                                <view class="group">
+                                    <view class="input-box bg-gray">
+                                        <input class="input color-black  font-13"
+                                               type="number"
+                                               :placeholder="$t('contruct.trigger_price')"
+                                               v-model="order_wprice">
+                                    </view>
+                                    <fui-dropdown-menu :size="24"
+                                                       :minWidth="100"
+                                                       :maxHeight="priceType.length * 72"
+                                                       padding="8rpx"
+                                                       :radius="8"
+                                                       :background="userTheme === 'light' ? '#ffffff' : '#282828'"
+                                                       :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                                                       :isCheckbox="false"
+                                                       :selectedColor="userTheme === 'light' ? '#03aac7' : '#4d9eb1'"
+                                                       :options="priceType"
+                                                       @click="setPriceType"
+                                                       ref="priceType">
+                                        <view class="right-box bg-gray">
+                                            <text class="font-12 color-black "
+                                                  @click="$refs.priceType.show()">
+                                                {{
+                                                    priceType[priceIndex]
+                                                }}
+                                            </text>
+                                            <image class="down-icon"
+                                                   :src="`/static/img/tactic/down-${userTheme}.png`"
+                                                   mode="widthFix">
+                                            </image>
+                                        </view>
+                                    </fui-dropdown-menu>
+                                </view>
+                                <view class="group">
+                                    <view class="input-box bg-gray">
+                                        <input class="input color-black  font-13"
+                                               :type="!wtype ? 'text':'digit'"
+                                               :placeholder="!wtype  ? $t('contruct.bmp'):$t('newcontract.t2')"
+                                               v-model="order_price"
+                                               :disabled="!wtype">
+                                    </view>
+                                    <view class="right-box bg-gray">
+                                        <text class="font-12 color-black "
+                                              @click="wtype=!wtype">
+                                            {{
+                                                wtype ? $t('trade.mk_pr') : $t('trade.lm_pr')
+                                            }}
+                                        </text>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- (限价显示) -->
+                        <view v-if="orderModeIndex < 1">
+                            <view class="row-box input-box price-box bg-gray">
+                                <input class="input font-13  color-black"
+                                       type="digit"
+                                       :placeholder="$t('kline.price')"
+                                       @focus="priceFocus = true"
+                                       @blur="priceFocus = false"
+                                       v-model="order_price">
+                                <view class="toggle-group">
+                                    <fui-icon @click="decryPrice"
+                                              name="minus"
+                                              size="44"
+                                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'">
+                                    </fui-icon>
+                                    <view class="ver-line bg-light-gray"></view>
+                                    <fui-icon @click="incryPrice"
+                                              name="plus"
+                                              size="44"
+                                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'">
+                                    </fui-icon>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- 数量 -->
+                        <view class="row-box number-box">
+                            <view class="nb-top bg-gray">
+                                <text class="desc font-10 color-gray"
+                                      :class="{'focus-desc': numberFocus || numberModel !== ''}">
+                                    {{
+                                        contractunitVal.title ? contractunitVal.title : $t('kline.num')
+                                    }}
+                                    ({{
+                                        contractunitVal.type ? contractunitVal.type : currentCurrency['symbol']
+                                    }})
+                                </text>
+                                <input class="input  font-13 color-black"
+                                       :class="{'focus-input font-12': numberFocus || numberModel !== ''}"
+                                       type="digit"
+                                       @focus="numberFocus = true"
+                                       @blur="numberFocus = false"
+                                       :placeholder="numberFocus ? '' : contractunitVal.title ? contractunitVal.title : $t('kline.num')"
+                                       v-model="order_amount"
+                                       confirm-type="done"
+                                       @input="orderRateSet">
+                                <view class="down-box"
+                                      v-if="numberFocus === false && numberModel === ''"
+                                      @click="contractUnit = true">
+                                    <text class="font-12 color-black ">
+                                        {{
+                                            contractunitVal.type ? contractunitVal.type : currentCurrency['symbol']
+                                        }}
+                                    </text>
+                                    <image class="down-icon"
+                                           :src="`/static/img/tactic/down-${userTheme}.png`"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                            <view class="nb-bottom"
+                                  v-if="order_amount !== ''">
+                                <text class="font-10  color-gray">
+                                    ≈
+                                </text>
+                                <text class="font-10 price_up ">
+                                    {{
+                                        util.thousandSeparator(
+                                                amountType === 0 ?
+                                                        order_amount * (order_price > 0 ? order_price : currentCurrency['c']) / leverValue :
+                                                        order_amount,
+                                                amountType === 0 ? currentCurrency['decimals'] : 2)
+                                    }}
+                                </text>
+                                <text class="font-10  color-gray">
+                                    /
+                                </text>
+                                <text class="font-10 price_down ">
+                                    {{
+                                        util.thousandSeparator(
+                                                amountType === 0 ?
+                                                        order_amount * (order_price > 0 ? order_price : currentCurrency['c']) / leverValue :
+                                                        order_amount,
+                                                amountType === 0 ? currentCurrency['decimals'] : 2)
+                                    }}
+                                </text>
+                                <text class="font-10 color-gray ">
+                                    USDT
+                                </text>
+                            </view>
+                        </view>
+                        <!-- 滑块 -->
+                        <view class="slider-warp">
+                            <view class="slider-top">
+                                <view class="slider-background bg-gray">
+                                    <view class="active bg-black"
+                                          :style="`width: ${order_rate*4.12}rpx`">
+                                    </view>
+                                    <view class="dot-warp">
+                                        <view class="dot-item bg-light-gray"
+                                              v-for="item in [0, 25, 40, 60, 100]">
+                                        </view>
+                                    </view>
+                                </view>
+                                <view class="slider">
+                                    <slider activeColor="transparent"
+                                            backgroundColor="transparent"
+                                            :block-color="userTheme === 'light' ? '#ffffff' : '#111111'"
+                                            :block-size="15"
+                                            :value="order_rate"
+                                            :step="1"
+                                            @change="sliderChange"
+                                            @changing="sliderChange"/>
+                                </view>
+                            </view>
+                            <view class="slider-number-group">
+                                <text class="font-10  sn-item"
+                                      :class="order_rate >= item ? 'color-black' : 'color-gray'"
+                                      :style="`left: ${index * 90 + 3}rpx`"
+                                      v-for="(item,index) in [0, 25, 50, 75, 100]"
+                                      :key="index">
+                                    {{
+                                        item
+                                    }}%
+                                </text>
+                            </view>
+                        </view>
+                        <!-- 开仓操作 -->
+                        <view v-if="buttonActive == 0">
+                            <!-- 止盈/止损 -->
+                            <view class="take-pl"
+                                  v-if="isLogin">
+                                <view class="take-top">
+                                    <view class="take-label">
+                                        <view class="checkbox border-solid"
+                                              :class="{'border-primary': checked}"
+                                              @click="checked = !checked">
+                                            <view class="before"
+                                                  v-if="checked">
+                                            </view>
+                                        </view>
+                                        <text class="font-12  color-black dashed-solid"
+                                              @click="explainOpen(0)">
+                                            {{
+                                                $t('cor.t26')
+                                            }}
+                                        </text>
+                                    </view>
+                                    <view class="label-right"
+                                          v-if="checked">
+                                        <text class="font-12  color-primary">
+                                            {{
+                                                $t('newcontract.t3')
+                                            }}
+                                        </text>
+                                    </view>
+                                </view>
+                                <view class="take-bottom"
+                                      v-if="checked">
+                                    <view class="input-group">
+                                        <view class="input-item bg-gray"
+                                              :class="{'border-primary': inputFocus[0]}">
+                                            <text class="font-10 color-gray  desc"
+                                                  :class="{'focus-desc': inputFocus[0] || inputVal[0] != '' || inputVal[1] != ''}">
+                                                {{
+                                                    $t('contruct.t_price')
+                                                }}
+                                            </text>
+                                            <input class="input  font-13 color-black"
+                                                   :class="{'focus-input font-12': inputFocus[0]}"
+                                                   type="digit"
+                                                   v-model="winPrice"
+                                                   @focus="inputFocus[0] = true; inputFocus[2] = false"
+                                                   @blur="inputFocus[0] = false"
+                                                   :placeholder="inputFocus[0] ? '' : $t('contruct.t_price')">
+                                        </view>
+                                        <view class="input-item bg-gray"
+                                              :class="{'border-primary': inputFocus[2]}">
+                                            <text class="font-10 color-gray  desc"
+                                                  :class="{'focus-desc': inputFocus[2] || inputVal[2] != '' || inputVal[3] != ''}">
+                                                {{
+                                                    $t('contruct.s_price')
+                                                }}
+                                            </text>
+                                            <input class="input  font-13 color-black"
+                                                   :class="{'focus-input font-12': inputFocus[2]}"
+                                                   type="digit"
+                                                   v-model="losePrice"
+                                                   @focus="inputFocus[2] = true; inputFocus[0] = false"
+                                                   @blur="inputFocus[2] = false"
+                                                   :placeholder="inputFocus[2] ? '' : $t('contruct.s_price')">
+                                        </view>
+                                    </view>
+                                </view>
+                            </view>
+                            <!-- 可用 -->
+                            <view class="toggle-row-cell">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray ">
+                                        {{
+                                            $t('contruct.available')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-black">
+                                        {{
+                                            isLogin ? util.thousandSeparator(balance.legal_balance ? balance.legal_balance : 0) : '--'
+                                        }} USDT
+                                    </text>
+                                    <image @click="mroute.exchange"
+                                           class="exchange-icon"
+                                           src="/static/img/tactic/tran-icon.png"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                            <!-- 可开 -->
+                            <view class="toggle-row-cell">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray  dashed-solid"
+                                          @click="explainOpen(1)">
+                                        {{
+                                            $t('newcontract.t4')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray mr-3">
+                                        {{
+                                            isLogin ? util.thousandSeparator(getAvliAmount(1), 2) : '--'
+                                        }}
+                                    </text>
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            amountType == 0 ? currentCurrency['symbol'] : 'USDT'
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 预估强平 -->
+                            <view class="toggle-row-cell"
+                                  v-if="isLogin && order_amount >0">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray ">
+                                        {{
+                                            $t('entrust.t11')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            util.thousandSeparator(estimatePrice(1), 2)
+                                        }} USDT
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可开(买入)-按钮 -->
+                            <view class="toggle-row-button">
+                                <view class="button bg-green button-active"
+                                      @click="submit(1)">
+                                    <text class="font-13 font-weight always-white">
+                                        {{
+                                            isLogin ? $t('contruct.open_bullish') : $t('newcontract.t5')
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可开 -->
+                            <view class="toggle-row-cell">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray  dashed-solid"
+                                          @click="explainOpen(1)">
+                                        {{
+                                            $t('newcontract.t4')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray mr-3">
+                                        {{
+                                            isLogin ? util.thousandSeparator(getAvliAmount(2), 2) : '--'
+                                        }}
+                                    </text>
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            amountType == 0 ? currentCurrency['symbol'] : 'USDT'
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 预估强平 -->
+                            <view class="toggle-row-cell"
+                                  v-if="isLogin && order_amount >0">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray ">
+                                        {{
+                                            $t('entrust.t11')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            util.thousandSeparator(estimatePrice(2), 2)
+                                        }} USDT
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可开(卖出)-按钮 -->
+                            <view class="toggle-row-button">
+                                <view class="button bg-red button-active"
+                                      @click="submit(2)">
+                                    <text class="font-13 font-weight always-white">
+                                        {{
+                                            isLogin ? $t('contruct.open_bear') : $t('newcontract.t5')
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                        <!-- 平仓操作 -->
+                        <view v-else>
+                            <view class="toggle-row-cell">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray ">
+                                        {{
+                                            $t('contruct.can_close')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            isLogin ? '0.0000' : '--'
+                                        }} {{
+                                            currentCurrency['symbol']
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可平(平空)-按钮 -->
+                            <view class="toggle-row-button">
+                                <view class="button bg-green button-active">
+                                    <text class="font-13 font-weight always-white">
+                                        {{
+                                            isLogin ? $t('contruct.empty') : $t('newcontract.t5')
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可平(平多) -->
+                            <view class="toggle-row-cell">
+                                <view class="cell-left">
+                                    <text class="font-11 color-gray ">
+                                        {{
+                                            $t('contruct.can_close')
+                                        }}
+                                    </text>
+                                </view>
+                                <view class="cell-right">
+                                    <text class="font-11  color-gray">
+                                        {{
+                                            isLogin ? '0.0000' : '--'
+                                        }} {{
+                                            currentCurrency['symbol']
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                            <!-- 可平(平多)-按钮 -->
+                            <view class="toggle-row-button">
+                                <view class="button bg-red button-active">
+                                    <text class="font-13 font-weight always-white">
+                                        {{
+                                            isLogin ? $t('contruct.pindo') : $t('newcontract.t5')
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="price-data">
+                        <!-- 资费说明 -->
+                        <view class="desc-box">
+                            <text class="font-10  color-gray dashed-solid"
+                                  @click="explainOpen(2)">
+                                {{
+                                    $t('newcontract.t6')
+                                }}
+                            </text>
+                            <text class="font-11 font-weight color-black">
+                                {{
+                                    util.thousandSeparator(market['r'] * 100, 4)
+                                }}% / {{
+                                    time
+                                }}
+                            </text>
+                        </view>
+                        <view class="title-desc">
+                            <view class="td-item td-first">
+                                <text class="font-10 color-gray ">
+                                    {{
+                                        $t('trade.price')
+                                    }}
+                                </text>
+                                <text class="font-10 color-gray ">
+                                    (USDT)
+                                </text>
+                            </view>
+                            <view class="td-item">
+                                <text class="font-10 color-gray ">
+                                    {{
+                                        $t('kline.num')
+                                    }}
+                                </text>
+                                <text class="font-10 color-gray ">
+                                    ({{
+                                        currentCurrency['symbol']
+                                    }})
+                                </text>
+                            </view>
+                        </view>
+                        <!-- 价格 -->
+                        <view class="data-list">
+                            <view class="dl-item"
+                                  v-for="(item, index) in asks"
+                                  :key="'b' + index">
+                                <text class="font-10 price_down  font-weight">
+                                    {{
+                                        util.thousandSeparator(item[0], currentCurrency['decimals'])
+                                    }}
+                                </text>
+                                <text class="font-10 color-black  font-weight">
+                                    {{
+                                        util.thousandUnit(item[1], currentCurrency['decimals'])
+                                    }}
+                                </text>
+                                <view class="dl-active bg-red"
+                                      :style="`width: ${264 * item[2] }rpx`">
+                                </view>
+                            </view>
+                        </view>
+                        <view class="data-center">
+                            <text class="font-13 font-bold  price_down"
+                                  :class="{
+                                        'price_up':currentCurrency['di']===1,
+                                        'price_down':currentCurrency['di']===-1,
+                                        'color-gray':currentCurrency['di']===0
+                                        }">
+                                {{
+                                    util.thousandSeparator(currentCurrency['new_price'], currentCurrency['decimals'])
+                                }}
+                            </text>
+                            <text class="font-10  color-gray dashed-solid"
+                                  @click="explainOpen(3)">
+                                {{
+                                    util.thousandSeparator(market['p'], currentCurrency['decimals'])
+                                }}
+                            </text>
+                        </view>
+                        <view class="data-list">
+                            <view class="dl-item"
+                                  v-for="(item, index) in bids"
+                                  :key="'a' + index">
+                                <text class="font-10 price_up  font-weight">
+                                    {{
+                                        util.thousandSeparator(item[0], currentCurrency['decimals'])
+                                    }}
+                                </text>
+                                <text class="font-10 color-black  font-weight">
+                                    {{
+                                        util.thousandUnit(item[1], currentCurrency['decimals'])
+                                    }}
+                                </text>
+                                <view class="dl-active bg-green"
+                                      :style="`width: ${264 * item[2] }rpx`">
+                                </view>
+                            </view>
+                        </view>
+                        <!-- 切换 -->
+                        <view class="data-footer">
+                            <image class="change-icon"
+                                   :src="`/static/img/newContract/toggle-own-${userTheme}.png`"
+                                   mode="widthFix">
+                            </image>
+                            <view class="down-box bg-gray"
+                                  @tap="pointVisible = true">
+                                <text class="font-11 color-black ">
+                                    {{
+                                        pointVal
+                                    }}
+                                </text>
+                                <image class="down-icon"
+                                       :src="`/static/img/tactic/down-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <!--  列表选项卡     -->
+                <view class="list-tab-warp bg-white border-bottom">
+                    <scroll-view class="scroll-view"
+                                 :scroll-x="true"
+                                 :enable-flex='true'
+                                 :scroll-with-animation="true"
+                                 :scroll-into-view="`tab${swiperTabActive}`">
+                        <view class="item"
+                              :class="swiperTabActive === item.id ? 'border-black' : 'not-active'"
+                              :id="`tab${item.id+1}`"
+                              v-for="(item,index) in listTabs"
+                              :key="item.id"
+                              @click="orderTabChange(item.id)">
+                            <text class="font-14 font-weight tab-text"
+                                  :class="swiperTabActive === item.id ? 'color-black' : 'color-gray'">
+                                {{
+                                    item.text
+                                }} {{
+                                    item.num > 0 ? '(' + item.num + ')' : ''
+                                }}
+                            </text>
+                        </view>
+                    </scroll-view>
+                    <image @click="mroute.newOrders()"
+                           class="order-icon"
+                           :src="`/static/img/tactic/order-${userTheme}.png`"
+                           mode="widthFix">
+                    </image>
+                </view>
+                <!--  列表区域  -->
+                <view class="bottom-warp">
+                    <swiper class="swiper-box"
+                            :disable-touch="true"
+                            :current="swiperTabActive"
+                            :style="`height: ${swiperHeight}px`">
+                        <swiper-item class="swiper-item-warp">
+                            <!--  持仓   -->
+                            <keep-alive>
+                                <view class="swiper-item">
+                                    <view class="swiper-list-warp"
+                                          v-if="isLogin">
+                                        <!--  仅看当前   -->
+                                        <view class="header-box border-bottom">
+                                            <view class="checkbox-label"
+                                                  @click="current = !current">
+                                                <view class="checkbox "
+                                                      :class="current ? 'border-primary' : 'border-solid'">
+                                                    <view class="befor-box"
+                                                          v-if="current"></view>
+                                                </view>
+                                                <text class="font-10 color-gray ">
+                                                    {{
+                                                        $t('newcontract.t7')
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="label-tag bg-gray"
+                                                  @click="closeAllPositions = true"
+                                                  v-if="isLogin && position && position.position.length > 0">
+                                                <text class="font-10 color-black  font-weight">
+                                                    {{
+                                                        $t('newcontract.t8')
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                        <view class="card" v-if="position.position && position.position.length === 0 && balance.legal_balance > 0">
+                                            <empty-view :visible="true"
+                                                        :width="750"
+                                                        :height="750"
+                                                        :title="$t('trade.not_order')">
+                                            </empty-view>
+                                        </view>
+                                        <!--  持仓项   -->
+                                        <view v-else>
+                                            <list-components :data="position.position"
+                                                             :ticker="ticker"
+                                                             @stopProfitLossClick="stopProfitLossClick"
+                                                             @closePositionClick="closePositionClick"
+                                                             @backhandClick="backhandClick"
+                                                             @shareClick="setPoster" />
+                                        </view>
+
+
+                                        <view v-if="!balance || balance.legal_balance <= 0">
+                                            <view class="no-assets">
+                                                <text class="font-14  font-weight color-black mb-10">
+                                                    {{
+                                                        $t('newcontract.t14')
+                                                    }}
+                                                </text>
+                                                <text class="font-12 color-gray  mb-10">
+                                                    {{
+                                                        $t('newcontract.t15')
+                                                    }}
+                                                </text>
+                                                <view class="group">
+                                                    <view class="group-item"
+                                                          @click="mroute.recharge()">
+                                                        <image class="button-icon"
+                                                               :src="`/static/wallet/cz-${userTheme}.png`"
+                                                               mode="widthFix">
+                                                        </image>
+                                                        <text class="font-12 color-black  font-weight">
+                                                            {{
+                                                                $t('wallet.desposit')
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="group-item"
+                                                          @click="mroute.exchange()">
+                                                        <image class="button-icon"
+                                                               :src="`/static/wallet/hz-${userTheme}.png`"
+                                                               mode="widthFix">
+                                                        </image>
+                                                        <text class="font-12 color-black  font-weight">
+                                                            {{
+                                                                $t('wallet.transfer')
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <!--  未登录显示无资产   -->
+                                    <view class="swiper-list-warp"
+                                          v-if="!isLogin">
+                                        <view class="no-assets">
+                                            <text class="font-14  font-weight color-black mb-10">
+                                                {{
+                                                    $t('newcontract.t14')
+                                                }}
+                                            </text>
+                                            <text class="font-12 color-gray  mb-10">
+                                                {{
+                                                    $t('newcontract.t15')
+                                                }}
+                                            </text>
+                                            <view class="group">
+                                                <view class="group-item"
+                                                      @click="mroute.recharge()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/cz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.desposit')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="group-item"
+                                                      @click="mroute.exchange()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/hz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.transfer')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </keep-alive>
+                        </swiper-item>
+                        <swiper-item class="swiper-item-warp">
+                            <!--  委托   -->
+                            <view class="swiper-item">
+                                <view class="swiper-list-warp">
+                                    <view
+                                        v-if="isLogin && ((position && (position.entrust || position.entrustP)) || balance.legal_balance != 0)">
+                                        <!--  子菜单   -->
+                                        <view class="header-box border-bottom">
+                                            <scroll-view :scroll-x="true"
+                                                         :show-scrollbar="false"
+                                                         :scroll-with-animation="true"
+                                                         :scroll-into-view="`miniTab${entrustTabIndex}`"
+                                                         class="sub-scroll">
+                                                <view class="item"
+                                                      :id="`miniTab${index+1}`"
+                                                      :class="{'bg-gray': entrustTabIndex === index}"
+                                                      v-for="(item,index) in entrustTabs"
+                                                      :key="index"
+                                                      @click="entrustTabChange(index)">
+                                                    <text class="font-11 "
+                                                          :class="entrustTabIndex === index ? 'color-black' : 'color-gray'">
+                                                        {{
+                                                            item['text']
+                                                        }}{{
+                                                            item['num'] > 0 ? '(' + item['num'] + ')' : ''
+                                                        }}
+                                                    </text>
+                                                </view>
+                                            </scroll-view>
+                                        </view>
+                                        <view
+                                            v-if="!position || (entrustTabIndex===0 && position.entrust.length === 0 || entrustTabIndex=== 1 && position.entrustP.length === 0)">
+                                            <empty-view :visible="true"
+                                                        :width="750"
+                                                        :height="750"
+                                                        :title="$t('trade.not_order')">
+                                            </empty-view>
+                                        </view>
+                                        <view class="list-card"
+                                              id="cardItem"
+                                              v-for="(item,index) in position ? (entrustTabIndex === 0 ? position.entrust:entrustTabIndex===1?position.entrustP.filter(item=>item.type!==5 || item.type!==6):position.entrustP.filter(item=>item.type===5||item.type===6)):[]"
+                                              :key="'p'+item.id">
+                                            <view class="head border-bottom">
+                                                <view class="tp-box">
+                                                    <view class="row">
+                                                        <view class="row-left">
+                                                            <text class="font-15 font-weight price_up"
+                                                                  v-if="item.type === 1">
+                                                                {{
+                                                                    $t('calc.t5')
+                                                                }}
+                                                            </text>
+                                                            <text class="font-15 font-weight price_down"
+                                                                  v-if="item.type === 2">
+                                                                {{
+                                                                    $t('calc.t6')
+                                                                }}
+                                                            </text>
+                                                            <text class="font-15 font-weight price_up"
+                                                                  v-if="item.type === 3">
+                                                                {{
+                                                                    $t('contruct.pindo')
+                                                                }}
+                                                            </text>
+                                                            <text class="font-15 font-weight price_down"
+                                                                  v-if="item.type === 4">
+                                                                {{
+                                                                    $t('contruct.empty')
+                                                                }}
+                                                            </text>
+                                                            <text class="font-15 font-weight price_up"
+                                                                  v-if="item.type === 5">
+                                                                {{
+                                                                    $t('entrust.t12')
+                                                                }}
+                                                            </text>
+                                                            <text class="font-15 font-weight price_down"
+                                                                  v-if="item.type === 6">
+                                                                {{
+                                                                    $t('entrust.t23')
+                                                                }}
+                                                            </text>
+                                                            <text class="dot bg-red"
+                                                                  :class="{'bg-red':item.type === 2 || item.type === 4 || item.type === 6,'bg-green':item.type === 1 || item.type === 3 || item.type === 5}">
+                                                            </text>
+                                                            <text class="font-15 font-weight"
+                                                                  :class="{'price_down':item.type === 2 || item.type === 4 || item.type === 6,'price_up':item.type === 1 || item.type === 3 || item.type === 5}">
+                                                                {{
+                                                                    item.order.muilt
+                                                                }}X
+                                                            </text>
+                                                            <text class="font-15 font-weight color-black coin-text">
+                                                                {{
+                                                                    item.symbol
+                                                                }}
+                                                            </text>
+                                                            <view class="mini-tag bg-gray">
+                                                                <text class="font-10 color-gray  font-weight">
+                                                                    {{
+                                                                        item.ttype === 2 ? $t('trade.lm_pr') : $t('newcontract.t90')
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                        <view class="row-right">
+                                                            <view class="mini-button bg-gray">
+                                                                <text class="font-11 color-gray  font-weight"
+                                                                      @click="planId=item;entrustTabIndex === 0 ? modifyOrderVisible = true : modifyPL = true">
+                                                                    {{
+                                                                        $t('secrety.revise')
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                            <view class="mini-button bg-gray"
+                                                                  @click="closePlanId=item.id;closeLimitType=true;closeAllLimit=true">
+                                                                <text class="font-11 color-gray  font-weight">
+                                                                    {{
+                                                                        $t('financing.t11')
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                    </view>
+                                                </view>
+                                                <!--  委托价格/委托数量/成交数量..  -->
+                                                <view class="bm-box">
+                                                    <view class="column-list">
+                                                        <view class="column">
+                                                            <view class="cm-row">
+                                                                <text class="font-12 color-gray desc">
+                                                                    {{
+                                                                        $t('contruct.com_pr')
+                                                                    }}(USDT)
+                                                                </text>
+                                                            </view>
+                                                            <view class="cm-row not-margin">
+                                                                <text class="font-13 font-weight color-black">
+                                                                    {{
+                                                                        util.float(entrustTabIndex === 1 ? item.wprice : item.price)
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                        <view class="column column-center">
+                                                            <view class="cm-row">
+                                                                <text class="font-12 color-gray desc">
+                                                                    {{
+                                                                        $t('contruct.od_quan')
+                                                                    }}({{
+                                                                        item.symbol
+                                                                    }})
+                                                                </text>
+                                                            </view>
+                                                            <view class="cm-row not-margin">
+                                                                <text class="font-13 font-weight color-black">
+                                                                    {{
+                                                                        util.float(item.amount)
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                        <view class="column column-last"
+                                                              v-if="item.ttype === 3">
+                                                            <view class="cm-row">
+                                                                <text class="font-12 color-gray desc">
+                                                                    {{
+                                                                        $t('newcontract.t2')
+                                                                    }}(USDT)
+                                                                </text>
+                                                            </view>
+                                                            <view class="cm-row not-margin">
+                                                                <text class="font-13 font-weight color-black">
+                                                                    {{
+                                                                        item.price > 0 ? util.float(item.price) : '市价'
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                        <view class="column column-last"
+                                                              v-if="item.ttype !== 3">
+                                                            <view class="cm-row">
+                                                                <text class="font-12 color-gray desc">
+                                                                    {{
+                                                                        $t('trade.ddqu')
+                                                                    }}({{
+                                                                        item.symbol
+                                                                    }})
+                                                                </text>
+                                                            </view>
+                                                            <view class="cm-row not-margin">
+                                                                <text class="font-13 font-weight color-black">
+                                                                    0.000
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                    </view>
+                                                    <view class="column-list">
+                                                        <view class="column">
+                                                            <view class="cm-row">
+                                                                <text class="font-12 color-gray desc">
+                                                                    {{ $t('newcontract.t89') }}
+                                                                </text>
+                                                            </view>
+                                                            <view class="cm-row not-margin">
+                                                                <text class="font-13 font-weight color-black">
+                                                                    {{
+                                                                        item.type === 3 || item.type === 4 || item.type === 5 || item.type === 6 ? $t('txt.yes') : $t('txt.no')
+                                                                    }}
+                                                                </text>
+                                                            </view>
+                                                        </view>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                            <view class="bottom">
+                                                <text class="font-12 color-gray  time">
+                                                    {{
+                                                        item.created_at
+                                                    }}
+                                                </text>
+                                                <view v-if="false">
+                                                    <view class="right-button"
+                                                          v-if="item.type === 1 || item.type === 2">
+                                                        <text class="font-12 color-gray ">
+                                                            ({{
+                                                                $t('cor.t26')
+                                                            }})
+                                                        </text>
+                                                        <text class="font-12 price_up ">
+                                                            --
+                                                        </text>
+                                                        <text class="font-12  color-gray">/</text>
+                                                        <text class="font-12  price_down">
+                                                            --
+                                                        </text>
+                                                        <image class="edit-icon"
+                                                               :src="`/static/img/tactic/bj-${userTheme}.png`"
+                                                               mode="widthFix">
+                                                        </image>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                            <view class="line-view"></view>
+                                        </view>
+                                    </view>
+                                    <!--  未登录显示无资产   -->
+                                    <view v-if="(isLogin || !isLogin) && balance.legal_balance == 0">
+                                        <view class="no-assets">
+                                            <text class="font-14  font-weight color-black mb-10">
+                                                {{
+                                                    $t('newcontract.t14')
+                                                }}
+                                            </text>
+                                            <text class="font-12 color-gray  mb-10">
+                                                {{
+                                                    $t('newcontract.t15')
+                                                }}
+                                            </text>
+                                            <view class="group">
+                                                <view class="group-item"
+                                                      @click="mroute.recharge()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/cz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.desposit')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="group-item"
+                                                      @click="mroute.exchange()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/hz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.transfer')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                                <!--  未登录显示无资产   -->
+                                <view class="swiper-list-warp"
+                                      v-if="!isLogin">
+                                    <view v-if="true">
+                                        <view class="no-assets">
+                                            <text class="font-14  font-weight color-black mb-10">
+                                                {{
+                                                    $t('newcontract.t14')
+                                                }}
+                                            </text>
+                                            <text class="font-12 color-gray  mb-10">
+                                                {{
+                                                    $t('newcontract.t15')
+                                                }}
+                                            </text>
+                                            <view class="group">
+                                                <view class="group-item"
+                                                      @click="mroute.recharge()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/cz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.desposit')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="group-item"
+                                                      @click="mroute.exchange()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/hz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.transfer')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </view>
+                        </swiper-item>
+                        <swiper-item class="swiper-item-warp">
+                            <!--  资产   -->
+                            <view class="swiper-item">
+                                <view class="assets-box"
+                                      id="swiperBody">
+                                    <view v-if="isLogin && balance.legal_balance > 0">
+                                        <view class="row-cell">
+                                            <view class="item item-first">
+                                                <text class="font-11 color-gray ">
+                                                    {{
+                                                        $t('quickly.tt64')
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="item item-end">
+                                                <text class="font-11 color-gray ">
+                                                    {{
+                                                        $t('newcontract.t18')
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="item item-end">
+                                                <text class="font-11 color-gray ">
+                                                    {{
+                                                        $t('trade.usable')
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                        <!--   币资产项  -->
+                                        <view class="row-cell">
+                                            <view class="item item-first">
+                                                <image class="coin-icon"
+                                                       src="/static/coin/usdt.png"
+                                                       mode="widthFix">
+                                                </image>
+                                                <text class="font-13 color-black font-weight">
+                                                    USDT
+                                                </text>
+                                            </view>
+                                            <view class="item item-end">
+                                                <text class="font-13 color-black font-weight">
+                                                    {{
+                                                        util.thousandSeparator(parseFloat(balance.legal_balance) + parseFloat(balance.legal_lock))
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="item item-end">
+                                                <text class="font-13 color-black font-weight">
+                                                    {{
+                                                        util.thousandSeparator(balance.legal_balance)
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="swiper-list-warp">
+                                        <view class="not-login no-assets"
+                                              v-if="!balance || balance.legal_balance <= 0">
+                                            <view class="row">
+                                                <text class="font-14  font-weight color-black">
+                                                    {{
+                                                        $t('newcontract.t14')
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="row">
+                                                <text class="font-12 color-gray ">
+                                                    {{
+                                                        $t('newcontract.t15')
+                                                    }}
+                                                </text>
+                                            </view>
+                                            <view class="row row-last">
+                                                <view class="column"
+                                                      @click="mroute.recharge()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/cz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.desposit')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="column"
+                                                      @click="mroute.exchange()">
+                                                    <image class="button-icon"
+                                                           :src="`/static/wallet/hz-${userTheme}.png`"
+                                                           mode="widthFix">
+                                                    </image>
+                                                    <text class="font-12 color-black  font-weight">
+                                                        {{
+                                                            $t('wallet.transfer')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </view>
+                        </swiper-item>
+                    </swiper>
+                </view>
+            </scroll-view>
+        </view>
+
+
+        <!--    止盈止损新增   -->
+        <profit-loss-popup :show="plshow"
+                           :currency="pcurrency"
+                           :ticker="ticker"
+                           :position="pindex !== false ? position.position[pindex]:[]"
+                           @hiddenKeybord="hiddenKeybord"
+                           @close="plshow = false"
+                           @confirm="submitStop"/>
+        <!--    平仓新增   -->
+        <close-position-popup :show="cpshow"
+                              :position="pindex !== false ? position.position[pindex]:{}"
+                              :ticker="ticker"
+                              :currency="pcurrency"
+                              @hiddenKeybord="hiddenKeybord"
+                              @close="pindex=false;cpshow = false"
+                              @confirm="stopPosition"/>
+
+        <!--    分享海报新增   -->
+        <contract-share-popup :show="shareShow"
+                              @close="shareShow = false"/>
+
+        <!--    反手说明   -->
+        <back-hand-popup :show="backhandShow"
+                         @close="backhandShow = false"
+                         @confirm="stopOnOpen"/>
+
+
+        <!--    侧边弹窗    -->
+        <fui-drawer :show="drawerVisible"
+                    direction="left"
+                    :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                    @close="drawerVisible = false"
+                    @toggle="hiddenTabbar"
+        >
+            <view class="drawer">
+                <view class="drawer-header">
+                    <fui-nav-bar custom
+                                 :padding="0"
+                                 :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                                 @init="drawerNavInit">
+                        <view class="drawer-title">
+                            <text class="font-16 font-weight color-black">
+                                {{
+                                    $t('newcontract.t19')
+                                }}
+                            </text>
+                        </view>
+                    </fui-nav-bar>
+                    <!--    搜索    -->
+                    <view class="search-box bg-gray">
+                        <input class="search-input color-black  font-12"
+                               :placeholder="$t('newcontract.t20')"
+                               v-model="searchVal"
+                               type="text">
+                        <image class="search-icon"
+                               :src="`/static/newImage/search-${userTheme}.png`"
+                               mode="widthFix">
+                        </image>
+                    </view>
+                </view>
+                <!--    选项卡   -->
+                <view class="drawer-tabs border-bottom">
+                    <scroll-view :scroll-x="true"
+                                 :show-scrollbar="false"
+                                 class="tab-scroll"
+                                 :scroll-with-animation="true"
+                                 :scroll-into-view="`drawerTab${drawerTabIndex}`">
+                        <view class="item"
+                              :id="`drawerTab${index+1}`"
+                              :class="{'item-active': drawerTabIndex === index}"
+                              v-for="(item,index) in drawerTabs" :key="'tab'+index"
+                              @click="drawerTabChange($event,item,index)">
+                            <text class="font-13 "
+                                  :class="drawerTabIndex === index ? 'color-black' : 'color-gray'">
+                                {{
+                                    item
+                                }}
+                            </text>
+                            <view class="dot bg-black"
+                                  v-if="drawerTabIndex === index"
+                                  :style="`width: ${dotWidth}px;`">
+                            </view>
+                        </view>
+                    </scroll-view>
+                </view>
+                <!--    内容   -->
+                <swiper class="drawer-swiper"
+                        :style="`height: ${drawerSwiperHeight}px`"
+                        @change="drawerTabIndex=$event.detail.current"
+                        :current="drawerTabIndex"
+                >
+                    <swiper-item class="drawer-swiper-item"
+                                 :style="`height: ${drawerSwiperHeight}px`"
+                                 v-for="(item,index) in drawerTabs" :key="'tlist'+index">
+                        <view class="list-warp">
+                            <view class="desc-box">
+                                <view class="row">
+                                    <view class="row-item"
+                                          @click="switchSort(0,'symbol')">
+                                        <text class="font-12 color-gray">
+                                            {{
+                                                $t('index.name')
+                                            }}
+                                        </text>
+                                        <image class="toggle-icon"
+                                               :src="sort[0]['active']"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                    <!--                                    <view class="row-item" @click="switchSort(1,'quota')">-->
+                                    <!--                                        <text class="font-12 color-gray">-->
+                                    <!--                                            /成交额-->
+                                    <!--                                        </text>-->
+                                    <!--                                        <image class="toggle-icon"-->
+                                    <!--                                               :src="sort[1]['img']"-->
+                                    <!--                                               mode="widthFix">-->
+                                    <!--                                        </image>-->
+                                    <!--                                    </view>-->
+                                </view>
+                                <view class="row">
+                                    <view class="row-item"
+                                          @click="switchSort(2,'new_price')">
+                                        <text class="font-12 color-gray">
+                                            {{
+                                                $t('index.latest_price')
+                                            }}
+                                        </text>
+                                        <image class="toggle-icon"
+                                               :src="sort[2]['active']"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                    <view class="row-item"
+                                          @click="switchSort(3,'change_rate')">
+                                        <text class="font-12 color-gray">
+                                            /{{
+                                                $t('contruct.pl14')
+                                            }}
+                                        </text>
+                                        <image class="toggle-icon"
+                                               :src="sort[3]['active']"
+                                               mode="widthFix">
+                                        </image>
+                                    </view>
+                                </view>
+                            </view>
+                            <scroll-view :scroll-y="true"
+                                         class="coin-scroll"
+                                         :style="`height: ${drawerSwiperHeight - 24}px`">
+                                <empty-view
+                                        :visible="(drawerTabIndex === 0 && mlist.length === 0) || (drawerTabIndex === 1 && drawList.length === 0)"
+                                        :width="600"
+                                        :height="400"
+                                        :title="$t('list.not_data')">
+                                </empty-view>
+                                <view class="coin-item border-bottom"
+                                      v-for="(items,indexs) in searchVal === '' ? (drawerTabIndex===0?mlist:drawList) : (drawerTabIndex===0?mlist:drawList).filter(i=>i.symbol.toLowerCase().includes(searchVal.toLowerCase()))"
+                                      :key="'currencylist'+items.id"
+                                      :class="{'bg-dark': items.id === currentCurrency.id}"
+                                      @click="setCurrentCurrency(items,[])"
+                                >
+                                    <view class="coin-name">
+                                        <text class="font-14 font-weight color-black">{{
+                                                items.symbol
+                                            }}
+                                        </text>
+                                        <text class="font-11 color-gray ">/USDT</text>
+                                    </view>
+                                    <view class="coin-price">
+                                        <view class="coin-price-text">
+                                            <text class="font-14 font-bold"
+                                                  :class="{'price_up':items.change_rate > 0,'price_down':items.change_rate<0,'color-black':items.change_rate===0}">
+                                                {{
+                                                    util.thousandSeparator(items.new_price, item.decimals)
+                                                }}
+                                            </text>
+                                            <text class="font-11 font-weight"
+                                                  :class="{'price_up':items.change_rate > 0,'price_down':items.change_rate<0,'color-black':items.change_rate===0}">
+                                                {{
+                                                    items.change_rate > 0 ? '+' : ''
+                                                }}{{
+                                                    util.thousandSeparator(items.change_rate, item.decimals)
+                                                }}%
+                                            </text>
+                                        </view>
+                                        <!--                                        <image class="collect-icon"-->
+                                        <!--                                               src="/static/img/tactic/sc-n.webp"-->
+                                        <!--                                               mode="widthFix">-->
+                                        <!--                                        </image>-->
+                                    </view>
+                                </view>
+                            </scroll-view>
+                        </view>
+                    </swiper-item>
+                </swiper>
+            </view>
+        </fui-drawer>
+        <!--    保证金模式    -->
+        <fui-bottom-popup :show="marginModel"
+                          :safeArea="false"
+                          :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                          @close="marginModel = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('contruct.mt11')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="marginModel = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <!--    模式选项    -->
+                    <view class="model-group">
+                        <view class="button-item bg-gray"
+                              :class="{'border-primary': modelActive === index}"
+                              v-for="(item,index) in marginModelOption"
+                              :key="index"
+                              @click="modelActive = index">
+                            <text class="font-13 "
+                                  :class="modelActive === index ? 'color-primary' : 'color-gray'">
+                                {{
+                                    item
+                                }}
+                            </text>
+                            <image class="select-image"
+                                   src="/static/img/tactic/select-primary.png"
+                                   mode="widthFix"
+                                   v-if="modelActive === index">
+                            </image>
+                        </view>
+                    </view>
+                    <!--    模式介绍    -->
+                    <view class="model-content">
+                        <view class="model-tip">
+                            <text class="font-12 color-warring">
+                                {{
+                                    $t('newcontract.t21')
+                                }}
+                            </text>
+                        </view>
+                        <fui-collapse-item :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                                           :contentBg="userTheme == 'light' ? '#ffffff' : '#111111'"
+                                           :borderColor="userTheme == 'light' ? '#ffffff' : '#111111'"
+                                           :arrowColor="userTheme == 'light' ? '#898989' : '#7a7a7a'"
+                                           :arrowRight="0"
+                                           :open="true">
+                            <view class="collapse-title">
+                                <text class="font-14 font-weight color-black">
+                                    {{
+                                        $t('newcontract.t22')
+                                    }}?
+                                </text>
+                            </view>
+                            <template v-slot:content>
+                                <view class="collapse-desc">
+                                    <text class="desc-text font-12 color-gray ">
+                                        {{
+                                            $t('newcontract.t23')
+                                        }}.
+                                    </text>
+                                    <text class="desc-text font-12 color-gray ">
+                                        {{
+                                            $t('newcontract.t24')
+                                        }}.
+                                    </text>
+                                </view>
+                            </template>
+                        </fui-collapse-item>
+                        <view class="confirm-button bg-black button-active"
+                              @click="setMarginModel">
+                            <text class="font-13 font-weight color-white">
+                                {{
+                                    $t('hand.confirm_t')
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    调整杠杆    -->
+        <fui-bottom-popup :show="leverVisible"
+                          :safeArea="false"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="leverVisible = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('newcontract.t25')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="leverVisible = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <!--   输入  -->
+                    <view class="lever-box bg-gray">
+                        <fui-input-number custom
+                                          backgroundColor="transparent"
+                                          :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                                          :size="32"
+                                          :width="534"
+                                          :height="78"
+                                          :min="1"
+                                          :max="125"
+                                          v-model="leverValue"
+                                          margin="0">
+                            <view class="mini-button">
+                                <fui-icon name="minus"
+                                          :size="48"
+                                          :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'">
+                                </fui-icon>
+                            </view>
+                            <template v-slot:plus>
+                                <view class="mini-button">
+                                    <fui-icon name="plus"
+                                              :size="48"
+                                              :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'">
+                                    </fui-icon>
+                                </view>
+                            </template>
+                        </fui-input-number>
+                    </view>
+                    <!--   滑块  -->
+                    <view class="lever-slider">
+                        <view class="slider-dot bg-gray">
+                            <view class="active-box bg-black"
+                                  :style="`width: ${leverValue * 5.48}rpx`"></view>
+                            <view class="dot bg-light-gray"
+                                  v-for="item in [1, 25, 50, 75, 100, 125]"></view>
+                        </view>
+                        <view class="slider">
+                            <slider activeColor="transparent"
+                                    backgroundColor="transparent"
+                                    :block-color="userTheme === 'light' ? '#ffffff' : '#111111'"
+                                    :block-size="15"
+                                    :value="leverValue"
+                                    :min="1"
+                                    :max="125"
+                                    :step="1"
+                                    @change="leverSliderChange"
+                                    @changing="leverSliderChange"/>
+                        </view>
+                        <view class="slider-number">
+                            <text class="font-10 "
+                                  :class="leverValue >= item ? 'color-black' : 'color-gray'"
+                                  v-for="item in [1, 25, 50, 75, 100, 125]">
+                                {{
+                                    item
+                                }}X
+                            </text>
+                        </view>
+                    </view>
+                    <!--   当前杠杆倍数最高可开  -->
+                    <view class="lever-row"
+                          v-if="false">
+                        <text class="font-12 color-black ">
+                            {{
+                                $t('newcontract.t26')
+                            }}: 0.00 BTC
+                        </text>
+                    </view>
+                    <!--   当前仓位所需保证金  -->
+                    <view class="lever-row"
+                          v-if="false">
+                        <text class="font-12 color-black ">
+                            {{
+                                $t('newcontract.t27')
+                            }}: 0.00 USDT
+                        </text>
+                    </view>
+                    <!--   提示  -->
+                    <view calss="lever-tip">
+                        <text class="font-12 color-warring ">
+                            {{
+                                $t('newcontract.t28')
+                            }}
+                        </text>
+                    </view>
+                    <view class="confirm-button bg-black button-active"
+                          @click="setLever">
+                        <text class="font-13 font-weight color-white">
+                            {{
+                                $t('hand.confirm_t')
+                            }}
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    下单模式介绍    -->
+        <fui-bottom-popup :show="orderModeVisible"
+                          :safeArea="false"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="orderModeVisible = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="ordermode-tab border-bottom">
+                    <scroll-view scroll-x="true"
+                                 show-scrollbar="false"
+                                 scroll-with-animation="true"
+                                 :scroll-into-view="`mode${modeTabIndex}`"
+                                 class="ordermode-scroll">
+                        <view class="item"
+                              :id="`mode${index + 1}`"
+                              v-for="(item,index) in orderMode"
+                              :key="index"
+                              @click="modeTabIndex = index">
+                            <text class="font-13 font-weight"
+                                  :class="modeTabIndex === index ? 'color-black' : 'color-gray'">
+                                {{
+                                    item.text
+                                }}
+                            </text>
+                            <view class="dot bg-black"
+                                  v-if="modeTabIndex === index">
+                            </view>
+                        </view>
+                    </scroll-view>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="orderModeVisible = false">
+                    </fui-icon>
+                </view>
+                <view class="ordermode-container">
+                    <view class="tip-box">
+                        <text class="font-12 color-warring font-weight">
+                            {{
+                                $t('newcontract.t29')
+                            }}
+                        </text>
+                    </view>
+                    <view class="image-group">
+                        <image class="content-image"
+                               :src="lang === 'zh-Hant' ? orderMode[modeTabIndex].img_zh:orderMode[modeTabIndex].img_en"
+                               mode="widthFix">
+                        </image>
+                    </view>
+                    <view class="content-box">
+                        <text class="font-12 color-gray "
+                              v-if="modeTabIndex===0">
+                            {{
+                                $t('newcontract.t30')
+                            }}！
+                        </text>
+                        <text class="font-12 color-gray "
+                              v-if="modeTabIndex===1">
+                            {{
+                                $t('newcontract.t31')
+                            }}
+                        </text>
+                        <text class="font-12 color-gray "
+                              v-if="modeTabIndex===2">
+                            {{
+                                $t('newcontract.t32')
+                            }}.
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    合约单位设置    -->
+        <fui-bottom-popup :show="contractUnit"
+                          :safeArea="false"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="contractUnit = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('newcontract.t33')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="contractUnit = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <view class="radio-list">
+                        <view class="radio-item border-solid"
+                              :class="{'item-active': contractunitChecked == index}"
+                              v-for="(item,index) in radioList"
+                              :key="index"
+                              @click="radioChange(item,index)">
+                            <view class="item-row title">
+                                <text class="font-13 color-black font-weight">
+                                    {{
+                                        item.title
+                                    }}({{
+                                        item.type === '' ? currentCurrency['symbol'] : item.type
+                                    }})
+                                </text>
+                                <view class="checkbox border-solid"
+                                      :class="{'checkbox-active': contractunitChecked == item.val}">
+                                    <view class="before bg-green"
+                                          v-if="contractunitChecked == item.val">
+                                    </view>
+                                </view>
+                            </view>
+                            <view class="item-row">
+                                <text class="font-11 color-gray ">
+                                    {{
+                                        item.desc
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    全部平仓    -->
+        <fui-modal :buttons="[]"
+                   width="600"
+                   :boxRadius="16"
+                   :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                   :show="closeAllPositions">
+            <view class="close-all-warp">
+                <image class="warning-image"
+                       src="/static/img/newContract/tip-image.png"
+                       mode="widthFix">
+                </image>
+                <view class="close-content">
+                    <text class="font-16 color-black font-weight title">
+                        {{
+                            $t('newcontract.t8')
+                        }}
+                    </text>
+                    <text class="font-13 color-gray  desc">
+                        {{
+                            $t('newcontract.t50')
+                        }}?
+                    </text>
+                </view>
+                <view class="close-buttons">
+                    <view class="button-item bg-gray button-active"
+                          @click="closeAllPositions = false">
+                        <text class="font-13 color-black font-weight">
+                            {{
+                                $t('login.cancel')
+                            }}
+                        </text>
+                    </view>
+                    <view class="button-item bg-black button-active"
+                          @click="stopAll()">
+                        <text class="font-13 color-white font-weight">
+                            {{
+                                $t('hand.confirm_t')
+                            }}
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </fui-modal>
+
+        <fui-modal :buttons="[]"
+                   width="600"
+                   :boxRadius="16"
+                   :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                   :show="closeAllLimit">
+            <view class="close-all-warp">
+                <view class="close-content">
+                    <text class="font-16 color-black font-weight title">
+                        {{
+                            $t('newcontract.t51')
+                        }}
+                    </text>
+                    <text class="font-13 color-gray  desc">
+                        {{
+                            $t('newcontract.t52')
+                        }}{{
+                            closeLimitType ? $t('newcontract.t53') : $t('financing.t89')
+                        }}{{
+                            $t('newcontract.t54')
+                        }}？
+                    </text>
+                    <text class="font-13 color-gray  desc"
+                          v-if="!closeLimitType">
+                        {{
+                            $t('newcontract.t55')
+                        }}
+                    </text>
+                </view>
+                <view class="close-buttons">
+                    <view class="button-item bg-gray button-active"
+                          @click="closeAllLimit = false">
+                        <text class="font-13 color-black font-weight">
+                            {{
+                                $t('login.cancel')
+                            }}
+                        </text>
+                    </view>
+                    <view class="button-item bg-black button-active"
+                          @tap="closePlan">
+                        <text class="font-13 color-white font-weight">
+                            {{
+                                $t('hand.confirm_t')
+                            }}
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </fui-modal>
+        <!--    解释说明弹出层    -->
+        <fui-bottom-popup :show="explainVisible"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="explainVisible = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="title-row border-bottom">
+                    <text class="font-15 font-weight color-black"
+                          v-if="explainType == 0">
+                        {{
+                            $t('contruct.tp_sl')
+                        }}
+                    </text>
+                    <text class="font-15 font-weight color-black"
+                          v-if="explainType == 1">
+                        {{
+                            $t('newcontract.t56')
+                        }}
+                    </text>
+                    <text class="font-15 font-weight color-black"
+                          v-if="explainType == 2">
+                        {{
+                            $t('newcontract.t57')
+                        }}
+                    </text>
+                    <text class="font-15 font-weight color-black"
+                          v-if="explainType == 3">
+                        {{
+                            $t('newcontract.t12')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="explainVisible = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <view v-if="explainType == 0">
+                        <view class="explain-content">
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t58')
+                                }}.
+                            </text>
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t59')
+                                }}.
+                            </text>
+                        </view>
+                    </view>
+                    <view v-if="explainType == 1">
+                        <view class="explain-content">
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t60')
+                                }}.
+                            </text>
+                        </view>
+                    </view>
+                    <view v-if="explainType == 2">
+                        <view class="explain-content">
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t61')
+                                }}
+                            </text>
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t62')
+                                }}.
+                            </text>
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t63')
+                                }}.
+                            </text>
+                        </view>
+                    </view>
+                    <view v-if="explainType == 3">
+                        <view class="explain-content">
+                            <text class="font-13 color-black  desc">
+                                {{
+                                    $t('newcontract.t64')
+                                }}.
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    更多    -->
+        <fui-bottom-popup :show="moreVisible"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="moreVisible = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('index.menu_more')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="moreVisible = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <view class="more-list">
+                        <view class="item"
+                              v-for="(item,index) in moreMenu"
+                              :key="index"
+                              @click="moreMenuTap(item)">
+                            <view class="icon-box">
+                                <image class="icon-item"
+                                       :src="`/static/wallet/${item.iconName}-${userTheme}.png`"
+                                       mode="widthFix">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black ">
+                                {{
+                                    item.text
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    修改订单    -->
+        <fui-bottom-popup :show="modifyOrderVisible"
+                          :safeArea="false"
+                          :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                          @close="modifyOrderVisible = false;planId=false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp"
+                  v-if="planId !== false">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('newcontract.t65')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="modifyOrderVisible = false;planId=false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container"
+                      @click="hiddenKeybord">
+                    <view class="modify-content">
+                        <!--  币名  -->
+                        <view class="row">
+                            <view class="row-left">
+                                <fui-tag
+                                        :text="planId.order.direction === 1 ? $t('tradeInfo.many'):$t('tradeInfo.null')"
+                                        :size="20"
+                                        :marginRight="5"
+                                        :radius="3"
+                                        :padding="['6rpx','8rpx']"
+                                        :background="planId.order.direction === 1 ? '#03aac7':'#f1493f'">
+                                </fui-tag>
+                                <text class="font-15 font-weight price_down">
+                                    {{
+                                        planId.order.muilt
+                                    }}X
+                                </text>
+                                <text class="font-15 color-black font-weight">
+                                    {{
+                                        planId.symbol
+                                    }}USDT
+                                </text>
+                                <fui-tag :text="planId.order.margin_type === 1 ? $t('cor.t46'):$t('cor.t47')"
+                                         :size="20"
+                                         :marginRight="5"
+                                         :radius="3"
+                                         :padding="['6rpx','8rpx']"
+                                         :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                         :background="userTheme === 'light' ? '#f6f6f6' : '#282828'">
+                                </fui-tag>
+                            </view>
+                        </view>
+                        <!--  当前价格  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('newcontract.t34')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(getNewPrice(planId.currency_id))
+                                }} USDT
+                            </text>
+                        </view>
+                        <!--  触发价格  -->
+                        <view class="row"
+                              v-if="planId.ttype === 3">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('contruct.trigger_price')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId.wprice)
+                                }} USDT
+                            </text>
+                        </view>
+                        <!--  委托价格  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('contruct.com_pr')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId.price)
+                                }} USDT
+                            </text>
+                        </view>
+                        <!--  委托数量  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('contruct.od_quan')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId.amount)
+                                }} {{
+                                    planId.symbol
+                                }}
+                            </text>
+                        </view>
+                        <!--  输入框  -->
+                        <view class="input-box bg-gray"
+                              v-if="planId.ttype === 3">
+                            <input class="input color-black "
+                                   v-model="wwprice"
+                                   type="digit"
+                                   :placeholder="$t('contruct.pl20')">
+                            <text class="desc font-12 color-gray ">
+                                USDT
+                            </text>
+                        </view>
+                        <!--  输入框  -->
+                        <view class="input-box bg-gray">
+                            <input class="input color-black "
+                                   v-model="wpprice"
+                                   type="digit"
+                                   :placeholder="$t('contruct.pl19')">
+                            <text class="desc font-12 color-gray ">
+                                USDT
+                            </text>
+                        </view>
+                        <view class="input-box bg-gray">
+                            <input class="input color-black "
+                                   type="digit"
+                                   v-model="wamount"
+                                   :placeholder="$t('newcontract.t66')">
+                            <text class="desc font-12 color-gray ">
+                                {{
+                                    planId.symbol
+                                }}
+                            </text>
+                        </view>
+                        <view class="tip-box">
+                            <text class="color-warring font-11 ">
+                                {{
+                                    $t('newcontract.t67')
+                                }}.
+                            </text>
+                        </view>
+                        <view class="button-group">
+                            <view class="button-item button-active bg-gray"
+                                  @click="modifyOrderVisible = false;planId=false">
+                                <text class="font-13 color-black ">
+                                    {{
+                                        $t('login.cancel')
+                                    }}
+                                </text>
+                            </view>
+                            <view class="button-item button-active bg-black"
+                                  @click="changeLimitOrder">
+                                <text class="font-13 color-white ">
+                                    {{
+                                        $t('login.confirm')
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+
+        <!--        止盈止损的修改-->
+        <fui-bottom-popup :show="modifyPL"
+                          :safeArea="false"
+                          :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                          @close="modifyPL = false;planId=false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp"
+                  v-if="planId !== false">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            planId.type === 5 ? $t('contruct.tp') : $t('contruct.sl')
+                        }}{{
+                            $t('newcontract.t68')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme === 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="modifyPL = false;planId=false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container"
+                      @click="hiddenKeybord">
+                    <view class="modify-content">
+                        <!--  币名  -->
+                        <view class="row">
+                            <view class="row-left">
+                                <fui-tag
+                                        :text="planId.order.direction === 1 ? $t('tradeInfo.many'):$t('tradeInfo.null')"
+                                        :size="20"
+                                        :marginRight="5"
+                                        :radius="3"
+                                        :padding="['6rpx','8rpx']"
+                                        :background="planId.order.direction === 1 ? '#03aac7':'#f1493f'">
+                                </fui-tag>
+                                <text class="font-15 font-weight price_down">
+                                    {{
+                                        planId.order.muilt
+                                    }}X
+                                </text>
+                                <text class="font-15 color-black font-weight">
+                                    {{
+                                        planId.symbol
+                                    }}USDT
+                                </text>
+                                <fui-tag :text="planId.order.margin_type === 1 ? $t('entrust.t7'):$t('entrust.t8')"
+                                         :size="20"
+                                         :marginRight="5"
+                                         :radius="3"
+                                         :padding="['6rpx','8rpx']"
+                                         :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                         :background="userTheme === 'light' ? '#f6f6f6' : '#282828'">
+                                </fui-tag>
+                            </view>
+                        </view>
+                        <!--  当前价格  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('contruct.trigger_price')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId['wprice'])
+                                }} USDT
+                            </text>
+                        </view>
+                        <!--  委托价格  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('newcontract.t2')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId.price > 0 ? planId.price : planId.wprice)
+                                }} USDT
+                            </text>
+                        </view>
+                        <!--  委托数量  -->
+                        <view class="row">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('contruct.od_quan')
+                                }}
+                            </text>
+                            <text class="font-12 color-black font-weight">
+                                {{
+                                    util.float(planId.amount)
+                                }} {{
+                                    planId.symbol
+                                }}
+                            </text>
+                        </view>
+                        <!--  输入框  -->
+                        <view class="input-box bg-gray"
+                              v-if="planId.ttype === 3">
+                            <input class="input color-black "
+                                   v-model="wwprice"
+                                   type="digit"
+                                   :placeholder="$t('contruct.pl20')">
+                            <text class="desc font-12 color-gray ">
+                                USDT
+                            </text>
+                        </view>
+                        <!--  输入框  -->
+                        <!--                        <view class="input-box bg-gray">-->
+                        <!--                            <input class="input " v-model="wpprice" type="digit" placeholder="请输入委托价格">-->
+                        <!--                            <text class="desc font-12 color-gray ">-->
+                        <!--                                USDT-->
+                        <!--                            </text>-->
+                        <!--                        </view>-->
+                        <!--                        <view class="input-box bg-gray">-->
+                        <!--                            <input class="input " type="text" v-model="wamount" placeholder="请输入委托数量">-->
+                        <!--                            <text class="desc font-12 color-gray ">-->
+                        <!--                                {{planId.symbol}}-->
+                        <!--                            </text>-->
+                        <!--                        </view>-->
+                        <view class="column">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('calc.t10')
+                                }}
+                            </text>
+                            <view class="row-box">
+                                <view class="input-box"
+                                      :class="{'bg-dark':wtype,'bg-gray':!wtype}">
+                                    <input class="input color-black "
+                                           v-model="wpprice"
+                                           :focus="wtype"
+                                           :disabled="!wtype"
+                                           :type="!wtype ? 'text':'digit'"
+                                           :placeholder="!wtype ? $t('contruct.bmp'):$t('newcontract.t43')">
+                                    <text class="font-13 color-gray  desc">
+                                        USDT
+                                    </text>
+                                </view>
+                                <view class="mini-button bg-gray"
+                                      @click="wtype = !wtype">
+                                    <text class="font-12 color-primary ">
+                                        {{
+                                            !wtype ? $t('entrust.t3') : $t('entrust.t18')
+                                        }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+                        <!--  数量  -->
+                        <view class="column">
+                            <text class="font-12 color-gray ">
+                                {{
+                                    $t('entrust.t20')
+                                }}
+                            </text>
+                            <view class="number-box bg-dark">
+                                <input class="input color-black "
+                                       type="digit"
+                                       v-model="wamount"
+                                       :placeholder="wamount <= 0 ? $t('newcontract.t44'):''">
+                                <text class="font-13 color-gray  desc">
+                                    {{
+                                        planId['symbol']
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                        <!--  滑块  -->
+                        <view class="closeposition-slider">
+                            <view class="slider-dot bg-gray">
+                                <view class="active-box bg-black"
+                                      :style="`width: ${closePositionRate*6.9}rpx`"></view>
+                                <view class="dot bg-light-gray"
+                                      v-for="item in [0, 25, 50, 75, 100]"></view>
+                            </view>
+                            <view class="slider">
+                                <slider activeColor="transparent"
+                                        backgroundColor="transparent"
+                                        :block-color="userTheme === 'light' ? '#ffffff' : '#111111'"
+                                        block-size="18"
+                                        :value="closePositionRate"
+                                        :step="1"
+                                        @change="PLslider"
+                                        @changing="PLslider"/>
+                            </view>
+                        </view>
+                        <view class="tip-box">
+                            <text class="color-warring font-11 ">
+                                {{
+                                    $t('newcontract.t69')
+                                }}.
+                            </text>
+                        </view>
+                        <view class="button-group">
+                            <view class="button-item button-active bg-gray"
+                                  @click="modifyPL = false;planId=false">
+                                <text class="font-13 color-black ">
+                                    {{
+                                        $t('login.cancel')
+                                    }}
+                                </text>
+                            </view>
+                            <view class="button-item button-active bg-black"
+                                  @click="changeLimitOrder">
+                                <text class="font-13 color-white ">
+                                    {{
+                                        $t('quickly.tt33')
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    委托展示深度    -->
+        <fui-bottom-popup :show="pointVisible"
+                          :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          @close="pointVisible = false"
+                          @toggle="hiddenTabbar"
+        >
+            <view class="popup-warp">
+                <view class="popup-title">
+                    <text class="font-15 font-weight color-black">
+                        {{
+                            $t('newcontract.t70')
+                        }}
+                    </text>
+                    <fui-icon name="close"
+                              size="48"
+                              :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                              @click="pointVisible = false">
+                    </fui-icon>
+                </view>
+                <view class="popup-container">
+                    <view class="point-list">
+                        <view class="row border-bottom"
+                              v-for="(item,index) in pointList"
+                              :key="index"
+                              @click="pointChange(item,index)">
+                            <text class="font-12 color-black">
+                                {{
+                                    item
+                                }}
+                            </text>
+                            <image class="select-icon"
+                                   src="/static/img/tactic/check-select.png"
+                                   mode="widthFix"
+                                   v-if="pointActive == index">
+                            </image>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!--    分享海报    -->
+        <fui-backdrop :show="shareVisible"
+                      :closable="false"
+                      :safeArea="false"
+                      :zIndex="1000"
+                      @click="shareVisible = false">
+            <view class="share-warp"
+                  :style="`height: ${shareWarpHeight}px`">
+                <view class="share-top">
+                    <l-painter ref="dpainter"
+                               :hidpi="true"
+                               hybrid
+                               isCanvasToTempFilePath
+                               @success="renderSuccess"
+                               :pixel-ratio="2"/>
+                </view>
+                <view class="share-bottom bg-white"
+                      :style="`top: ${shareWarpHeight - 165}px`">
+                    <view class="menu-group">
+                        <view class="item"
+                              @click="savePoster">
+                            <view class="image-box bg-gray">
+                                <image class="item-image"
+                                       src="/static/img/newContract/share-image.png">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black ">
+                                {{
+                                    $t('invaite.tt4')
+                                }}
+                            </text>
+                        </view>
+                        <view class="item"
+                              @click="copyUrl">
+                            <view class="image-box bg-gray">
+                                <image class="item-image"
+                                       src="/static/img/newContract/share-link.png">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black ">
+                                {{
+                                    $t('invite.copy_link')
+                                }}
+                            </text>
+                        </view>
+                        <view class="item"
+                              @click="sharePoser">
+                            <view class="image-box bg-gray">
+                                <image class="item-image"
+                                       src="/static/img/newContract/share-tw.png">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black ">
+                                Twitter
+                            </text>
+                        </view>
+                        <view class="item"
+                              @click="sharePoser">
+                            <view class="image-box bg-gray">
+                                <image class="item-image"
+                                       src="/static/img/newContract/share-tg.png">
+                                </image>
+                            </view>
+                            <text class="font-11 color-black ">
+                                Telegram
+                            </text>
+                        </view>
+                    </view>
+                    <view class="button-group">
+                        <view class="button button-active bg-gray"
+                              @click="shareVisible = false;pindex=false">
+                            <text class="font-13 color-black font-weight">
+                                {{
+                                    $t('login.cancel')
+                                }}
+                            </text>
+                        </view>
+                        <view class="button button-active bg-black"
+                              @click="sharePoser">
+                            <text class="font-13 color-white font-weight">
+                                {{
+                                    $t('newcontract.t71')
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-backdrop>
+
+        <uni-popup type="center"
+                   ref="loading"
+                   :is-mask-click="false">
+            <fui-loading type="col"
+                         text="loading"
+                         :isFixed="false"></fui-loading>
+        </uni-popup>
+
+        <fui-dialog :show="alertShow"
+                    :title="$t('login.tip_t2')"
+                    :background="userTheme == 'light' ? '#ffffff' : '#17181e'"
+                    :color="userTheme == 'light' ? '#23262e' : '#ffffff'"
+                    :content="content"
+                    :buttons="buttons"
+                    maskClosable
+                    @click="alertConfirm">
+        </fui-dialog>
+    </view>
+</template>
+
+<script>
+    import service from './newContract.js';
+
+    export default service;
+</script>
+
+<style scoped>
+    @import url("newContract.css");
+</style>

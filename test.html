@@ -1,0 +1,626 @@
+<template>
+    <view class="futures" :data-theme="userTheme">
+        <fui-nav-bar
+                statusBar
+                isFixed
+                isOccupy
+                zIndex="9"
+                background="var(--color-gray-bg)"
+                custom
+                @init="navInit">
+            <view class="nav-bar">
+                <view class="nav-bar-item">
+                    <fui-icon @click="$mroute.back()"
+                              name="arrowleft"
+                              size="56"
+                              color="var(--black)">
+                    </fui-icon>
+                </view>
+                <view class="nav-bar-item" @click="$refs.showSelect.open()">
+                    <image class="change-icon"
+                           :src="`/static/newImage/toggle-${ userTheme }.png`"
+                           mode="widthFix">
+                    </image>
+                    <text class="font-16 color-black font-weight mr-5">
+                        BTCUSDT
+                    </text>
+                    <text class="font-13 color-gray">
+                        1分钟
+                    </text>
+                </view>
+            </view>
+        </fui-nav-bar>
+
+        <view class="futures-body">
+            <view class="futures-body-head">
+                <text class="font-18 price_up font-weight">
+                    {{ $util.thousandSeparator(price, 2) }}
+                </text>
+                <view class="flex flex-column align-end">
+                    <text class="font-12 color-black">
+                        {{ seconds }}
+                    </text>
+                    <text class="font-12 color-gray mt-5">
+                        投注时间
+                    </text>
+                </view>
+            </view>
+            <view class="futures-body-chart">
+                <div id="container" style="width: 100%;height: 400px;"></div>
+            </view>
+            <view class="futures-body-tabs">
+                <fui-tabs scroll
+                          alignLeft
+                          color="var(--color-text-dark-gray)"
+                          selectedSize="28"
+                          selectedColor="var(--black)"
+                          height="88"
+                          scale="1"
+                          background="var(--white)"
+                          sliderBackground="var(--blue)"
+                          :short="false"
+                          :tabs="items"
+                          :current="current"
+                          @change="current = $event.index">
+                </fui-tabs>
+            </view>
+            <!--    进行中的   -->
+            <template v-if="current === 0">
+                <scroll-view scroll-y class="scroll-view" :style="{'height': scrollHeight + 'px'}">
+                    <view class="list-item" v-for="i in 2">
+                        <view class="list-item-cell">
+                            <view class="flex align-center">
+                                <fui-tag v-if="i === 1"
+                                         :padding="['8rpx','10rpx']"
+                                         :isBorder="false"
+                                         :radius="4"
+                                         :marginRight="10"
+                                         type="danger"
+                                         theme="dark"
+                                         text="看空">
+                                </fui-tag>
+                                <fui-tag v-if="i === 2"
+                                         :padding="['8rpx','10rpx']"
+                                         :isBorder="false"
+                                         :radius="4"
+                                         :marginRight="10"
+                                         type="success"
+                                         theme="dark"
+                                         text="看涨">
+                                </fui-tag>
+                                <text class="font-14 color-black font-weight mr-5">
+                                    04:13:00
+                                </text>
+                                <text class="font-12 color-gray">
+                                    BTC/USDT-1分钟
+                                </text>
+                            </view>
+                        </view>
+                        <view class="list-item-cell">
+                            <view class="flex align-center">
+                                <view class="flex align-center mr-10">
+                                    <text class="font-12 color-gray mr-5">
+                                        开单金额
+                                    </text>
+                                    <text class="font-12 color-black">
+                                        10.00 USDT
+                                    </text>
+                                </view>
+                                <view class="flex align-center">
+                                    <text class="font-12 color-gray mr-5">
+                                        收益率
+                                    </text>
+                                    <text class="font-12 color-black">
+                                        50%
+                                    </text>
+                                </view>
+                            </view>
+                            <text class="font-14 price_down font-weight">
+                                -10 USDT
+                            </text>
+                        </view>
+                        <view class="list-item-cell">
+                            <fui-count-down background="var(--white)"
+                                            borderColor="var(--white)"
+                                            color="var(--black)"
+                                            colonColor="var(--color-text-dark-gray)"
+                                            size="24rpx"
+                                            :isDays="false"
+                                            :isHours="false"
+                                            :isMs="false"
+                                            isColon
+                                            msWidth="40"
+                                            :value="30"
+                                            :autoStart="false"
+                                            ref="countdown">
+                            </fui-count-down>
+                            <view class="progress">
+                                <fui-progress :percent="80" background="var(--color-gray-bg)"
+                                              activeColor="var(--blue)"></fui-progress>
+                            </view>
+                        </view>
+                    </view>
+                    <view style="height: 400rpx"></view>
+                </scroll-view>
+            </template>
+            <!--    历史记录   -->
+            <template v-if="current === 1">
+                <scroll-view scroll-y class="scroll-view" :style="{'height': scrollHeight + 'px'}">
+                    <view class="list-desc">
+                        <text class="font-12 color-gray">
+                            2023-08-18
+                        </text>
+                        <text class="font-12 color-gray">
+                            2 记录
+                        </text>
+                        <view class="flex align-center" @click="$refs.profit.open()">
+                            <text class="font-12 price_down mr-5">
+                                -2 USDT
+                            </text>
+                            <fui-icon name="more-fill" size="38" color="var(--black)"></fui-icon>
+                        </view>
+                    </view>
+                    <view class="list-item" v-for="i in 2">
+                        <view class="list-item-cell">
+                            <view class="flex align-center">
+                                <fui-tag v-if="i === 1"
+                                         :padding="['8rpx','10rpx']"
+                                         :isBorder="false"
+                                         :radius="4"
+                                         :marginRight="10"
+                                         type="danger"
+                                         theme="dark"
+                                         text="看空">
+                                </fui-tag>
+                                <fui-tag v-if="i === 2"
+                                         :padding="['8rpx','10rpx']"
+                                         :isBorder="false"
+                                         :radius="4"
+                                         :marginRight="10"
+                                         type="success"
+                                         theme="dark"
+                                         text="看涨">
+                                </fui-tag>
+                                <text class="font-14 color-black font-weight mr-5">
+                                    04:13:00
+                                </text>
+                                <text class="font-12 color-gray">
+                                    BTC/USDT-1分钟
+                                </text>
+                            </view>
+                        </view>
+                        <view class="list-item-cell">
+                            <text class="font-14 color-black">
+                                USDT
+                            </text>
+                            <text class="font-14 color-black">
+                                72%
+                            </text>
+                            <text class="font-14 color-black">
+                                -1
+                            </text>
+                        </view>
+                        <view class="list-item-cell">
+                            <text class="font-12 color-gray">
+                                开单币种
+                            </text>
+                            <text class="font-12 color-gray">
+                                收益率
+                            </text>
+                            <text class="font-12 color-gray">
+                                盈亏
+                            </text>
+                        </view>
+                    </view>
+                    <view style="height: 400rpx"></view>
+                </scroll-view>
+            </template>
+        </view>
+
+        <view class="footer-box">
+            <view class="footer-box-cell">
+                <text class="font-12 color-gray">
+                    开单数量
+                </text>
+                <view class="flex align-center justify-end">
+                    <text class="font-12 color-black font-weight">
+                        可用 8 USDT
+                    </text>
+                    <image @click="$mroute.exchange()"
+                           class="transfer-icon"
+                           src="/static/newImage/transfer.png"
+                           mode="widthFix">
+                    </image>
+                </view>
+            </view>
+            <view class="footer-box-button">
+                <view class="tag-item"
+                      @click="btnindex = index"
+                      :class="btnindex === index ? 'tag-item-active' : ''"
+                      v-for="(item,index) in [1, 5, 10, 20]" :key="index">
+                    <text class="font-12"
+                          :class="btnindex === index ? 'color-white' : 'color-gray'">
+                        {{ item }}USDT
+                    </text>
+                </view>
+            </view>
+            <view class="footer-box-cell mt-10">
+                <view class="flex align-center">
+                    <text class="font-12 color-gray mr-5">
+                        当前价格即为执行价格
+                    </text>
+                    <fui-icon name="help-fill" size="32" color="var(--color-text-dark-gray)" @click="$refs.notice.open()"></fui-icon>
+                </view>
+            </view>
+            <view class="footer-box-button">
+                <view class="button">
+                    <fui-button height="88rpx" radius="16rpx" bold size="26" background="var(--green)">
+                        看涨 +10%
+                    </fui-button>
+                </view>
+                <view class="button">
+                    <fui-button height="88rpx"
+                                radius="16rpx"
+                                bold
+                                size="26"
+                                background="var(--red)"
+                                @click="$refs.alert.open()">
+                        看跌 -15%
+                    </fui-button>
+                </view>
+            </view>
+        </view>
+
+        <!-- 价格说明 -->
+        <uni-popup type="center" ref="notice">
+            <view class="popup-box">
+                <text class="font-13 color-gray">到期价格高于下单时的执行价格，看涨盈利</text>
+                <text class="font-13 color-gray">到期价格低于下单时的执行价格，看跌盈利</text>
+                <text class="font-13 color-gray">按钮上的百分比即为收益率</text>
+            </view>
+        </uni-popup>
+        <alert ref="alert" @confirm="$mroute.exchange()" title="提示" content="余额不足,请划转资金到期权账户"></alert>
+        <!-- 单次盈亏详情 -->
+        <uni-popup type="center" ref="info">
+            <view class="popup-box">
+
+                <view class="pd-15">
+                    <view class="flex acenter">
+                        <view style="width: 70%;">
+                            <text class="font-13 color-black font-weight">BTC/USDT-1分钟</text>
+                            <text class="font-12 color-999 font-weight">23:05:00</text>
+                        </view>
+                        <view style="width: 30%;text-align: right;">
+                            <image @click="$refs.info.close()" style="width: 25px;height: 25px;"
+                                   src="../../../static/img/close2.png" mode=""></image>
+                        </view>
+                    </view>
+                    <view class="mt-15 bg-gray">
+                        <view class="">
+                            <text class="font-12 mt-10 block color-999">2023-08-18 23:04:24</text>
+                        </view>
+                        <view class="flex acenter">
+                            <view class="wr-50">
+                                <view class="mt-5">
+                                    <text class="font-13 font-weight price_up block">看涨</text>
+                                    <text class="font-12 color-999 block mt-5">开单方向</text>
+                                </view>
+                            </view>
+                            <view class="wr-50 " style="text-align: center;">
+                                <text class="font-13 font-weight price_up block">-1</text>
+                                <text class="font-12 color-999 block mt-5">盈亏</text>
+                            </view>
+                        </view>
+                        <view class="flex acenter mt-10">
+                            <view class="wr-50">
+                                <view class="mt-5">
+                                    <text class="font-13 font-weight color-black block">26,140.62/26138.94</text>
+                                    <text class="font-12 color-999 block mt-5">开单价/结算价</text>
+                                </view>
+                            </view>
+                            <view class="wr-50 " style="text-align: center;">
+                                <text class="font-13 font-weight price_up block">72%</text>
+                                <text class="font-12 color-999 block mt-5">收益率</text>
+                            </view>
+                        </view>
+                        <view class="flex acenter mt-10">
+                            <view class="wr-50">
+                                <view class="mt-5">
+                                    <text class="font-13 font-weight color-black block">USDT</text>
+                                    <text class="font-12 color-999 block mt-5">开单币种</text>
+                                </view>
+                            </view>
+                            <view class="wr-50 " style="text-align: center;">
+                                <text class="font-13 font-weight price_up block">亏损</text>
+                                <text class="font-12 color-999 block mt-5">本期结果</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </uni-popup>
+        <!-- 单日盈亏统计 -->
+        <uni-popup type="bottom" ref="profit">
+            <view class="popup-warp">
+                <view class="popup-warp-title">
+                    <text class="font-16 color-black font-weight">
+                        单日盈亏统计
+                    </text>
+                    <view class="close" @click="$refs.profit.close()">
+                        <fui-icon name="close" size="48" color="var(--black)"></fui-icon>
+                    </view>
+                </view>
+                <view class="popup-warp-content">
+                    <view class="popup-warp-content-cell">
+                        <text class="font-12 color-gray">
+                            2023-08-18
+                        </text>
+                        <text class="font-12 color-gray">
+                            2 记录
+                        </text>
+                    </view>
+                    <view class="popup-warp-content-card">
+                        <view class="flex flex-column">
+                            <text class="font-14 color-black font-weight">
+                                单日总盈亏
+                            </text>
+                            <text class="font-12 color-gray mt-5">
+                                当日盈利亏损的总和
+                            </text>
+                        </view>
+                        <text class="font-16 price_down font-weight">
+                            -2USDT
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </uni-popup>
+        <!-- 币种选择 -->
+        <uni-drawer ref="showSelect" mode="left" :showrAudus="true" :width="$device.windowWidth*0.8"
+                    style="z-index: 10002;">
+            <view class="drawer">
+                <view class="title">
+                    <text class="font-16 color-black font-weight">
+                        闪期权交易对
+                    </text>
+                </view>
+                <view class="drawer-search">
+                    <fui-icon name="search" size="34" color="var(--color-text-dark-gray)"></fui-icon>
+                    <input type="text" @confirm="search" v-model="searchValue" @input="input" placeholder="搜索币种" placeholder-class="placeholder">
+                </view>
+                <scroll-view scroll-y class="drawer-bottom" :style="{'height': ($device.windowHeight - 110) + 'px'}">
+                    <view class="drawer-coin-cell" v-for="(item,index) in currency[0]['currency']" :key="index">
+                        <view class="left">
+                            <text class="font-14 color-black font-weight">
+                                {{ item['symbol'] }}/USDT
+                            </text>
+                        </view>
+                        <view class="right">
+                            <text class="font-13 font-weight"
+                                  :class="{'price_up':item['change_rate'] >= 0,'price_down':item['change_rate'] < 0}">
+                                {{ $util.thousandSeparator(item['new_price'], item['decimals']) }}
+                            </text>
+                            <text class="font-13 font-weight"
+                                  :class="{'price_up':item['change_rate'] >= 0,'price_down':item['change_rate'] < 0}">
+                                {{ $util.thousandSeparator(item['change_rate']) }}%
+                            </text>
+                        </view>
+                    </view>
+                    <view style="height: 240rpx;"></view>
+                </scroll-view>
+            </view>
+        </uni-drawer>
+    </view>
+</template>
+
+<script>
+    import {NavBar, Icon, RollingText} from 'vant';
+    import {createChart} from 'lightweight-charts';
+
+    import {mapGetters} from 'vuex';
+
+    var option = {};
+    var seriesData = [];
+    var timeData = [];
+    var newPrice = 0;
+    var _charts;
+    var chartInit = 0;
+    var updateInterval;
+    var chatHandler;
+
+
+    export default {
+        components: {
+            [NavBar.name]: NavBar,
+            [Icon.name]: Icon,
+            [RollingText.name]: RollingText
+        },
+        data() {
+            return {
+                currency: [],
+                seconds: "00:00",
+                price: '0.00',
+                current: 0,
+                items: ['进行中的', '历史记录'],
+                activeColor: '#000',
+                btnindex: 0,
+                navHeight: "",
+                scrollHeight: ""
+            }
+        },
+        onReady() {
+            this.currency = uni.getStorageSync('trade-currency');
+            this._createChart();
+            this.initInterval();
+        },
+        onShow() {
+            // this.open();
+        },
+        onHide() {
+
+        },
+        onBackPress() {
+
+        },
+        computed: {
+            ...mapGetters(['userTheme'])
+        },
+        methods: {
+            navInit(e) {
+                const windowHeight = uni.getSystemInfoSync().windowHeight;
+                this.navHeight = e.height + e.statusBarHeight;
+                this.scrollHeight = windowHeight - this.navHeight;
+            },
+            open() {
+                this.$refs.profit.open();
+            },
+            onTradeMessage(data) {
+                if (data.currency_id == 1) {
+                    newPrice = data.data.c;
+                    this.price = data.data.c;
+                }
+            },
+            _createChart() {
+                const chart = createChart(
+                    document.getElementById('container'),
+                    {
+                        width: this.$device.screenWidth,
+                        height: 400,
+                        layout: {
+                            background: {color: "#222"},
+                            textColor: "#C3BCDB",
+                        },
+                        grid: {
+                            vertLines: {color: "#333"},
+                            horzLines: {color: "#333"},
+                        },
+                    },
+                );
+                chatHandler = chart;
+                const lineSeries = chart.addAreaSeries({
+                    topColor: '#00ddfa',
+                    bottomColor: 'rgba(41, 98, 255, 0.1)',
+                    lineColor: '#2979ff',
+                    lineWidth: 2,
+                    lastPriceAnimation: 1
+                });
+                const test = [
+                    {time: '2019-04-11', value: 80.01},
+                    {time: '2019-04-12', value: 96.63},
+                    {time: '2019-04-13', value: 76.64},
+                    {time: '2019-04-14', value: 81.89},
+                    {time: '2019-04-15', value: 74.43},
+                    {time: '2019-04-16', value: 80.01},
+                    {time: '2019-04-17', value: 96.63},
+                    {time: '2019-04-18', value: 76.64},
+                    {time: '2019-04-19', value: 81.89},
+                    {time: '2019-04-20', value: 74.43},
+                    {time: '2019-04-21', value: 74.43},
+                    {time: '2019-04-22', value: 74.43},
+                    {time: '2019-04-23', value: 74.43},
+                    {time: '2019-04-24', value: 74.43},
+                    {time: '2019-04-25', value: 74.43},
+                    {time: '2019-04-26', value: 74.43},
+                    {time: '2019-04-27', value: 74.43},
+                    {time: '2019-04-28', value: 74.43},
+                    {time: '2019-04-29', value: 74.43},
+                ];
+                lineSeries.setData(test);
+                const areaSeries = chart.addAreaSeries({
+                    lastValueVisible: false, // hide the last value marker for this series
+                    crosshairMarkerVisible: false, // hide the crosshair marker for this series
+                    lineColor: 'transparent', // hide the line
+                    topColor: 'rgba(102, 57, 220, 0.6)',
+                    bottomColor: 'rgba(102, 57, 220, 0.1)',
+                });
+
+
+                areaSeries.setData(test);
+
+                areaSeries.priceScale().applyOptions({
+                    scaleMargins: {
+                        // positioning the price scale for the area series
+                        top: 0.1,
+                        bottom: 0.2,
+                        right: 0.2,
+                        left: 0.2
+                    },
+                })
+                chart.timeScale().applyOptions({
+                    barSpacing: 10,
+                    borderColor: '#71649C',
+                    timeVisible: false,
+                    secondsVisible: false
+                });
+                chart.timeScale().fitContent();
+                chart.applyOptions({
+                    localization: {
+                        priceFormatter: this.PriceFormatter
+                    },
+                    watermark: {
+                        visible: true,
+                        fontSize: 24,
+                        horzAlign: 'center',
+                        vertAlign: 'center',
+                        color: 'rgba(171, 71, 188, 0.5)',
+                        text: 'ComeBit',
+                    },
+                });
+
+                const downPriceLine = {
+                    price: 95,
+                    color: '#ef5350',
+                    lineWidth: 2,
+                    lineStyle: 2, // LineStyle.Dashed
+                    axisLabelVisible: true,
+                    title: '看跌-30',
+                };
+                areaSeries.createPriceLine(downPriceLine);
+                const upPriceLine = {
+                    price: 74,
+                    color: '#35ad7a',
+                    lineWidth: 2,
+                    lineStyle: 2, // LineStyle.Dashed
+                    axisLabelVisible: true,
+                    title: '看涨+100',
+                };
+                areaSeries.createPriceLine(upPriceLine);
+                window.addEventListener('resize', () => {
+                    chart.resize(window.innerWidth, this.$device.screenWidth);
+                });
+            },
+            applyData() {
+                chatHandler
+            },
+            PriceFormatter(price) {
+                return parseFloat(price).toFixed(4);
+            },
+            initInterval() {
+                updateInterval = setInterval(() => {
+                    var currentDate = new Date();
+                    var currentSeconds = currentDate.getSeconds();
+                    this.seconds = '00:' + (60 - currentSeconds > 10 ? 60 - currentSeconds : '0' + 60 - currentSeconds);
+                    if (60 - currentSeconds <= 1) {
+                        seriesData = [];
+                        timeData = [];
+                    }
+                }, 1000);
+            },
+            onClickItem(e) {
+                console.log(e);
+                this.current = e.currentIndex;
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+  @import "futures";
+</style>
+
+<style scoped>
+    /deep/ .fui-tabs__item {
+        padding-left: 0;
+        padding-right: 40rpx;
+    }
+</style>

@@ -1,0 +1,147 @@
+<template>
+    <view class="webview-wrap bg-white" :class="userTheme" style="overflow-y: hidden;">
+        <fui-nav-bar :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                     :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                     statusBar
+                     isFixed
+                     isOccupy
+                     :title="title"
+                     @leftClick="back()"
+                     @init="navInit">
+            <fui-icon name="arrowleft" size="56" :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"></fui-icon>
+        </fui-nav-bar>
+
+        <scroll-view scroll-y class="richText-box bg-white" :style="{'height': webviewStyles.height + 'px'}"
+                     v-if="type == 1" style="position: relative;">
+            <rich-text class="rich-text color-black bg-white" :nodes="nodes"></rich-text>
+        </scroll-view>
+        <view class="webview-wrap bg-white" v-if="type == 2">
+            <view class="status_bar"></view>
+            <web-view ref="webview"
+                      class="webview bg-white"
+                      @message="handlePostMessage"
+                      @onPostMessage="handlePostMessage"
+                      :style="webviewStyles"
+                      :src="params">
+            </web-view>
+        </view>
+    </view>
+</template>
+
+<script>
+var type;
+var params;
+var ext = 0;
+import commonApi from '/common/api/common.js';
+import {
+    mapState,
+    mapGetters,
+    mapMutations
+} from 'vuex';
+
+export default {
+    data() {
+        return {
+            title: "",
+            nodes: "",
+            type: 1,
+            params: '',
+            webviewStyles: {
+                width: '750rpx',
+                height: ''
+            },
+            statusbarHeight: '',
+            $device: {},
+            height: "",
+            webviewHeight: ""
+        }
+    },
+    onLoad(e) {
+		console.log(e);
+        this.type = e.type;
+        this.params = unescape(e.params);
+        this.title = e.title ? e.title : ''
+        ext = e.ext;
+        this.getData();
+        this.device = uni.getSystemInfoSync();
+        this.webviewStyles.top = 0 + 'px';
+        this.webviewStyles.height = (this.device.screenHeight - (this.device.statusBarHeight * 2) - 15) + 'px';
+        this.webviewStyles.bottom = (this.device.statusBarHeight + 50) + 'px';
+    },
+    computed: {
+        ...mapGetters(['userTheme']),
+    },
+    onShow() {
+        this.getPageInfo();
+    },
+    methods: {
+        navInit(e) {
+            // var webviewHeight = this.webviewStyles.height;
+            // let windowHeight = uni.getSystemInfoSync();
+            // this.webviewHeight = windowHeight - e.height - e.statusbarHeight - windowHeight.safeArea.height;
+        },
+        onContractMessage() {
+
+        },
+        handlePostMessage(e) {
+            if ((e.detail && e.detail === 'back') || (e.detail.data && e.detail.data === 'back')) {
+                uni.navigateBack();
+            }
+        },
+        back() {
+            if (this.type == 1) {
+                uni.navigateBack();
+            } else {
+                if (parseInt(ext) === 100) {
+                    uni.navigateBack();
+                } else {
+                    this.$refs.webview.evalJs("back()");
+                }
+            }
+        },
+        onTradeMessage(e) {
+
+        },
+        getData() {
+            if (this.type == 1) {
+                commonApi.articleDetail({key: this.params}).then(res => {
+                    this.nodes = res.data.content;
+                })
+            }
+        },
+        getPageInfo() {
+            this.statusbarHeight = uni.getSystemInfoSync().statusBarHeight;
+            //this.webviewStyles.height = uni.getSystemInfoSync().windowHeight;
+        }
+    }
+}
+</script>
+
+<style scoped>
+.webview-wrap {
+    width: 750rpx;
+}
+
+.richText-box {
+    width: 750rpx;
+    padding: 30rpx;
+}
+
+.rich-text {
+    font-size: 28rpx;
+    line-height: 46rpx;
+    padding-bottom: 140rpx;
+}
+
+.webview {
+    width: 750rpx;
+}
+
+/deep/ .fui-nav__title-text {
+    width: 408rpx;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    lines: 1;
+}
+</style>

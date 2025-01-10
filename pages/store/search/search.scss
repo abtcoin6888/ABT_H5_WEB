@@ -1,0 +1,211 @@
+.searchWrap {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    .nav-bar {
+        width: 100%;
+        height: 88rpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+    }
+
+    .scroll-view {
+        width: 100%;
+        padding: 30rpx 0;
+        box-sizing: border-box;
+        background: var(--background-primary);
+        position: relative;
+
+        //historical-search
+        .historical-search {
+            width: 100%;
+            height: auto;
+            padding: 0 30rpx 30rpx 30rpx;
+            box-sizing: border-box;
+
+            .title-box {
+                width: 100%;
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                text {
+                    font-size: 30rpx;
+                    font-weight: 500;
+                    color: var(--content-primary);
+                }
+
+                .delete-box {
+                    width: 60rpx;
+                    height: 60rpx;
+                    border-radius: 50%;
+                    background: var(--background-secondary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    image {
+                        width: 30rpx;
+                    }
+                }
+            }
+
+            .tag-group {
+                width: 100%;
+                height: auto;
+                padding: 24rpx 0;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+
+                .item {
+                    width: fit-content;
+                    height: 52rpx;
+                    padding: 0 24rpx;
+                    box-sizing: border-box;
+                    border-radius: 8rpx;
+                    background: var(--background-secondary);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 24rpx;
+                    margin-bottom: 16rpx;
+
+                    text {
+                        &:first-of-type {
+                            font-size: 26rpx;
+                            font-weight: 500;
+                            color: var(--content-primary);
+                            margin-right: 8rpx;
+                        }
+
+                        &:last-of-type {
+                            font-size: 24rpx;
+                            color: var(--content-tertiary);
+                        }
+                    }
+                }
+            }
+        }
+
+        //hot-search
+        .hot-title {
+            width: 100%;
+            height: auto;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 9;
+            padding: 0 30rpx 24rpx 30rpx;
+            box-sizing: border-box;
+            background: var(--background-primary);
+
+            text {
+                font-size: 30rpx;
+                font-weight: 500;
+                color: var(--content-primary);
+            }
+        }
+
+        .hot-list {
+            width: 100%;
+            height: auto;
+            padding: 0 30rpx 30rpx;
+            box-sizing: border-box;
+
+            .hot-item {
+                width: 100%;
+                height: auto;
+                padding: 24rpx 0;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                &-left {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+
+                    .collect-box {
+                        width: 35rpx;
+                        height: 35rpx;
+                        margin-right: 24rpx;
+
+                        image {
+                            width: 35rpx;
+                        }
+                    }
+
+                    .row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+
+                        text {
+                            &:first-of-type {
+                                font-size: 28rpx;
+                                font-weight: 500;
+                                color: var(--content-primary);
+                                margin-right: 8rpx;
+                            }
+
+                            &:nth-of-type(2) {
+                                font-size: 24rpx;
+                                color: var(--content-tertiary);
+                            }
+
+                            &.mini-tag {
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                height: 32rpx;
+                                padding: 0 12rpx;
+                                box-sizing: border-box;
+                                border-radius: 4rpx;
+                                background-color: rgba(3, 170, 199, 0.2);
+                                font-size: 20rpx;
+                                color: #03aac7;
+                                margin-left: 6rpx;
+                            }
+                        }
+                    }
+                }
+
+                &-right {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+
+                    .column {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-end;
+
+                        text {
+                            &:first-of-type {
+                                font-size: 28rpx;
+                                font-weight: 500;
+                            }
+
+                            &:last-of-type {
+                                font-size: 24rpx;
+                                font-weight: 500;
+                                margin-top: 6rpx;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

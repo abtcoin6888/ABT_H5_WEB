@@ -1,0 +1,126 @@
+<template>
+    <view class="body-warp bg-white"
+          :class="userTheme"
+          :style="`height: ${windowHeight}px`">
+        <view class="status-bar" :style="`height: ${statusBarHeight}px`"></view>
+        <view class="back-button">
+            <fui-icon name="close"
+                      size="58"
+                      fontWeight="600"
+                      :color="userTheme == 'light' ? '#1f1f1f' : '#ffffff'"
+                      @click="pageBack">
+            </fui-icon>
+        </view>
+        <view class="container">
+            <text class="title font-28 font-bold color-black">
+                {{
+                    $t('scanLogin.t1')
+                }}
+            </text>
+            <text class="desc font-15 color-black">
+                {{
+                    $t('scanLogin.t2')
+                }}
+            </text>
+            <image class="banner-image"
+                   src="/static/img/KIN.webp"
+                   mode="widthFix">
+            </image>
+            <view class="container-card bg-gray">
+                <view class="cell">
+                    <text class="lt font-14 color-gray">
+                        {{
+                            $t('scanLogin.t3')
+                        }}
+                    </text>
+                    <text class="rt font-14 color-black font-weight">
+                        218.103.205.194
+                    </text>
+                </view>
+                <view class="cell">
+                    <text class="lt font-14 color-gray">
+                        {{
+                            $t('scanLogin.t4')
+                        }}
+                    </text>
+                    <text class="rt font-14 color-black font-weight">
+                        HongKong-Central and Western District-Central
+                    </text>
+                </view>
+                <view class="cell">
+                    <text class="lt font-14 color-gray">
+                        {{
+                            $t('scanLogin.t5')
+                        }}
+                    </text>
+                    <text class="rt font-14 color-black font-weight">
+                        Chrome Mobile 121
+                    </text>
+                </view>
+            </view>
+            <view class="footer">
+                <view class="button bg-black">
+                    <text class="button-text font-14 color-white font-weight">
+                        {{
+                            $t('scanLogin.t6')
+                        }}
+                    </text>
+                </view>
+                <view class="button mt-10"
+                      @click="pageBack">
+                    <text class="button-text font-14 color-black font-weight">
+                        {{
+                            $t('scanLogin.t7')
+                        }}
+                    </text>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+import {mapGetters} from "vuex"
+import {initVueI18n} from '@dcloudio/uni-i18n'
+import en from '@/local/en.json';
+import zh_Hant from "@/local/zh-Hant.json"
+import ja from '@/local/ja.json'
+import ko from '@/local/ko.json'
+
+const messages = {
+    en,
+    'zh-Hant': zh_Hant,
+    'ja': ja,
+    'ko': ko
+}
+const localLang = uni.getStorageSync('lang');
+const i18n = initVueI18n(typeof localLang != 'undefined' && localLang != '' ? localLang : 'en', messages);
+export default {
+    data() {
+        return {
+            statusBarHeight: '',
+            windowHeight: ''
+        }
+    },
+    computed: {
+        ...mapGetters(['userTheme'])
+    },
+    onShow() {
+        this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+        this.windowHeight = uni.getSystemInfoSync().windowHeight;
+        console.log(this.statusBarHeight)
+    },
+    methods: {
+        $t(key) {
+            return i18n.t(key);
+        },
+        pageBack() {
+            uni.navigateBack({
+                delta: 1
+            });
+        }
+    }
+}
+</script>
+<style>
+@import "scanLogin.css";
+</style>

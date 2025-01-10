@@ -1,0 +1,613 @@
+<template>
+    <view class="storeNvue bg-white"
+          :class="userTheme">
+        <fui-nav-bar :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                     statusBar
+                     isFixed
+                     isOccupy
+                     zIndex="999"
+                     custom
+                     :padding="0"
+                     @init="navInit">
+            <view class="titleBar">
+                <view class="tabBox">
+                    <view class="item"
+                          v-for="(item,index) in tabOption"
+                          @click="titleBarActive = index;">
+                        <text class="font-16  font-weight"
+                              :class="titleBarActive == index ? 'color-black' : 'color-gray'">
+                            {{ item }}
+                        </text>
+                    </view>
+                </view>
+                <image class="searchIcon"
+                       @click="mroute.coinSearch()"
+                       :src="`/static/newImage/search-${userTheme}.png`"
+                       mode="widthFix">
+                </image>
+            </view>
+        </fui-nav-bar>
+
+        <view class="store-body"
+              :style="`height: ${containerHeight}px`">
+            <swiper class="body-swiper"
+                    :current="titleBarActive"
+                    :duration="1000"
+                    :style="`height: ${containerHeight}px`"
+                    @change="swiperChange">
+                <!--    自选 -->
+                <swiper-item class="body-swiper-item">
+                    <!--    (子菜单)现货/合约按钮 -->
+                    <view class="submenu">
+                        <view class="tag-group">
+                            <view class="item"
+                                  :class="{'bg-gray': subActive == index}"
+                                  v-for="(item,index) in subTag" :key="index"
+                                  @click="subActive = index">
+                                <text class="font-12 font-weight"
+                                      :class="subActive == index ? 'color-black' : 'color-gray'">
+                                    {{ item }}
+                                </text>
+                            </view>
+                        </view>
+                        <view class="edit bg-gray"
+                              @click="mroute.editMine(this.symbolIndex)">
+                            <image class="edit-icon"
+                                   :src="`/static/newImage/edit-${userTheme}.png`"
+                                   mode="widthFix">
+                            </image>
+                        </view>
+                    </view>
+                    <!--    排序 -->
+                    <view class="sort-menu"
+                          v-if="(subActive === 0 && spotMine.length > 0) || subActive === 1 && futureMine.length > 0">
+                        <view class="sort-menu-left sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(0,'symbol')">
+                                <text class="sort-text">
+                                    {{ $t('index.name') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[0]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(1,'quota')">
+                                <text class="sort-text">
+                                    {{ $t('store.turnover') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[1]['active']">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="sort-menu-right sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(2,'new_price')">
+                                <text class="sort-text">
+                                    {{ $t('index.latest_price') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[2]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(3,'change_rate')">
+                                <text class="sort-text">
+                                    {{ $t('index.quote_change') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[3]['active']">
+                                </image>
+                            </view>
+                        </view>
+                    </view>
+                    <!--    (子菜单)现货/合约内容 -->
+                    <swiper class="container-swiper"
+                            :current="subActive"
+                            :style="`height: ${scrollHeight}px`"
+                            @change="subSwiperChange">
+                        <swiper-item class="container-swiper-item">
+                            <template v-if="spotMine.length === 0">
+                                <scroll-view :scroll-y="true"
+                                             class="scroll-view"
+                                             :style="`height: ${scrollHeight}px`">
+                                    <view class="checkbox-group">
+                                        <view class="checkbox-item bg-gray"
+                                              v-for="(item, index) in currency.slice(0, 6)"
+                                              :key="'lc' + item.id"
+                                              @click="onChangeCurrencySelect(index,item.select)">
+                                            <view class="row row-first">
+                                                <text class="font-12  color-gray font-weight">
+                                                    {{ item['symbol'] }}
+                                                </text>
+                                                <text class="font-12  color-gray">
+                                                    / USDT
+                                                </text>
+                                            </view>
+                                            <view class="row">
+                                                <text class="font-14  color-black font-weight">
+                                                    {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                                </text>
+                                            </view>
+                                            <view class="row row-last">
+                                                <text class="font-12 color-gray "
+                                                      :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                    {{ item['change_rate'] }}%
+                                                </text>
+                                                <view class="checkbox">
+                                                    <fui-checkbox :isCheckMark="true"
+                                                                  checkMarkColor="#03aac7"
+                                                                  :checked="!item.select"
+                                                                  scaleRatio="1.4"
+                                                                  @change="">
+                                                    </fui-checkbox>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="checkbox-confirm-button bg-black button-active"
+                                          v-if="currency.length != 0"
+                                          @click="selectMine()">
+                                        <text class="font-13  color-white font-weight">
+                                            {{ $t('index.add_own') }}
+                                        </text>
+                                    </view>
+                                    <!--   数据为空  -->
+                                    <empty-view :title="$t('list.not_data')"
+                                                :visible="currency.length == 0"
+                                                :width="750"
+                                                :height="600">
+                                    </empty-view>
+                                </scroll-view>
+                            </template>
+                            <template v-else>
+                                <scroll-view :scroll-y="true"
+                                             class="scroll-view"
+                                             :style="`height:${scrollHeight}px`">
+                                    <view class="coin-group">
+                                        <view class="coin-item"
+                                              v-for="(item, index) in spotMine"
+                                              :key="'m' + item.id"
+                                              @click="mroute.toKline(0, item.id, 1)">
+                                            <view class="coin-item-left coin-item-cell">
+                                                <view class="column">
+                                                    <view class="row">
+                                                        <text class="font-14  color-black font-weight">
+                                                            {{ item['symbol'] }}
+                                                        </text>
+                                                        <text class="font-12  color-gray">
+                                                            / USDT
+                                                        </text>
+                                                    </view>
+                                                    <view class="row">
+                                                        <text class="font-12  color-gray">
+                                                            {{ util.bigNumberToString(item['quota']) }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                            <view class="coin-item-right coin-item-cell">
+                                                <view class="column">
+                                                    <view class="row">
+                                                        <text class="font-14  color-black font-weight"
+                                                              :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                            {{
+                                                                util.thousandSeparator(item['new_price'], item['decimals'])
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="row">
+                                                        <text class="font-12  color-gray">
+                                                            ≈{{ symbol }} {{
+                                                                util.thousandSeparator(symbol_rate * item['new_price'])
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                                <view class="column">
+                                                    <view class="rate-tag bg-gray"
+                                                          :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                                        <text class="font-12  font-weight always-white"
+                                                              :class="{'color-black' : item['change_rate'] == 0}">
+                                                            {{ util.thousandSeparator(item['change_rate']) }}%
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                        </view>
+                                        <!--   底部占位  -->
+                                        <view class="ph_view" v-if="spotMine.length != 0"></view>
+                                    </view>
+                                    <!--   数据为空  -->
+                                    <empty-view :title="$t('list.not_data')"
+                                                :visible="spotMine.length == 0"
+                                                :width="750"
+                                                :height="600">
+                                    </empty-view>
+                                </scroll-view>
+                            </template>
+                        </swiper-item>
+                        <!--                        自选合约列表-->
+                        <swiper-item class="container-swiper-item">
+                            <template v-if="futureMine.length === 0">
+                                <scroll-view :scroll-y="true"
+                                             class="scroll-view"
+                                             :style="`height: ${scrollHeight}px`">
+                                    <view class="checkbox-group">
+                                        <view class="checkbox-item bg-gray"
+                                              v-for="(item, index) in contract[0] ? contract[0]['currency'].slice(0, 6) : []"
+                                              :key="'lc' + item.id"
+                                              @click="item.select = !item.select">
+                                            <view class="row row-first">
+                                                <text class="font-12  color-gray font-weight">
+                                                    {{ item['symbol'] }}USDT
+                                                </text>
+                                                <text class="mini-tag">
+                                                    {{ $t('contract.p1') }}
+                                                </text>
+                                            </view>
+                                            <view class="row">
+                                                <text class="font-14  color-black font-weight">
+                                                    {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                                </text>
+                                            </view>
+                                            <view class="row row-last">
+                                                <text class="font-12 color-gray "
+                                                      :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                    {{ item['change_rate'] }}%
+                                                </text>
+                                                <view class="checkbox">
+                                                    <fui-checkbox :isCheckMark="true"
+                                                                  checkMarkColor="#03aac7"
+                                                                  :checked="!item.select"
+                                                                  scaleRatio="1.4"
+                                                                  @change="item['select'] = !item['select']">
+                                                    </fui-checkbox>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="checkbox-confirm-button bg-black button-active"
+                                          v-if="contract.length != 0"
+                                          @click="selectMine()">
+                                        <text class="font-13  color-white font-weight">
+                                            {{ $t('index.add_own') }}
+                                        </text>
+                                    </view>
+                                    <!--   数据为空  -->
+                                    <empty-view :title="$t('list.not_data')"
+                                                :visible="contract.length == 0"
+                                                :width="750"
+                                                :height="600">
+                                    </empty-view>
+                                </scroll-view>
+                            </template>
+                            <template v-else>
+                                <scroll-view scroll-y="true" class="scroll-view" :style="`height:${scrollHeight}px`">
+                                    <view class="coin-group">
+                                        <view class="coin-item"
+                                              v-for="(item, index) in futureMine"
+                                              :key="'m' + item.id"
+                                              @click="mroute.toKline(0, item.id, 2)">
+                                            <view class="coin-item-left coin-item-cell">
+                                                <view class="column">
+                                                    <view class="row">
+                                                        <text class="font-14  color-black font-weight">
+                                                            {{ item['symbol'] }}USDT
+                                                        </text>
+                                                        <text class="mini-tag">
+                                                            {{ $t('contract.p1') }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="row">
+                                                        <text class="font-12  color-gray">
+                                                            {{ util.bigNumberToString(item['quota']) }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                            <view class="coin-item-right coin-item-cell">
+                                                <view class="column">
+                                                    <view class="row">
+                                                        <text class="font-14  color-black font-weight"
+                                                              :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                            {{
+                                                                util.thousandSeparator(item['new_price'], item['decimals'])
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                    <view class="row">
+                                                        <text class="font-12  color-gray">
+                                                            ≈{{
+                                                                symbol
+                                                            }}{{
+                                                                util.thousandSeparator(symbol_rate * item['new_price'])
+                                                            }}
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                                <view class="column">
+                                                    <view class="rate-tag bg-gray"
+                                                          :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                                        <text class="font-12  font-weight always-white"
+                                                              :class="{'color-black' : item['change_rate'] == 0}">
+                                                            {{ util.thousandSeparator(item['change_rate']) }}%
+                                                        </text>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                        </view>
+                                        <!--   底部占位  -->
+                                        <view class="ph_view" v-if="futureMine.length != 0"></view>
+                                    </view>
+                                    <!--   数据为空  -->
+                                    <empty-view :title="$t('list.not_data')"
+                                                :visible="futureMine.length == 0"
+                                                :width="750"
+                                                :height="600">
+                                    </empty-view>
+                                </scroll-view>
+                            </template>
+                        </swiper-item>
+                    </swiper>
+                </swiper-item>
+                <!--    现货 -->
+                <swiper-item class="body-swiper-item">
+                    <!--    (子菜单) -->
+                    <view class="submenu">
+                        <view class="tag-group">
+                            <view class="item bg-gray">
+                                <text class="font-12 font-weight color-black">
+                                    USDT
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                    <!--    排序 -->
+                    <view class="sort-menu"
+                          v-if="showList !== 0">
+                        <view class="sort-menu-left sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(0,'symbol')">
+                                <text class="sort-text">
+                                    {{ $t('index.name') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[0]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(1,'quota')">
+                                <text class="sort-text">
+                                    {{ $t('store.turnover') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[1]['active']">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="sort-menu-right sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(2,'new_price')">
+                                <text class="sort-text">
+                                    {{ $t('index.latest_price') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[2]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(3,'change_rate')">
+                                <text class="sort-text">
+                                    {{ $t('index.quote_change') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[3]['active']">
+                                </image>
+                            </view>
+                        </view>
+                    </view>
+                    <!--    (内容) -->
+                    <scroll-view scroll-y="true"
+                                 class="scroll-view"
+                                 :style="`height: ${scrollHeight}px`">
+                        <view class="coin-group">
+                            <view class="coin-item"
+                                  v-for="(item, index) in currency"
+                                  :key="'tl' + item.id"
+                                  @click="mroute.toKline(0, item.id, 1)">
+                                <view class="coin-item-left coin-item-cell">
+                                    <view class="column">
+                                        <view class="row">
+                                            <text class="font-14  color-black font-weight">
+                                                {{ item['symbol'] }}
+                                            </text>
+                                            <text class="font-12  color-gray">
+                                                / USDT
+                                            </text>
+                                        </view>
+                                        <view class="row">
+                                            <text class="font-12  color-gray">
+                                                {{ util.bigNumberToString(item['quota']) }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+                                <view class="coin-item-right coin-item-cell">
+                                    <view class="column">
+                                        <view class="row">
+                                            <text class="font-14  color-black font-weight"
+                                                  :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                            </text>
+                                        </view>
+                                        <view class="row">
+                                            <text class="font-12  color-gray">
+                                                ≈{{ symbol }} {{
+                                                    util.thousandSeparator(symbol_rate * item['new_price'])
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="column">
+                                        <view class="rate-tag bg-gray"
+                                              :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                            <text class="font-12  font-weight always-white"
+                                                  :class="{'color-black' : item['change_rate'] == 0}">
+                                                {{ util.thousandSeparator(item['change_rate']) }}%
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+                            </view>
+                            <!--   底部占位  -->
+                            <view class="ph_view" v-if="currency.length != 0"></view>
+                        </view>
+                        <!--   数据为空  -->
+                        <empty-view :title="$t('list.not_data')"
+                                    :visible="currency.length == 0"
+                                    :width="750"
+                                    :height="600">
+                        </empty-view>
+                    </scroll-view>
+                </swiper-item>
+                <!--    合约 -->
+                <swiper-item class="body-swiper-item">
+                    <!--    (子菜单) -->
+                    <view class="submenu">
+                        <view class="tag-group">
+                            <template v-for="(item,index) in contract" :key="'ctab'+item.id">
+                                <view class="item" :class="{'bg-gray':subTabIndex===index}" @click="subTabIndex=index">
+                                    <text class="font-12 font-weight" :class="subTabIndex === index ? 'color-black' : 'color-gray'">
+                                        {{ item['title'][lang] }}
+                                    </text>
+                                </view>
+                            </template>
+                        </view>
+                    </view>
+                    <!--    排序 -->
+                    <view class="sort-menu"
+                          v-if="showList !== 0">
+                        <view class="sort-menu-left sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(0,'symbol')">
+                                <text class="sort-text">
+                                    {{ $t('index.name') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[0]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(1,'quota')">
+                                <text class="sort-text">
+                                    {{ $t('store.turnover') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[1]['active']">
+                                </image>
+                            </view>
+                        </view>
+                        <view class="sort-menu-right sort-menu-group">
+                            <view class="sort-menu-item"
+                                  @click="switchSort(2,'new_price')">
+                                <text class="sort-text">
+                                    {{ $t('index.latest_price') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[2]['active']">
+                                </image>
+                            </view>
+                            <view class="sort-menu-item"
+                                  @click="switchSort(3,'change_rate')">
+                                <text class="sort-text">
+                                    {{ $t('index.quote_change') }}
+                                </text>
+                                <image class="sort-icon"
+                                       :src="sort[3]['active']">
+                                </image>
+                            </view>
+                        </view>
+                    </view>
+                    <!--    (内容) -->
+
+
+                    <scroll-view
+                            :scroll-y="true"
+                            class="scroll-view"
+                            :style="`height: ${scrollHeight}px`"
+                    >
+                        <view class="coin-group">
+                            <template v-for="(item,index) in contract[subTabIndex] ? contract[subTabIndex]['currency'] : []" :key="'cm'+item.id">
+                                <view class="coin-item" @click="mroute.toKline(contract[subTabIndex]['currency_type'],item['id'], contract[subTabIndex]['id'])">
+                                    <view class="coin-item-left coin-item-cell">
+                                        <view class="column">
+                                            <view class="row">
+                                                <text class="font-14  color-black font-weight">
+                                                    {{ item['symbol'] }}USDT
+                                                </text>
+                                                <text class="mini-tag">
+                                                    {{ $t('contract.p1') }}
+                                                </text>
+                                            </view>
+                                            <view class="row">
+                                                <text class="font-12  color-gray">
+                                                    {{ util.bigNumberToString(item['quota']) }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="coin-item-right coin-item-cell">
+                                        <view class="column">
+                                            <view class="row">
+                                                <text class="font-14  color-black font-weight"
+                                                      :class="item['change_rate'] > 0 ? 'price_up' : 'price_down'">
+                                                    {{ util.thousandSeparator(item['new_price'], item['decimals']) }}
+                                                </text>
+                                            </view>
+                                            <view class="row">
+                                                <text class="font-12  color-gray">
+                                                    ≈{{ symbol }} {{
+                                                        util.thousandSeparator(symbol_rate * item['new_price'])
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                        <view class="column">
+                                            <view class="rate-tag bg-gray"
+                                                  :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                                <text class="font-12  font-weight always-white"
+                                                      :class="{'color-black' : item['change_rate'] == 0}">
+                                                    {{ util.thousandSeparator(item['change_rate']) }}%
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </template>
+                            <!--   底部占位  -->
+                            <view class="ph_view" v-if="contract.length != 0"></view>
+                        </view>
+                        <!--   数据为空  -->
+                        <empty-view :title="$t('list.not_data')"
+                                    :visible="!contract[subTabIndex] || contract[subTabIndex]['currency'].length <= 0"
+                                    :width="750"
+                                    :height="600">
+                        </empty-view>
+                    </scroll-view>
+                </swiper-item>
+            </swiper>
+        </view>
+    </view>
+</template>
+
+<script>
+    import service from './serviceNvue.js';
+
+    export default service;
+</script>
+
+<style scoped>
+    @import url("storeNvue.css");
+</style>

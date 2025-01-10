@@ -1,0 +1,102 @@
+.payment-methods {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    .payment-methods-container {
+        width: 100%;
+        height: auto;
+
+        .scroll-view {
+            width: 100%;
+            padding: 0 30rpx;
+            box-sizing: border-box;
+
+            .not-data {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            &-item {
+                width: 100%;
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20rpx 0;
+                box-sizing: border-box;
+
+                .left {
+                    width: calc(100% - 100rpx);
+                    height: auto;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+
+                    &-cell {
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        margin: 2rpx 0;
+
+                        &:first-of-type {
+                            margin-bottom: 8rpx;
+                        }
+
+                        image {
+                            width: 30rpx;
+                            height: 30rpx;
+                            margin-right: 10rpx;
+
+                            &[type='unionpay'] {
+                                width: 35rpx;
+                            }
+                        }
+                    }
+                }
+
+                .right {
+                    width: 80rpx;
+                    height: 80rpx;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+
+
+                    image {
+                        width: 55rpx;
+                        height: 55rpx;
+                    }
+                }
+            }
+        }
+    }
+
+    .footer-button {
+        width: 100%;
+        height: auto;
+        padding: 20rpx 30rpx;
+        box-sizing: border-box;
+        background: var(--background-primary);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 9;
+    }
+
+    .preview-box {
+        width: 600rpx;
+        height: auto;
+        padding: 1rpx;
+        box-sizing: border-box;
+        background: var(--background-primary);
+        border-radius: 22rpx;
+
+        image {
+            width: 100%;
+            border-radius: 22rpx;
+        }
+    }
+}

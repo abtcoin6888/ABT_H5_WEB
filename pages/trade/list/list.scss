@@ -1,0 +1,214 @@
+.trade-list {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    //nav-tabs
+    .nav-tabs {
+        width: 100%;
+        height: 88rpx;
+    }
+
+    //list-tabs
+    .list-tabs {
+        width: 100%;
+        height: 88rpx;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+    }
+
+    //list-swiper
+    .list-swiper {
+        width: 100%;
+
+        &-item {
+            width: 100%;
+            height: 100%;
+
+            .tag-group {
+                width: 100%;
+                height: 58rpx;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 0 30rpx;
+                box-sizing: border-box;
+
+                .item {
+                    width: fit-content;
+                    height: 48rpx;
+                    padding: 0 30rpx;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 4rpx;
+                    margin-right: 16rpx;
+                    background: var(--background-secondary);
+
+                    text {
+                        font-size: 22rpx;
+                        color: var(--content-tertiary);
+                    }
+
+                    image {
+                        width: 25rpx;
+                        opacity: .5;
+                        margin-left: 6rpx;
+                        transition: all 0.15s linear;
+                    }
+
+                    &.active {
+                        text {
+                            color: var(--color-primary);
+                        }
+
+                        image {
+                            transform: rotate(180deg);
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+
+            .scroll-view {
+                width: 100%;
+                height: calc(100% - 58rpx);
+                transition: all 0.15s linear;
+                padding: 30rpx 0 0;
+                box-sizing: border-box;
+
+                .list-content {
+                    width: 100%;
+                    height: auto;
+                    padding: 0 30rpx 30rpx;
+                    box-sizing: border-box;
+
+                    .card-item {
+                        width: 100%;
+                        height: auto;
+                        border-bottom: 1rpx solid var(--border-strength-100);
+                        margin-bottom: 24rpx;
+
+                        &:last-of-type {
+                            border: none;
+                        }
+
+                        .row {
+                            width: 100%;
+                            height: auto;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin-bottom: 16rpx;
+
+                            &-left {
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-start;
+                            }
+
+                            &:right {
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //骨架
+    .skeleton-warp {
+        padding: 30rpx 0;
+        box-sizing: border-box;
+        transition: all 0.15s linear;
+
+        .skeleton-box {
+            width: 100%;
+            height: 320rpx;
+            padding-bottom: 10rpx;
+            box-sizing: border-box;
+            background: var(--background-primary);
+            margin-bottom: 30rpx;
+            position: relative;
+        }
+
+        &.skeleton-show {
+            transform: translateY(0);
+            opacity: 1;
+
+            .skeleton-box {
+                width: 100%;
+                height: 320rpx;
+            }
+        }
+
+        &.skeleton-hide {
+            transform: translateY(-15rpx);
+            opacity: 0;
+
+            .skeleton-box {
+                width: 0;
+                height: 0;
+            }
+        }
+    }
+}
+
+//popup-wrap
+.popup-wrap {
+    width: 100%;
+    height: auto;
+
+    .popup-title {
+        width: 100%;
+        height: 88rpx;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1rpx solid var(--border-strength-100);
+        position: relative;
+
+        .close-icon {
+            position: absolute;
+            right: 30rpx;
+        }
+    }
+
+    .popup-scroll-view {
+        width: 100%;
+        padding: 30rpx 30rpx 0 30rpx;
+        box-sizing: border-box;
+
+        .cell {
+            width: 100%;
+            padding: 24rpx 0;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16rpx;
+
+            image {
+                width: 25rpx;
+            }
+        }
+    }
+
+    &[type='min-wrap'] {
+        .popup-scroll-view {
+            height: 360rpx;
+        }
+    }
+
+    &[type='tp-wrap'] {
+        .popup-scroll-view {
+            height: 630rpx;
+        }
+    }
+}

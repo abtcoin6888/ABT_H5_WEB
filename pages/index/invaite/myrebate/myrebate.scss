@@ -1,0 +1,125 @@
+.myrebate {
+	width: 100%;
+	min-height: 100vh;
+	background-color: var(--background-primary);
+	
+	.content-warp {
+		width: 100%;
+		height: auto;
+		padding: 30rpx;
+		box-sizing: border-box;
+		
+		.top-box {
+			width: 100%;
+			height: auto;
+			padding: 30rpx;
+			box-sizing: border-box;
+			border-radius: 16rpx;
+			background-color: var(--background-secondary);
+			display: flex;
+			flex-direction: column;
+			
+			.cell_row {
+				width: 100%;
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				margin-bottom: 20rpx;
+				
+				&:first-of-type {
+					margin-bottom: 30rpx;
+					justify-content: flex-start;
+				}
+				
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+				
+				._item {
+					width: 50%;
+					height: auto;
+					display: flex;
+					flex-direction: column;
+					align-items: flex-start;
+					
+					text {
+						&:last-of-type {
+							margin-top: 10rpx;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		.bottom-list {
+			width: 100%;
+			height: auto;
+			padding: 30rpx 0;
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			
+			.bottom-title {
+				width: 100%;
+				height: auto;
+				display: flex;
+				align-items: center;
+			}
+			
+			.not-date {
+				width: 100%;
+				height: 600rpx;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+		}
+	}
+}
+
+.bottom-list {
+	margin-top: 30rpx;
+	width: 100%;
+	height: auto;
+	min-height: 880rpx;
+	padding-bottom: 200rpx;
+	box-sizing: border-box;
+
+	.not-data {
+		width: 100%;
+		height: 600rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&-cell {
+		width: 100%;
+		height: 88rpx;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		text {
+			line-height: 88rpx;
+		}
+
+		.user-info {
+			height: 88rpx;
+			display: flex;
+			align-items: center;
+
+			.rank-num {
+				width: 45rpx;
+				text-align: center;
+				margin-right: 10rpx;
+			}
+		}
+
+		image {
+			width: 45rpx;
+			margin-right: 10rpx;
+		}
+	}
+}

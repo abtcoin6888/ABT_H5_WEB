@@ -1,0 +1,599 @@
+/* 背景色 */
+.bg-gray {
+	background-color: #f8f9f9;
+}
+
+.bg-white {
+	background: #ffffff;
+}
+
+.bg-red {
+	background: #e25355;
+}
+
+.bg-green {
+	background: #60b485;
+}
+
+.bg-light-green {
+	background-color: rgba(53, 173, 122, .1);
+}
+
+.bg-light-red {
+	background-color: rgba(255, 92, 81, .1);
+}
+
+
+/* 边距 */
+.mr-5 {
+	margin-right: 10rpx;
+}
+
+.mt-5 {
+	margin-top: 10rpx;
+}
+
+.mt-3 {
+	margin-top: 6rpx;
+}
+
+/* 字体 */
+.font-18 {
+	font-size: 36rpx;
+}
+
+.font-17 {
+	font-size: 34rpx;
+}
+
+.font-16 {
+	font-size: 32rpx;
+}
+
+.font-15 {
+	font-size: 30rpx;
+}
+
+.font-14 {
+	font-size: 28rpx;
+}
+
+.font-13 {
+	font-size: 26rpx;
+}
+
+.font-12 {
+	font-size: 24rpx;
+}
+
+.font-11 {
+	font-size: 22rpx;
+}
+
+.font-10 {
+	font-size: 20rpx;
+}
+
+.font-weight {
+	font-weight: 500;
+}
+
+.color-black {
+	color: #363944;
+}
+
+.color-gray {
+	color: #b9bdc2;
+}
+
+.color-dark {
+	color: #85898e;
+}
+
+.color-sub {
+	color: #50535e;
+}
+
+.color-white {
+	color: #ffffff;
+}
+
+.price_down {
+	color: #e25355;
+}
+.price_up {
+	color: #60b485;
+}
+
+.color-green {
+	color: #60b485;
+}
+
+.color-blue {
+	color: #3070ec;
+}
+
+.color-red {
+	color: #e25355;
+}
+
+.price_down {
+	color: #e25355;
+}
+
+.price_up {
+	color: #60b485;
+}
+
+/* ---------------- */
+
+.kline_nvue {
+	width: 750rpx;
+	background-color: #ffffff;
+}
+
+/* nav bar  */
+
+.nav-bar {
+	width: 718rpx;
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.nav-bar .left{
+	width: 170rpx;
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.nav-bar .left .image-box,
+.nav-bar .right .image-box{
+	width: 48rpx;
+	height: 88rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-bar .center {
+	width: 350rpx;
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-bar .center .change-image {
+	width: 40rpx;
+	margin-right: 10rpx;
+}
+
+.nav-bar .right {
+	width: 170rpx;
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.nav-bar .right .image-box {
+	margin-left: 20rpx;
+}
+
+.nav-bar .right .image-box .btn-image {
+	width: 40rpx;
+}
+
+/* scroll view */
+
+.scroll-list {
+	width: 750rpx;
+	border-top-right-radius: 30rpx;
+	border-top-left-radius: 30rpx;
+	border-bottom-left-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+.scroll-list .list-top {
+	width: 750rpx;
+	padding: 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.scroll-list .list-top .left {
+	width: 345rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.scroll-list .list-top .right {
+	width: 345rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.scroll-list .list-top .item ._row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.scroll-list .list-top .item ._row .width {
+	width: 180rpx;
+	text-align: right;
+}
+
+.scroll-list .list-top .item ._row .last-width {
+	width: 140rpx;
+	text-align: right;
+}
+
+/* time tab */
+.scroll-list .time-tab {
+	width: 750rpx;
+	padding: 0 30rpx;
+	border-bottom: 2rpx solid #f8f9f9;
+}
+
+/* kline box  */
+.scroll-list .kline {
+	width: 750rpx;
+}
+
+.scroll-list .kline .kline-webview {
+	width: 750rpx;
+	height: 500px;
+}
+
+/* kline-average */
+.scroll-list .kline-average {
+	width: 750rpx;
+	height: 66rpx;
+	padding: 0 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16rpx;
+}
+
+.scroll-list .kline-average .item {
+	height: 66rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.scroll-list .kline-average .line {
+	width: 3rpx;
+	height: 23rpx;
+	border-radius: 4rpx;
+	background: #85898e;
+}
+
+/* order tabs  */
+.scroll-list .order-tabs {
+	width: 750rpx;
+	height: 88rpx;
+	padding: 0 30rpx;
+}
+
+/*  list title  */
+.scroll-list .list-title{
+	width: 750rpx;
+	height: 66rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 30rpx;
+}
+
+.scroll-list .list-title .item {
+	width: 230rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.scroll-list .list-title .item-left {
+	justify-content: flex-start;
+}
+
+.scroll-list .list-title .item-center {
+	justify-content: center;
+}
+
+.scroll-list .list-title .item-right {
+	justify-content: flex-end;
+}
+
+/* list cell */
+.scroll-list .list-con {
+	width: 750rpx;
+}
+
+.scroll-list .list-con .list-cell{
+	width: 750rpx;
+	height: 44rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 30rpx;
+}
+
+.scroll-list .list-con .list-cell ._item{
+	width: 340rpx;
+	height: 44rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	position: relative;
+	overflow: hidden;
+}
+
+.scroll-list .list-con .list-cell ._item .bg-box {
+	width: 340rpx;
+	height: 44rpx;
+	position: absolute;
+	transition: width 0.5s linear;
+}
+
+.scroll-list .list-con .list-cell ._item-left .bg-box {
+	right: 0;
+}
+
+.scroll-list .list-con .list-cell ._item-right .bg-box {
+	left: 0;
+}
+
+._list-cell {
+	height: 44rpx !important;
+}
+
+._list-cell .item{
+	height: 44rpx !important;
+}
+
+/* coin info */
+.scroll-list .coin-info-warp {
+	width: 750rpx;
+}
+
+.scroll-list .coin-info {
+	width: 750rpx;
+	padding-bottom: 280rpx;
+}
+
+.scroll-list .coin-info .coin-card {
+	width: 750rpx;
+	padding: 30rpx;
+}
+
+.scroll-list .coin-info .coin-card .coin-row-image {
+	width: 690rpx;
+	margin-bottom: 16rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.scroll-list .coin-info .coin-card .coin-row-image .coin-img {
+	width: 60rpx;
+	height: 60rpx;
+	margin-right: 16rpx;
+}
+
+.scroll-list .coin-info .coin-card .coin-row {
+	width: 690rpx;
+	height: 66rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.scroll-list .coin-info .coin-card .coin-context {
+	width: 690rpx;
+	padding: 20rpx 0;
+}
+
+.scroll-list .coin-info .last-card {
+	border-bottom-color: transparent;
+}
+
+.scroll-list .zw-view {
+	width: 750rpx;
+}
+
+/*  footer button */
+
+.footer {
+	width: 750rpx;
+	padding: 20rpx 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	z-index: 99;
+}
+
+.footer .btn {
+	width: 335rpx;
+	height: 88rpx;
+	border-radius: 10rpx;
+	border-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.footer .btn .color-white {
+	color: #ffffff;
+}
+
+
+
+.drawer {
+	width: 600rpx;
+}
+
+.drawer .status_bar {
+	width: 600rpx;
+}
+
+.drawer .title {
+	padding: 20rpx 30rpx;
+	font-size: 32rpx;
+	font-weight: 500;
+}
+
+.drawer .search_box {
+	margin-top: 20rpx;
+	width: 540rpx;
+	height: 76rpx;
+	padding: 0 20rpx;
+	margin-left: 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 10rpx;
+}
+
+.drawer .search_box .search_icon {
+	width: 34rpx;
+	height: 34rpx;
+}
+
+.drawer .search_box .search_input {
+	width: 456rpx;
+	height: 76rpx;
+	font-size: 26rpx;
+	line-height: 76rpx;
+}
+
+.drawer .search_box .input_placeholder {
+	font-size: 26rpx;
+	line-height: 74rpx;
+}
+
+.drawer .tab_box {
+	margin-top: 20rpx;
+	width: 540rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: 30rpx;
+}
+
+.drawer .tab_box ._item {
+	height: 56rpx;
+	padding: 0 30rpx;
+	border-radius: 10rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.drawer .tab_list {
+	width: 540rpx;
+	margin-left: 30rpx;
+	margin-top: 30rpx;
+}
+
+.drawer .tab_list .list_top {
+	width: 540rpx;
+	height: 66rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	position: sticky;
+}
+
+.drawer .tab_list .list_top .top-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.drawer .tab_list .list_top .top-item .change_icon {
+	width: 14rpx;
+	height: 20rpx;
+	margin-left: 6rpx;
+}
+
+.drawer .tab_list .list_top .top-item .ri {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	 /*margin-left: 16rpx;*/
+}
+
+.drawer .tab_list .list_bottom {
+	width: 540rpx;
+	padding-bottom: 50rpx;
+}
+
+.drawer .tab_list .list_bottom .not-list {
+	width: 540rpx;
+	height: 600rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.drawer .tab_list .list_bottom .not-list .not-img {
+	width: 150rpx;
+	margin-bottom: 30rpx;
+}
+
+.drawer .tab_list .list_bottom .coin_box {
+	width: 540rpx;
+	padding: 6rpx 20rpx;
+	margin-bottom: 6rpx;
+	border-radius: 10rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.drawer .tab_list .list_bottom .coin_box .left {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.drawer .tab_list .list_bottom .coin_box .right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+
+
+
+
+/deep/.fui-tabs__item {
+	padding: 0 50rpx 0 0 !important;
+}

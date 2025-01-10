@@ -1,0 +1,347 @@
+<template>
+	<view class="light">
+		<!-- #ifdef APP-PLUS -->
+		<view class="status_bar bg-white" style="z-index: 999999;"></view>
+		<!-- #endif -->
+		<view class="headers">
+			<view class="flex p-15" style="height: 45px;line-height: 45px;align-items: center;">
+				<view class="flex"  style="width: 80%;">
+					<view class="pl-15">
+						<uni-icons @click="$mroute.back()" type="back" size="20"></uni-icons>
+					</view>
+					<view class="flex pl-10" style="align-items: center;">
+						<image  @click="$refs.showSelect.open()" src="/static/img/zy.png" style="height: 14px;width: 16px;" mode=""></image>
+					</view>
+					<view class="pl-5 flex acenter" >
+						<text @click="$refs.showSelect.open()" class="font-12 font-weight color-999">BTC/USDT</text>
+						<text @click="$refs.showSelect.open()" class="font-12 color-999 pl-5 font-weight">1分钟</text>
+					</view>
+				</view>
+				<view class="flex flexend" style="width: 20%;padding-right: 15px;">
+					<uni-icons type="more-filled" size="20"></uni-icons>
+				</view>
+			</view>
+		</view>
+		<view style="height: 45px;width: 100%;"></view>
+		<view class="container" style="background-color: #222;height: 50px;">
+			<view class="p-l-r-15 flex acenter">
+				<view class="wr-50">
+					<fui-digital-roller color="#60b485" :value="parseFloat(currentCurrency['new_price']).toFixed(decimals)"></fui-digital-roller>
+				</view>
+				<view class="wr-50" style="text-align: right;">
+					<text class="font-14 color-white block font-weight">{{seconds}}</text>
+					<text class="font-10 color-999 block">交割时间</text>
+				</view>
+			</view>
+		</view>
+		<view>
+			<view style="width: 100%; height:800rpx">
+				<!-- <l-echart ref="chart"></l-echart> -->
+				<view
+					:history="history"
+					:decimals="decimals"
+					:new_price="new_price"
+					:change:decimals="render.setDecimals"
+					:change:history="render.loadHistory"
+					:change:new_price="render.updatePrice"
+					id="container"
+					style="width: 750rpx;height: 800rpx;"
+				>
+				</view>
+			</view>
+			<view class="mt-10" style="width: 100%;height: 5px;background-color: #eee;"></view>
+			<view class="mt-5 flex p-l-r-15">
+				<uni-segmented-control style="font-size: 13px;font-weight: 500;" :current="current" :values="items" style-type="text"
+					:active-color="activeColor" @clickItem="onClickItem" />
+			</view>
+			<view style="width: 100%;height: 1px;background-color: #eee;"></view>
+			<!-- 进行中的 -->
+			<view v-if="current == 0" class="mt-10 p-l-r-15" style="min-height: 500px;">
+				<view v-if="false" style="width: 100%;height: 150px;display: flex;align-items: center;">
+					<view style="width: 80px;margin: auto;">
+						<image class="block" src="../../../static/img/noorder.png" style="width: 80px;height: 80px;" mode=""></image>
+						<text class="font-13 color-999 font-weight block">暂无数据</text>
+					</view>
+				</view>
+				<view v-else>
+					<!-- 数据跟着价格实时变化 -->
+					<view class="items mt-10 mb-10" v-for="i in 2" :key="i">
+						<view class="flex acenter">
+							<text class="price_down font-12 font-weight">看空</text>
+							<text class="font-13 font-weight color-black pl-5">04:13:00</text>
+							<text class="font-12 font-weight color-999 pl-5">BTC/USDT-1分钟</text>
+						</view>
+						<view class="mt-10 flex">
+							<view class="wr-50">
+								<text class="font-12 font-weight color-999">开单金额 1 USDT</text>
+								<text class="font-12 font-weight color-999 pl-10">收益率 74%</text>
+							</view>
+							<view class="wr-50" style="text-align: right;">
+								<text class="font-13 font-weight price_down">-10 USDT</text>
+							</view>
+						</view>
+						<view class="flex mt-10 acenter">
+							<view style="width: 50px;">
+								<text class="font-12 font-weight color-999">00:35</text>
+							</view>
+							<view style="width: 100%;">
+								<progress :percent="10" activeColor="#10AEFF" stroke-width="2" />
+							</view>
+						</view>
+						<view class="mt-15" style="width: 100%;height: 1px;background-color: #eee;"></view>
+					</view>
+				</view>
+			</view>
+			<!-- 历史数据 -->
+			<view v-if="current == 1" class="mt-10 p-l-r-15" style="min-height: 500px;">
+				<view class="flex mt-5">
+					<view class="wr-33">
+						<text class="font-12 color-999">2023-08-18</text>
+					</view>
+					<view class="wr-33 center">
+						<text class="font-12 color-999">2记录</text>
+					</view>
+					<view @click="$refs.profit.open()" class="wr-33 flex acenter flexend" style="text-align: right;">
+						<text class="font-12 price_down font-weight">-2 USDT</text>
+						<uni-icons type="more-filled" size="20"></uni-icons>
+					</view>
+				</view>
+				<view class="items mt-10 mb-10" v-for="i in 5" :key="5" @click="$refs.info.open()">
+					<view>
+						<text class="font-12 price_up font-weight">看涨</text>
+						<text class="font-12 font-weight color-black pl-5">23:05:00</text>
+						<text class="font-12 color-999 pl-5">BTC/USDT-1分钟</text>
+					</view>
+					<view class="flex mt-10">
+						<view class="wr-33">
+							<text class="font-13 font-weight color-black block">USDT</text>
+							<text class="font-12 color-999 mt-5 block">开单币种</text>
+						</view>
+						<view class="wr-33 center">
+							<text class="font-13 font-weight color-black block">72%</text>
+							<text class="font-12 color-999 mt-5 block">收益率</text>
+						</view>
+						<view class="wr-33" style="text-align: right;">
+							<text class="font-13 font-weight price_down block">-1</text>
+							<text class="font-12 color-999 mt-5 block">盈亏</text>
+						</view>
+					</view>
+					<view class="mt-15" style="width: 100%;height: 1px;background-color: #eee;"></view>
+				</view>
+			</view>
+		</view>
+
+		<view style="position: fixed;bottom: 0px;width: 100%;" class="bg-gray">
+			<view class="p-l-r-15" style="padding-bottom: 10px;">
+				<view class="mt-5 flex">
+					<view class="wr-50">
+						<text class="font-11 font-weight color-999">开单数量</text>
+					</view>
+					<view class="wr-50" style="text-align: right;">
+						<text class="font-12 font-weight color-999">USDT</text>
+						<text class="font-12 font-weight color-black pl-5">可用 8 USDT</text>
+						<image @click="$mroute.exchange()" class="pl-5" style="width: 10px;height: 10px;" src="../../../static/img/9i.png" mode=""></image>
+					</view>
+
+				</view>
+				<view class="mt-10 flex center">
+					<view style="width: 25%;">
+						<uni-tag style="margin: 0 5px;font-size: 10px;font-weight: 500;" @click="btnindex=1" :type="btnindex == 1 ? 'primary':'default'" :inverted="btnindex==1 ? false :true" text="1 USDT" />
+					</view>
+					<view style="width: 25%;">
+						<uni-tag style="margin: 0 5px;font-size: 10px;font-weight: 500;" @click="btnindex=2" :type="btnindex == 2 ? 'primary':'default'" :inverted="btnindex==2 ? false :true" text="5 USDT" />
+					</view>
+					<view style="width: 25%;">
+						<uni-tag style="margin: 0 5px;font-size: 10px;font-weight: 500;" @click="btnindex=3" :type="btnindex == 3 ? 'primary':'default'" :inverted="btnindex==3 ? false :true" text="10 USDT" />
+					</view>
+					<view style="width: 25%;">
+						<uni-tag style="margin: 0 5px;font-size: 10px;font-weight: 500;" @click="btnindex=4" :type="btnindex == 4 ? 'primary':'default'" :inverted="btnindex==4 ? false :true" text="20 USDT" />
+					</view>
+				</view>
+				<view class="mt-10">
+					<view class="flex acenter">
+						<text class="font-12 color-999">当前价格即为执行价格</text>
+						<image @click="$refs.notice.open()" class="pl-5" style="width: 13px;height: 13px;" src="../../../static/img/wenhao.webp" mode=""></image>
+					</view>
+				</view>
+				<view class="mt-10 flex">
+					<view class="wr-50">
+						<view style="width: 80%;margin: auto;">
+							<button class="bg-buy defaultBtns radus-5 font-13 font-weight color-white border-none">看涨-74%</button>
+						</view>
+					</view>
+					<view class="wr-50">
+						<view style="width: 80%;margin: auto;">
+							<button @click="$refs.alert.open()" class="bg-sell defaultBtns radus-5 font-13 font-weight color-white border-none">看跌-74%</button>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+		<!-- 价格说明 -->
+		<uni-popup type="center" ref="notice">
+			<view class="radus-5" style="width: 300px;background-color: white;">
+				<view class="pd-15">
+					<view>
+						<text>到期价格高于下单时的执行价格，看涨盈利</text>
+					</view>
+					<view class="mt-5">
+						<text>到期价格低于下单时的执行价格，看跌盈利</text>
+					</view>
+					<view class="mt-5">
+						<text>按钮上的百分比即为收益率</text>
+					</view>
+				</view>
+			</view>
+		</uni-popup>
+		<alert ref="alert" @confirm="$mroute.exchange()" title="提示" content="余额不足,请划转资金到期权账户"></alert>
+		<!-- 单次盈亏详情 -->
+		<uni-popup type="center" ref="info">
+			<view class="radus-5" style="width: 300px;background-color: white">
+				<view class="pd-15">
+					<view class="flex acenter">
+						<view style="width: 70%;">
+							<text class="font-13 color-black font-weight">BTC/USDT-1分钟</text>
+							<text class="font-12 color-999 font-weight">23:05:00</text>
+						</view>
+						<view style="width: 30%;text-align: right;">
+							<image @click="$refs.info.close()" style="width: 25px;height: 25px;" src="../../../static/img/close2.png" mode=""></image>
+						</view>
+					</view>
+					<view class="mt-15 bg-gray">
+						<view class="">
+							<text class="font-12 mt-10 block color-999">2023-08-18 23:04:24</text>
+						</view>
+						<view class="flex acenter">
+							<view class="wr-50">
+								<view class="mt-5">
+									<text class="font-13 font-weight price_up block">看涨</text>
+									<text class="font-12 color-999 block mt-5">开单方向</text>
+								</view>
+							</view>
+							<view class="wr-50 " style="text-align: center;">
+								<text class="font-13 font-weight price_up block">-1</text>
+								<text class="font-12 color-999 block mt-5">盈亏</text>
+							</view>
+						</view>
+						<view class="flex acenter mt-10">
+							<view class="wr-50">
+								<view class="mt-5">
+									<text class="font-13 font-weight color-black block">26,140.62/26138.94</text>
+									<text class="font-12 color-999 block mt-5">开单价/结算价</text>
+								</view>
+							</view>
+							<view class="wr-50 " style="text-align: center;">
+								<text class="font-13 font-weight price_up block">72%</text>
+								<text class="font-12 color-999 block mt-5">收益率</text>
+							</view>
+						</view>
+						<view class="flex acenter mt-10">
+							<view class="wr-50">
+								<view class="mt-5">
+									<text class="font-13 font-weight color-black block">USDT</text>
+									<text class="font-12 color-999 block mt-5">开单币种</text>
+								</view>
+							</view>
+							<view class="wr-50 " style="text-align: center;">
+								<text class="font-13 font-weight price_up block">亏损</text>
+								<text class="font-12 color-999 block mt-5">本期结果</text>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</uni-popup>
+		<!-- 单日盈亏统计 -->
+		<uni-popup type="bottom" ref="profit">
+			<view class="authPanel">
+				<view class="pd-15">
+					<view style="text-align: center;">
+						<text class="font-14 font-weight">安全验证</text>
+						<image src="/static/img/close2.png" @click="$refs.profit.close()" style="height: 25px;width: 25px;float: right;" mode=""></image>
+					</view>
+					<view class="mt-15">
+						<view class="flex">
+							<view class="wr-50">
+								<text class="font-12 font-weight color-999">2023-08-18</text>
+							</view>
+							<view class="wr-50" style="text-align: right;">
+								<text class="font-12 font-weight color-999">2记录</text>
+							</view>
+						</view>
+						<view class="mt-15">
+							<view class="bg-gray radus-5 pd-15 flex acenter">
+								<view style="width: 70%;">
+									<view>
+										<text class="font-13 font-weight color-black">单日总盈亏</text>
+									</view>
+									<view class="mt-5">
+										<text class="font-10 color-999">当日盈利亏损的总和</text>
+									</view>
+								</view>
+								<view style="width: 30%;text-align: right;">
+									<text class="font-16 font-weight price_down">-2 USDT</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</uni-popup>
+		<!-- 币种选择 -->
+		<uni-drawer ref="showSelect" mode="left" :showrAudus="true" :width="$device.windowWidth*0.8" style="z-index: 10002;">
+			<scroll-view scroll-y="true" :style="{'height':$device.windowHeight+'px'}">
+				<!-- #ifdef APP-PLUS -->
+				<view class="status_bar bg-gray"></view>
+				<!-- #endif -->
+				<view class="pd-15">
+					<view>
+						<text class="font-14 color-black">闪期权交易对</text>
+					</view>
+					<view>
+						<uni-search-bar @confirm="search" v-model="searchValue" @input="input" placeholder="搜索币种"></uni-search-bar>
+					</view>
+					<view class="mt-10">
+						<view class="flex plr-15" style="height: 40px;align-items: center;" v-for="(item,index) in currency" :key="index" @click="setCurrent(index)">
+							<view class="" style="width:40%;">
+								<view class="flex m-l-5" style="height: 20px;line-height: 20px;align-items: center;">
+									<text class="font-14 font-weight color-black">{{item['symbol']}}</text>
+									<text class="font-12 color-999 m-l-5"> /USDT</text>
+								</view>
+							</view>
+							<view class="" style="width: 30%;">
+								<view class="flex" style="height: 20px;line-height: 20px;align-items: center;width: 100%;text-align: right;">
+									<text class="font-12 font-weight" :class="{'price_up':item['change_rate'] >= 0,'price_down':item['change_rate'] < 0}" style="width: 100%;text-align: right;">
+										{{$util.thousandSeparator(item['new_price'],item['decimals'])}}
+									</text>
+								</view>
+							</view>
+							<view class="" style="width: 30%;">
+								<view class="flex" style="height: 20px;line-height: 20px;align-items: center;float:right;text-align: right;">
+									<view class="price_up" style="margin: auto;">
+										<text class="font-12">{{$util.thousandSeparator(item['change_rate'])}}%</text>
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+			</scroll-view>
+		</uni-drawer>
+		
+	</view>
+</template>
+
+
+<script>
+	import service from './service.js';
+	export default service;
+</script>
+
+<script module="render" lang="renderjs">
+	import controller from './render.js';
+	export default controller;
+</script>
+<style>
+	@import url("futures.scss");
+</style>

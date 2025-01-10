@@ -1,0 +1,106 @@
+.finance {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    .container {
+        width: 100%;
+        height: auto;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+
+        .banner {
+            width: 100%;
+            height: auto;
+            margin-top: 30rpx;
+
+            image {
+                width: 100%;
+                border-radius: 8rpx;
+            }
+        }
+
+        .search-box {
+            width: 100%;
+            height: 78rpx;
+            padding: 0 20rpx;
+            box-sizing: border-box;
+            background: var(--background-secondary);
+            border-radius: 78rpx;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 24rpx 0 10rpx 0;
+
+            input {
+                width: calc(100% - 60rpx);
+                height: 78rpx;
+                font-size: 26rpx;
+                color: var(--content-primary);
+            }
+        }
+
+        .list {
+            width: 100%;
+            height: auto;
+
+            .not-data {
+                width: 100%;
+                height: 600rpx;
+                display: flex;
+                align-items: center;
+            }
+
+            .items {
+                width: 100%;
+                height: auto;
+                padding: 30rpx 0;
+                box-sizing: border-box;
+                border-bottom: 2rpx solid var(--border-strength-100);
+
+                &-cell {
+                    width: 100%;
+                    height: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 16rpx;
+
+                    button {
+                        width: auto;
+                        height: 68rpx;
+                        margin: 0;
+                        padding: 0 30rpx;
+                        box-sizing: border-box;
+                        font-size: 26rpx;
+                        color: var(--background-primary);
+                        background: var(--content-primary);
+                        border-radius: 68rpx;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    &_i {
+                        width: calc(100% / 3);
+                        display: flex;
+                        align-items: center;
+
+                        &:nth-of-type(2) {
+                            justify-content: center;
+                            text-align: center;
+                        }
+
+                        &:last-of-type {
+                            justify-content: flex-end;
+                        }
+                    }
+
+                    &:last-of-type {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+}

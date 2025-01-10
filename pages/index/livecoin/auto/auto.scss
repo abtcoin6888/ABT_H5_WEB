@@ -1,0 +1,44 @@
+.liveCoinAuto {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    &-body {
+        width: 100%;
+        height: auto;
+        padding: 30rpx;
+        box-sizing: border-box;
+
+        .body-tip {
+            width: 100%;
+            height: auto;
+            padding: 20rpx;
+            box-sizing: border-box;
+            border-radius: 10rpx;
+            line-height: 36rpx;
+        }
+
+        .body-list {
+            width: 100%;
+            height: auto;
+
+            &-item {
+                width: 100%;
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 30rpx;
+                box-sizing: border-box;
+                border-radius: 8rpx;
+                background: var(--background-secondary);
+                margin-top: 30rpx;
+
+                image {
+                    width: 50rpx;
+                    margin-right: 20rpx;
+                }
+            }
+        }
+    }
+}

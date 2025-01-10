@@ -1,0 +1,202 @@
+.layer-warp {
+    width: 750rpx;
+}
+
+.title-warp {
+    width: 750rpx;
+    height: 88rpx;
+    padding: 0 30rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/*popup-container*/
+.popup-container {
+    width: 750rpx;
+    padding: 0 30rpx;
+}
+
+
+/*c-head*/
+.c-head {
+    width: 690rpx;
+    padding: 24rpx 0;
+}
+
+.c-head .currency-warp {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.c-head .currency-warp .tag-view {
+    height: 38rpx;
+    padding: 0 6rpx;
+    border-radius: 4rpx;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8rpx;
+}
+
+.c-head .currency-warp .currency-txt {
+    margin-right: 8rpx;
+}
+
+.c-head .currency-row-group {
+    padding: 24rpx 0 0;
+}
+
+.c-head .currency-row-group .h-row,
+.form-row-group .row-item {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10rpx;
+}
+
+.c-head .currency-row-group .h-row-last {
+    margin-bottom: 0;
+}
+
+/*from-warp*/
+.from-warp {
+    width: 690rpx;
+    padding: 24rpx 0;
+}
+
+.price-input-warp {
+    width: 690rpx;
+    height: 78rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10rpx 0 24rpx;
+}
+
+.price-input-warp .price-input {
+    width: 534rpx;
+    height: 78rpx;
+    border-radius: 8rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16rpx;
+    border: 2rpx solid transparent;
+    position: relative;
+}
+
+.price-input-warp .price-input:focus-within,
+.number-input-warp:focus-within {
+    border: 2rpx solid #03aac7;
+}
+
+.price-input-warp .price-input .input {
+    width: 434rpx;
+    height: 78rpx;
+}
+
+.price-input-warp .price-type-button {
+    width: 140rpx;
+    height: 78rpx;
+    border-radius: 8rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.price-input-warp .price-input .sysmol-text,
+.number-input-warp .sysmol-text {
+    position: absolute;
+    right: 16rpx !important;
+}
+
+/*number-input-warp*/
+.number-input-warp {
+    width: 690rpx;
+    height: 78rpx;
+    border-radius: 8rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16rpx;
+    border: 2rpx solid transparent;
+    position: relative;
+    margin: 10rpx 0 24rpx;
+}
+
+.number-input-warp .input {
+    width: 560rpx;
+    height: 78rpx;
+}
+
+/*form-slider-warp*/
+.form-slider-warp {
+    width: 690rpx;
+    padding: 24rpx 0 38rpx 0;
+    position: relative;
+}
+
+.form-slider-warp .slider-background {
+    width: 690rpx;
+    height: 14rpx;
+    border-radius: 14rpx;
+    padding: 0 4rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.form-slider-warp .slider-background .slider-active {
+    height: 14rpx;
+    border-radius: 14rpx;
+    position: absolute;
+    left: 0;
+}
+
+.form-slider-warp .slider-background .slider-dots {
+    width: 6rpx;
+    height: 6rpx;
+    border-radius: 50%;
+}
+
+.form-slider-warp .slider {
+    width: 690rpx;
+    position: absolute;
+    left: 0;
+    top: 8rpx;
+}
+
+.form-slider-warp .bottom-mark {
+    width: 690rpx;
+    height: 38rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    top: 48rpx;
+}
+
+.form-slider-warp .bottom-mark .mark-txt {
+    position: absolute;
+}
+
+/*form-row-group*/
+.form-row-group {
+    width: 690rpx;
+    margin-top: 40rpx;
+}
+
+/*confirm-button*/
+.confirm-button {
+    width: 690rpx;
+    height: 88rpx;
+    border-radius: 88rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 40rpx 0 16rpx;
+}

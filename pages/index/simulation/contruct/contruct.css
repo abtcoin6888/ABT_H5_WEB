@@ -1,0 +1,194 @@
+
+.headers {
+	width: 100%;
+	position: fixed;
+	top: var(--status-bar-height);
+	background-color: #f8f8f8;
+	z-index: 10000;
+}
+
+.p-15 {
+	padding-left: 30rpx;
+	padding-right: 30rpx;
+}
+
+.pl-10{
+	padding-left: 20rpx;
+}
+
+.rectangle {
+  width: 48%;
+  height: 35px;
+  line-height: 35px;
+  color: black;
+}
+
+.rectangle_buy {
+  position: relative;
+  height: 35px;
+  width: 48%;
+  background-color: #35ad7a;
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+  border-radius: 5px;
+  color: white !important;
+}
+
+
+.rectangle_sell {
+	width: 48%;
+	height: 35px;
+	line-height: 35px;
+	color: black;
+}
+
+.rectangleStyle_sell {
+  position: relative;
+  height: 35px;
+  width: 48%;
+  background-color: #f8f8f8;
+  clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+  border-radius: 5px;
+}
+
+.rectangleStyle_sell_active {
+	color: white !important;
+	background-color: #ff5c51;
+}
+
+.defaultBtns{
+	width: 100%;
+	height: 70rpx;
+	line-height: 70rpx;
+}
+
+.defaultBtns-sm {
+	width: 100%;
+	height: 60rpx;
+	line-height: 60rpx;
+}
+
+.van-popover__wrapper {
+	display: block !important;
+	width: 100% !important;
+}
+
+
+.custom-button {
+    width: 26px;
+    color: #fff;
+    font-size: 10px;
+    line-height: 18px;
+    text-align: center;
+    background-color: var(--van-primary-color);
+    border-radius: 100px;
+  }
+  
+
+
+.scroll-view_H {
+	white-space: nowrap;
+	width: 100%;
+}
+
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+}
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+view {
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+}
+
+view::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-content {
+  flex: 0 0 auto;
+  margin: 10px 0;
+}
+
+
+.timeActive  {
+	width: 100%;height: 2px;background-color: #8a6de9;border-radius: 5px;
+}
+
+.badge_tab {
+	min-width: 50px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	border-radius: 5px;
+	margin: 0px 10px;
+}
+
+.badge_tab_active {
+	background-color: #f8f8f8;
+	color: black !important;
+	font-weight: 500;
+	font-size: 28rpx;
+}
+
+.menuStyle {
+	position: fixed;
+	right: 15px;
+	background-color: #fff;
+	/* #ifdef APP-PLUS */
+	top:70px;
+	/* #endif */
+	/* #ifdef H5 */
+	top:45px;
+	/* #endif */
+	border:solid 1px #f8f8f8;
+	box-shadow: rgba(166, 166, 166, 0.2) 0px 1px 8px 1px
+}
+
+.authPanel {
+	min-height: 250px;
+	width: 100%;
+	background-color: #fff;
+	border-top-right-radius: 15px;
+	border-top-left-radius: 15px;
+}
+
+.kong {
+	background-color: #ff5c51;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+
+.position_label {
+	background-color: #f3a73f;
+	border-color: #f3a73f;
+	color: #fff;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+
+.label_buy {
+	line-height: 28rpx;
+	font-size: 24rpx;
+	font-weight: 300;
+	padding: 4px 7px;
+	border-radius: 3px;
+	border-style: none;
+	background-color: #35ad7a;
+}
+
+.label_sell {
+	line-height: 28rpx;
+	font-size: 24rpx;
+	font-weight: 300;
+	padding: 4px 7px;
+	border-radius: 3px;
+	border-style: none;
+	background-color: #ff5c51;
+}

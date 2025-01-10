@@ -1,0 +1,1050 @@
+<template>
+    <view class="newIndex bg-white"
+          :class="userTheme">
+        <fui-nav-bar statusBar
+                     custom
+                     padding="0"
+                     :background="userTheme == 'light' ? '#FFFFFF' : '#111111'"
+                     @init="navInit">
+            <view class="navigationBar">
+                <image @click="showDrawer"
+                       class="userAvatar bg-gray"
+                       src="/static/img/avatar.png"
+                       mode="scaleToFill"/>
+                <view class="search bg-gray"
+                      @click="mroute.coinSearch()">
+                    <image class="searchIcon"
+                           src="/static/newImage/search-gray.png"
+                           mode="scaleToFill"/>
+                    <text class="font-11 color-gray ">BTC&USDT</text>
+                </view>
+                <view class="navImages">
+                    <view class="imageButton"
+                          @click="scan">
+                        <image class="navIcon"
+                               :src="`/static/newImage/scan-${userTheme}.png`"
+                               mode="scaleToFill"/>
+                    </view>
+                    <!-- @click="mroute.onlineService()" -->
+                    <view class="imageButton"
+                          @click="mroute.webview(2,config.kefu_url,$t('common.kefu'),100)">
+                        <image class="navIcon"
+                               :src="`/static/newImage/customer-${userTheme}.png`"
+                               mode="scaleToFill"/>
+                    </view>
+                    <view class="imageButton"
+                          @click="mroute.message()">
+                        <image class="navIcon"
+                               :src="`/static/newImage/notify-${userTheme}.png`"
+                               mode="scaleToFill"/>
+                    </view>
+                </view>
+            </view>
+        </fui-nav-bar>
+        <!-- body -->
+        <scroll-view scroll-y
+                     :show-scrollbar="false"
+                     class="container-warp bg-white"
+                     :style="{ 'height': scrollCHeight + 'px' }">
+            <view class="banner-warp">
+                <!-- notLogin -->
+                <view class="loginTip"
+                      v-if="!isLogin">
+                    <image class="banner-background"
+                           :src="`/static/newImage/home-banner-background-${userTheme}.png`"
+                           mode="widthFix">
+                    </image>
+                    <image class="loginTip-bgImage"
+                           src="/static/newImage/banner_bg.png"
+                           mode="widthFix">
+                    </image>
+                    <text class="font-16 color-black font-bold text-center">
+                        {{ $t('index.banner_title') }}
+                    </text>
+                    <view class="login-button bg-black"
+                          @click="mroute.login()">
+                        <text class="font-13 font-bold color-white">
+                            {{ $t('index.banner_con') }}
+                        </text>
+                    </view>
+                </view>
+                <!-- assets -->
+                <view class="accountAssets"
+                      v-else>
+                    <view class="assets-cell">
+                        <text class="font-11 font-weight color-gray mr-10">
+                            {{ $t('index.asset') }} {{ profit ? $t('contract.ppt1') : '' }} (USDT)
+                        </text>
+                        <fui-icon :color="userTheme === 'light' ? '#1d1d1d' : '#f5f5f5'"
+                                  :name="eyeStatus === true ? 'visible' : 'invisible'"
+                                  :size="34"
+                                  @click="eyeStatus = !eyeStatus">
+                        </fui-icon>
+                    </view>
+                    <view class="assets-bottom mt-5">
+                        <view calss="assets-content">
+                            <text class="font-24 color-black font-bold balance-num">
+                                {{eyeStatus === true ? util.thousandSeparator(((assetsTotal + (profit ? profit : 0)))) : '****' }}
+                            </text>
+                            <text class="font-12 color-gray mt-5">
+                                ≈{{ symbol }} {{eyeStatus === true ? util.thousandSeparator((assetsTotal + (profit ? profit : 0)) * parseFloat(symbol_rate)) : '****' }}
+                            </text>
+                        </view>
+                        <view class="assets-button black-button"
+                              @click="addFundsPopup = true">
+                            <text class="font-13  black-button-text font-bold">
+                                {{ $t('index.addfunds_t1') }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <view class="padding-box">
+                <!-- 菜单 -->
+                <scroll-view :scroll-x="true"
+                             :show-scrollbar="false"
+                             class="menu-box">
+                    <view class="menu-item"
+                          v-for="(item, index) in menuList"
+                          :key="index"
+                          @click="item.click">
+                        <view class="image-box border-solid">
+                            <image class="menu-image"
+                                   :class="index == 0 ? 'invite_img' : ''"
+                                   :src="'/static/newImage/' + (userTheme == 'light' ? item.icon : item.darkIcon) + '.png'">
+                            </image>
+                        </view>
+                        <text class="color-black  menu-text">{{ $t(item.text) }}</text>
+                    </view>
+                </scroll-view>
+                <!-- 轮播 -->
+                <view class="center-box">
+                    <view class="center_left bg-white">
+                        <swiper class="banner"
+                                :circular="true"
+                                :autoplay="true"
+                                :interval="3000"
+                                :duration="500"
+                                @change="bannerChange">
+                            <swiper-item class="banner-item"
+                                         v-for="(item, index) in banner"
+                                         :key="index"
+                                         @click="navBanner(item)">
+                                <image class="banner_image"
+                                       :src="userTheme === 'light' ? item.cover : item.cover_dark"
+                                       mode=""></image>
+                            </swiper-item>
+                        </swiper>
+                        <!-- dots -->
+                        <view class="banner-dots">
+                            <view class="dot bg-gray border-solid"
+                                  :class="dotCurrent == index ? 'bg-blue' : ''"
+                                  v-for="(item, index) in banner"
+                                  :key="index"></view>
+                        </view>
+                    </view>
+                    <view class="center_right">
+                        <view class="item_top bg-white">
+                            <swiper class="sub_swiper"
+                                    :current="current"
+                                    :indicator-dots="false"
+                                    :autoplay="false"
+                                    :duration="500">
+                                <swiper-item class="swiper_item"
+                                             @click="mroute.welfare()">
+                                    <image class="sub_icon"
+                                           src="/static/img/icon_flzx.png"></image>
+                                    <text class="font-15  font-bold color-black mt-10">{{
+                                            $t('index.fuli')
+                                        }}
+                                    </text>
+                                    <text class="font-12  color-gray mt-5">{{ $t('index.sw_c') }}</text>
+                                </swiper-item>
+                                <swiper-item class="swiper_item"
+                                             @click="mroute.notice()">
+                                    <image class="sub_icon"
+                                           src="/static/help.png"></image>
+                                    <text class="font-15  font-bold color-black mt-10">{{
+                                            $t('index.sw_t')
+                                        }}
+                                    </text>
+                                    <text class="font-12  color-gray mt-5">{{ $t('index.sw_c1') }}</text>
+                                </swiper-item>
+                            </swiper>
+                            <!-- cut -->
+                            <view class="cut bg-gray"
+                                  @click="cutChange">
+                                <image class="cut_icon"
+                                       src="/static/ref.png"
+                                       mode=""></image>
+                            </view>
+                        </view>
+						<!-- @click="mroute.toIce" -->
+                        <view class="item_bottom bg-white" @click="mroute.toIce()">
+                            <image class="sub_icon"
+                                   src="/static/coin/usdt.png"
+                                   mode=""></image>
+                            <text class="font-15  font-bold color-black mt-5">{{ $t('ice.t32s') }}</text>
+                            <!-- <view class="rate">
+                                <text class="font-12  price_up">
+                                    {{ symbol }}{{ util.thousandSeparator(symbol_rate * 1) }}
+                                </text>
+                            </view> -->
+                        </view>
+                    </view>
+                </view>
+                <!-- 公告 -->
+                <view class="notice bg-white">
+                    <view class="notice-item">
+                        <image class="notice-image"
+                               :src="`/static/newImage/notice-${userTheme}.png`"></image>
+                    </view>
+                    <swiper class="notice-swiper"
+                            :disable-touch="true"
+                            circular
+                            vertical
+                            autoplay
+                            :interval="3000"
+                            :duration="500">
+                        <swiper-item class="notice-swiper-item"
+                                     v-for="(item, index) in notice"
+                                     :key="index"
+                                     @click="toNoticeDetail(item)">
+                            <text class="notice-text  color-black">{{ item.name }}</text>
+                        </swiper-item>
+                    </swiper>
+                    <view class="notice-item">
+                        <image @click="mroute.notice()"
+                               class="notice-image"
+                               :src="`/static/newImage/more1-${userTheme}.png`">
+                        </image>
+                    </view>
+                </view>
+            </view>
+            <!-- tab -->
+            <view class="list-tab-warp bg-white">
+                <view class="list-tab bg-white border-bottom">
+                    <fui-tabs :isSlider="false"
+                              scale="1"
+                              :tabs="tabOption"
+                              :current="tabSelect"
+                              scroll
+                              alignLeft
+                              padding="0"
+                              height="88rpx"
+                              size="30"
+                              selectedSize="30"
+                              :color="userTheme === 'light' ? '#898989' : '#585c60'"
+                              :selectedColor="userTheme === 'light' ? '#1d1d1d' : '#f5f5f5'"
+                              :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                              @change="tabChange">
+                    </fui-tabs>
+                </view>
+            </view>
+            <view class="padding-box">
+                <!-- 币 -->
+                <view class="list-wrap">
+                    <!-- 币 -->
+                    <view class="list-wrap">
+                        <!-- list-desc -->
+                        <view class="list-desc">
+                            <view class="item type">
+                                <text class="font-11  color-black font-weight"
+                                      @click="showPopup">
+                                    {{
+                                        pactType == 0 ? $t('index.spot') : $t('index.popup_c')
+                                    }}
+                                </text>
+                                <fui-icon name="turningdown"
+                                          size="28"
+                                          :color="userTheme === 'light' ? '#1d1d1d' : '#f5f5f5'"
+                                          @click="showPopup">
+                                </fui-icon>
+                            </view>
+                            <view class="item price">
+                                <text class="font-11  color-gray">
+                                    {{
+                                        $t('index.latest_price')
+                                    }}
+                                </text>
+                            </view>
+                            <view class="item change">
+                                <text class="font-11  color-gray"
+                                      v-if="tabSelect != 3">
+                                    {{
+                                        $t('index.quote_change')
+                                    }}
+                                </text>
+                                <text class="font-11  color-gray"
+                                      v-if="tabSelect == 3">
+                                    24h {{
+                                        $t('index.turnover')
+                                    }}
+                                </text>
+                            </view>
+                        </view>
+                        <!-- swiper -->
+                        <swiper class="list-swiper"
+                                :duration="1000"
+                                :current="tabSelect"
+                                :style="{ 'height': windowHeight/1.5 + 'px' }"
+                                @change="coinSwiperChange">
+                            <!-- 自选 -->
+                            <swiper-item class="list-swiper-item">
+                                <template v-if="isLogin || mlist">
+                                    <view class="coin-label"
+                                          v-for="(item, index) in mlist.slice(0, 10)"
+                                          :key="'m' + index"
+                                          @click="mroute.toKline(0, item.id, 1)">
+                                        <view class="item type">
+                                            <image class="coin-image"
+                                                   :src="item.icon">
+                                            </image>
+                                            <view class="coin-column">
+                                                <text class="font-14  color-black font-bold">
+                                                    {{
+                                                        item.symbol
+                                                    }}
+                                                </text>
+                                                <text class="font-11  color-gray">
+                                                    USDT
+                                                </text>
+                                            </view>
+                                        </view>
+                                        <view class="item price">
+                                            <view class="coin-column">
+                                                <text class="font-14  color-black font-bold">
+                                                    {{
+                                                        util.thousandSeparator(item.new_price, item.decimals)
+                                                    }}
+                                                </text>
+                                                <text class="font-11  color-gray">
+                                                    ≈{{
+                                                        symbol
+                                                    }}{{
+                                                        util.thousandSeparator(item.new_price * symbol_rate, 2)
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                        <view class="item change">
+                                            <view class="rate-tag bg-gray"
+                                                  :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                                <text class="font-12  always-white font-weight">
+                                                    {{
+                                                        util.Number2(item['change_rate']) + '%'
+                                                    }}
+                                                </text>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </template>
+                                <template v-if="mlist.length === 0">
+                                    <fui-checkbox-group class="check-group"
+                                                        name="checkbox"
+                                                        @change="checkboxChange">
+                                        <fui-label v-for="(item, index) in currency.slice(0, 6)"
+                                                   :key="index"
+                                                   @click="appointment(index)">
+                                            <view class="check-label bg-gray">
+                                                <view class="check-label-row">
+                                                    <text class="font-13  color-black font-bold">
+                                                        {{
+                                                            item.symbol
+                                                        }}USDT
+                                                    </text>
+                                                    <text class="mini-tag">
+                                                        {{
+                                                            $t('contract.p1')
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="check-label-row">
+                                                    <text class="font-15  color-black font-bold">
+                                                        {{
+                                                            util.thousandSeparator(item.new_price)
+                                                        }}
+                                                    </text>
+                                                </view>
+                                                <view class="check-label-row check-row">
+                                                    <text class="font-11  font-weight"
+                                                          :class="item['change_rate'] >= 0 ? 'color-green' : 'color-red'">
+                                                        {{
+                                                            util.Number2(item['change_rate'])
+                                                        }}%
+                                                    </text>
+                                                    <view class="check-box">
+                                                        <fui-checkbox :isCheckMark="true"
+                                                                      checkMarkColor="#03aac7"
+                                                                      :checked="!item.select"
+                                                                      scaleRatio="1.4"
+                                                                      @change="item['select']=!item['select']">
+                                                        </fui-checkbox>
+                                                    </view>
+                                                </view>
+                                            </view>
+                                        </fui-label>
+                                    </fui-checkbox-group>
+                                    <view class="check-confirm button-active new-button-bg"
+                                          @click="selectMine()">
+                                        <text class="font-13  font-bold color-white">
+                                            {{
+                                                $t('index.add_own')
+                                            }}
+                                        </text>
+                                    </view>
+                                </template>
+                            </swiper-item>
+                            <!-- 热门 -->
+                            <swiper-item class="list-swiper-item">
+                                <view class="coin-label"
+                                      v-for="(item, index) in currency"
+                                      :key="'desc' + index"
+                                      @click="mroute.toKline(0, item.id, 1)">
+                                    <view class="item type">
+                                        <image class="coin-image"
+                                               :src="item.icon"></image>
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    item.symbol
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                USDT
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item price">
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    util.thousandSeparator(item.new_price, item.decimals)
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                ≈{{
+                                                    symbol
+                                                }}{{
+                                                    util.thousandSeparator(item.new_price * symbol_rate, 2)
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item change">
+                                        <view class="rate-tag bg-gray"
+                                              :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                            <text class="font-12  always-white font-bold">
+                                                {{
+                                                    util.Number2(item['change_rate']) + '%'
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+                            </swiper-item>
+                            <!-- 跌幅榜 -->
+                            <!-- 涨幅榜 -->
+                            <swiper-item class="list-swiper-item">
+                                <view class="coin-label"
+                                      v-for="(item, index) in currencyDesc"
+                                      :key="'desc' + index"
+                                      @click="mroute.toKline(0, item.id, 1)">
+                                    <view class="item type">
+                                        <image class="coin-image"
+                                               :src="item.icon"></image>
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    item.symbol
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                USDT
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item price">
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    util.thousandSeparator(item.new_price, item.decimals)
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                ≈{{
+                                                    symbol
+                                                }}{{
+                                                    util.thousandSeparator(item.new_price * symbol_rate, 2)
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item change">
+                                        <view class="rate-tag bg-gray"
+                                              :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                            <text class="font-12  always-white font-bold">
+                                                {{
+                                                    util.Number2(item['change_rate']) + '%'
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+                            </swiper-item>
+                            <!-- 跌幅榜 -->
+                            <swiper-item class="list-swiper-item">
+                                <view class="coin-label"
+                                      v-for="(item, index) in currencyASC"
+                                      :key="'asc' + index"
+                                      @click="mroute.toKline(0, item.id, 1)">
+                                    <view class="item type">
+                                        <image class="coin-image"
+                                               :src="item.icon"></image>
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    item.symbol
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                USDT
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item price">
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    util.thousandSeparator(item.new_price, item.decimals)
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                ≈{{
+                                                    symbol
+                                                }}{{
+                                                    util.thousandSeparator(item.new_price * symbol_rate, 2)
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item change">
+                                        <view class="rate-tag bg-gray"
+                                              :class="item['change_rate'] > 0 ? 'bg-green' : 'bg-red'">
+                                            <text class="font-12  always-white font-bold">
+                                                {{
+                                                    util.Number2(item['change_rate']) + '%'
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                </view>
+                            </swiper-item>
+                            <!-- 成交额 -->
+                            <swiper-item class="list-swiper-item">
+                                <view class="coin-label"
+                                      v-for="(item, index) in currencyQuan"
+                                      :key="'quan' + index"
+                                      @click="mroute.toKline(0, item.id, 1)">
+                                    <view class="item type">
+                                        <image class="coin-image"
+                                               :src="item.icon"></image>
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    item.symbol
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                USDT
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item price">
+                                        <view class="coin-column">
+                                            <text class="font-14  color-black font-bold">
+                                                {{
+                                                    util.thousandSeparator(item.new_price, item.decimals)
+                                                }}
+                                            </text>
+                                            <text class="font-11  color-gray">
+                                                ≈{{
+                                                    symbol
+                                                }}{{
+                                                    util.thousandSeparator(item.new_price * symbol_rate, 2)
+                                                }}
+                                            </text>
+                                        </view>
+                                    </view>
+                                    <view class="item change">
+                                        <text class="font-13  color-black font-bold">
+                                            {{
+                                                util.bigNumberToString(item['quota'])
+                                            }}
+                                        </text>
+                                    </view>
+                                </view>
+                            </swiper-item>
+                        </swiper>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+        <!-- 侧边抽屉 -->
+        <fui-drawer :show="userDrawer"
+                    :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                    direction="left"
+                    @close="closeDrawer">
+            <view class="drawer">
+                <fui-nav-bar statusBar
+                             isOccupy
+                             :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                             @leftClick="closeDrawer"
+                             @init="drawerNavInit">
+                    <fui-icon name="arrowleft"
+                              size="56"
+                              :color="userTheme == 'light' ? '#111111' : '#ffffff'">
+                    </fui-icon>
+                </fui-nav-bar>
+                <scroll-view scroll-y
+                             :show-scrollbar="false"
+                             class="drawer-scroll"
+                             :style="{ 'height': windowHeight - drawerNavHeight + 'px' }">
+                    <view class="user-box"
+                          v-if="isLogin">
+                        <view class="head">
+                            <view class="avatar border-4"
+                                  @click="mroute.profile()">
+                                <image class="avatar-image"
+                                       :src="userinfo['avatar'] ? userinfo['avatar'] : '/static/img/avatar.png'">
+                                </image>
+                            </view>
+                            <view class="column">
+                                <view class="row">
+                                    <text class="font-18 color-black font-bold">
+                                        {{ util.hideText(userNickname) }}
+                                    </text>
+                                </view>
+                                <view class="row row-last">
+                                    <view class="row-left">
+                                        <text class="font-12 color-gray "
+                                              @click="copyUid(userinfo['id'])">
+                                            UID:{{ userinfo ? userinfo['id'] : '--' }}
+                                        </text>
+                                        <!-- <image class="copy-icon"
+                                               src="/static/newImage/copy-gray.png"
+                                               mode="widthFix"
+                                               @click="copyUid(userinfo['id'])">
+                                        </image> -->
+                                        <view class="real"
+                                              @click="mroute.userauth()"
+                                              style="margin-left: 20rpx">
+                                            <image class="real-image"
+                                                   :src="`/static/newImage/real-${userinfo.authStatus == 1 ? 's' : 'n'}.png`"
+                                                   mode="widthFix">
+                                            </image>
+                                            <view class="real-type">
+                                                <view class="real-type-text">
+                                                    <text class="font-11 color-red font-weight real-type-text"
+                                                          v-if="userinfo.authStatus === -2">
+                                                        {{ $t('index.notAuth') }}
+                                                    </text>
+                                                    <text class="font-11 color-gray font-weight real-type-text"
+                                                          v-if="userinfo.authStatus === -1">
+                                                        {{ $t('usAuth.type_c2') }}
+                                                    </text>
+                                                    <text class="font-11 color-gray font-weight real-type-text"
+                                                          v-if="userinfo.authStatus === 0">
+                                                        {{ $t('usAuth.type_c') }}
+                                                    </text>
+                                                    <text class="font-11 color-green font-weight real-type-text"
+                                                          v-if="userinfo.authStatus === 1">
+                                                        {{ $t('usAuth.type_c1') }}
+                                                    </text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                </view>
+                                <view class="info-button border-solid"
+                                      @click="mroute.profile()">
+                                    <text class="font-12 font-bold color-black">{{ $t('profile.profile') }}
+                                    </text>
+                                </view>
+                            </view>
+                        </view>
+
+                    </view>
+                    <view class="not-login"
+                          v-else>
+                        <text class="font-22 font-bold color-black">
+                            {{ $t('index.welcome') }} {{ config['site_name'] }}
+                        </text>
+                        <text class="font-13 color-gray">
+                            {{ $t('index.banner_title') }}
+                        </text>
+                        <view class="button-group">
+                            <view class="button button-active bg-gray"
+                                  @click="mroute.login()">
+                                <text class="font-13 color-black font-bold">
+                                    {{ $t('login.register') }}
+                                </text>
+                            </view>
+                            <view class="button button-active bg-black"
+                                  @click="mroute.login()">
+                                <text class="font-13 color-white font-bold">
+                                    {{ $t('login.login_t') }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                    <!-- 邀请 -->
+                    <view class="invite border-solid bg-gray"
+                          @click="mroute.invaite()">
+                        <image class="head-bg"
+                               src="/static/img/yw.png"
+                               mode="widthFix">
+                        </image>
+                        <view class="head border-bottom">
+                            <image class="invite-image"
+                                   src="/static/newImage/invate.webp"
+                                   mode="widthFix">
+                            </image>
+                            <view class="head-content">
+                                <text class="font-12 color-gray ">
+                                    {{ $t('index.polite_invite') }}
+                                </text>
+                                <text class="font-14 color-black font-bold mt-5">
+                                    {{ $t('index.polite_invite_con') }}
+                                </text>
+                            </view>
+                        </view>
+                        <view class="bottom">
+                            <view class="invite-code">
+                                <text class="font-11 color-gray ">
+                                    {{ $t('new_home_yic') }}
+                                </text>
+                                <view class="row"
+                                      @click.stop="copyInvateCode">
+                                    <text class="font-12 color-black font-bold">
+                                        {{ isLogin ? userinfo['invite_code'] : $t('trade.lg_rg') }}
+                                    </text>
+                                    <image v-if="isLogin"
+                                           class="copy-icon"
+                                           src="/static/newImage/copy-gray.png"
+                                           mode="widthFix">
+                                    </image>
+                                </view>
+                            </view>
+                            <view class="invite-button bg-black button-active"
+                                  @click="isLogin ? mroute.invaite() : mroute.login()">
+                                <text class="font-13 color-white font-bold">
+                                    {{ isLogin ? $t('invite.t9') : $t('index.banner_con') }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                    <!--  -->
+                    <view class="list">
+                        <view class="cell"
+                              v-if="isLogin"
+                              @click="mroute.secrety()">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/safecenter-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{
+                                        $t('index.security_center')
+                                    }}
+                                </text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <view class="line-view"></view>
+                        <view class="cell cell_set"
+                              @click="mroute.setting()">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/set-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{ $t('index.setting') }}</text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <view class="line-view"></view>
+                        <view class="cell"
+                              @click="mroute.webview(1, 'flbz', $t('index.rate'))">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/rates-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{ $t('index.rate') }}</text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <view class="cell"
+                              @click="mroute.webview(1, 'bbbzz', $t('index.qli'))">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/cre-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{ $t('index.qli') }}</text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <view class="cell"
+                              @click="mroute.contact()">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/con-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{ $t('index.connect') }}</text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <view class="cell"
+                              @click="mroute.about()">
+                            <view class="cell_left">
+                                <image class="cell_image"
+                                       :src="`/static/newImage/about-${userTheme}.png`"></image>
+                                <text class="font-14 font-bold color-black">{{ $t('index.about') }}</text>
+                            </view>
+                            <view class="cell_right">
+                                <fui-icon name="arrowright"
+                                          :color="userTheme === 'light' ? '#898989' : '#7a7a7a'"
+                                          size="38">
+                                </fui-icon>
+                            </view>
+                        </view>
+                        <!--  -->
+                        <view class="out-login bg-gray button-active"
+                              v-if="isLogin"
+                              @click="loginOut">
+                            <text class="font-13 color-black font-bold">{{ $t('index.sign_out') }}</text>
+                        </view>
+                    </view>
+                </scroll-view>
+            </view>
+        </fui-drawer>
+        <!-- 现货/合约弹窗 -->
+        <fui-bottom-popup :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          :show="bottomPopup"
+                          @close="closePopup">
+            <view class="popup-wrap">
+                <view class="title-box">
+                    <text class="font-16 font-weight color-black">{{ $t('index.popup_t') }}</text>
+                    <view class="close">
+                        <fui-icon @click="closePopup"
+                                  name="close"
+                                  :color="userTheme == 'light' ? '#23262e' : '#f1f2f4'"
+                                  :fontWeight="600"
+                                  :size="50">
+                        </fui-icon>
+                    </view>
+                </view>
+                <view class="btn-group">
+                    <view class="item"
+                          :class="pactType == 0 ? 'bg-gray' : ''"
+                          @click="btnChange(0)">
+                        <text class="font-14 font-bold"
+                              :class="pactType == 0 ? 'color-primary' : 'color-black'">
+                            {{ $t('index.spot') }}
+                        </text>
+                    </view>
+                    <view class="item"
+                          :class="pactType == 1 ? 'bg-gray' : ''"
+                          @click="btnChange(1)">
+                        <text class="font-14 font-bold"
+                              :class="pactType == 1 ? 'color-primary' : 'color-black'">
+                            {{ $t('index.popup_c') }}
+                        </text>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+        <!-- 升级弹窗 /upgradesPopup -->
+        <fui-landscape :show="upgradesPopup"
+                       :closable="false">
+            <view class="upgrades">
+                <view class="upgrades-container">
+                    <!-- 背景 -->
+                    <image class="upgrades_bg"
+                           :src="`/static/newImage/upgrade-${userTheme}.png`"></image>
+                    <view class="upgrades_content">
+                        <text class="_title font-22 font-bold color-white">{{ $t('index.new_ver') }}</text>
+                        <text class="_vernum font-14 font-bold color-white">V:{{ update['app_version'] }}</text>
+                        <scroll-view show-scrollbar="false"
+                                     scroll-y
+                                     class="up_list">
+                            <text class="font-12 color-black font-bold">
+                                {{ update['content'] }}
+                            </text>
+                        </scroll-view>
+                        <view class="up-button"
+                              @click="updateClient(true)">
+                            <text class="font-14 font-bold color-white">
+                                {{ $t('index.upgrade') }}
+                            </text>
+                        </view>
+                        <view class="_tips">
+                            <text class="font-11 color-primary  _tips-text">
+                                {{ uptext }}
+                            </text>
+                        </view>
+                    </view>
+                </view>
+                <view class="upgrades-close border-solid"
+                      @click="updateClient(false)">
+                    <fui-icon name="close"
+                              size="38"
+                              fontWeight="bold"
+                              color="#ffffff">
+                    </fui-icon>
+                </view>
+            </view>
+        </fui-landscape>
+
+        <fui-dialog :show="alertShow"
+                    :title="$t('login.tip_t2')"
+                    :content="content"
+                    :background="userTheme === 'light' ? '#ffffff' : '#111111'"
+                    :color="userTheme === 'light' ? '#23262e' : '#ffffff'"
+                    contentColor="#85898e"
+                    :buttons="[{ text: $t('确定') }]"
+                    @click="alertShow = false">
+        </fui-dialog>
+
+        <!--新增弹出层/见面礼/giftDrop-->
+        <fui-backdrop :show="giftDrop"
+                      closable>
+            <view class="gift-popup"
+                  v-if="activeList.length > 0">
+                <view class="gift-popup-card"
+                      @click="toActive()">
+                    <image class="new-popup-bg"
+                           :src="activeList[activeIndex]['img1']"></image>
+                    <view class="title">
+                        <text class="font-27 color-white font-weight">
+                            {{ activeList[activeIndex]['title'] }}
+                        </text>
+                        <view class="reward">
+                            <text class="font-27 color-white font-weight"></text>
+                            <text class="font-27 color-warring font-weight">{{
+                                    activeList[activeIndex]['subtitle']
+                                }}
+                            </text>
+                        </view>
+                    </view>
+                    <view class="time-box">
+                        <view class="time-box-con">
+                            <view class="top">
+                                <text class="font-14 color-white font-weight">
+                                    {{ activeList[activeIndex]['brief'] }}
+                                </text>
+                            </view>
+                            <view class="bottom"
+                                  v-if="false">
+                                <text class="font-12 color-black font-weight">
+                                    {{ activeList[activeIndex]['start_at'] }} - {{ activeList[activeIndex]['end_at'] }}
+                                </text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <view class="gift-popup-close"
+                      @click="closeActive">
+                    <fui-icon name="clear"
+                              size="48"
+                              color="#ffffff"></fui-icon>
+                </view>
+            </view>
+        </fui-backdrop>
+
+        <!-- 新增弹窗(添加资产) -->
+        <fui-bottom-popup :background="userTheme == 'light' ? '#ffffff' : '#111111'"
+                          :show="addFundsPopup"
+                          @close="addFundsPopup = false">
+            <view class="addfunds-popup bg-white">
+                <view class="popup-title">
+                    <text class="font-16 color-black font-weight">{{ $t('index.addfunds_t0') }}</text>
+                    <view class="close"
+                          @click="addFundsPopup = false">
+                        <fui-icon name="close"
+                                  size="48"
+                                  :color="userTheme == 'light' ? '#111111' : '#f1f2f4'"></fui-icon>
+                    </view>
+                </view>
+                <!--  拥有加密货币/Own cryptocurrency  -->
+                <view class="list-box border-solid">
+                    <view class="list-box-tip bg-gray">
+                        <image class="tip-icon"
+                               :src="`/static/newImage/safe-${userTheme}.png`"
+                               mode="widthFix"></image>
+                        <text class="font-12 price_up tip-text">{{ $t('index.addfunds_t2') }}</text>
+                    </view>
+                    <view class="list-box-title">
+                        <text class="font-13 color-gray">{{ $t('index.addfunds_t3') }}</text>
+                    </view>
+                    <!--   充值   -->
+                    <view class="list-box-card"
+                          @click="addFundsPopup = false; mroute.recharge();">
+                        <image class="card-icon"
+                               :src="`/static/newImage/recharge-${userTheme}.png`"></image>
+                        <view class="card-info">
+                            <text class="font-15 color-black font-weight">{{ $t('index.recharge') }}</text>
+                            <text class="font-12 color-gray desc">{{ $t('index.addfunds_t7') }}</text>
+                        </view>
+                    </view>
+                </view>
+                <!--  没有加密货币/no cryptocurrency  -->
+                <view class="list-box border-solid">
+                    <view class="list-box-title">
+                        <text class="font-13 color-gray">{{ $t('index.addfunds_t4') }}</text>
+                    </view>
+                    <!--   快捷买币   -->
+                    <view class="list-box-card"
+                          @click="addFundsPopup = false; mroute.toQuickly();">
+                        <image class="card-icon"
+                               :src="`/static/newImage/quick-${userTheme}.png`"></image>
+                        <view class="card-info">
+                            <text class="font-15 color-black font-weight">{{ $t('index.addfunds_t5') }}</text>
+                            <text class="font-12 color-gray desc">{{ $t('index.addfunds_t6') }}</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </fui-bottom-popup>
+    </view>
+</template>
+
+<script>
+import service from './service.js';
+
+export default service;
+</script>
+
+<style>
+/* @import url("/common/theme/nvue_theme.css"); */
+@import url("newindexNvue.css");
+</style>

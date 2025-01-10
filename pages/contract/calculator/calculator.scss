@@ -1,0 +1,261 @@
+.calculator {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background-primary);
+
+    .content {
+        width: 100%;
+        height: auto;
+        padding: 30rpx 0 200rpx 0;
+        box-sizing: border-box;
+
+        &-row-box {
+            width: 100%;
+            height: auto;
+            padding: 0 30rpx;
+            box-sizing: border-box;
+
+            .mini-buttons {
+                width: fit-content;
+                height: 68rpx;
+                padding: 8rpx;
+                box-sizing: border-box;
+                border-radius: 8rpx;
+                background: var(--background-secondary);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .item {
+                    width: fit-content;
+                    height: 100%;
+                    border-radius: 8rpx;
+                    padding: 0 24rpx;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &.itemActive {
+                        background: var(--background-strength);
+                    }
+                }
+            }
+
+            image {
+                width: 30rpx;
+                height: 30rpx;
+                margin-left: 10rpx;
+            }
+
+            .number-btn {
+                width: 78rpx;
+                height: 78rpx;
+                background: var(--background-secondary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10rpx;
+            }
+
+            /*slider-box*/
+            .slider-box {
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding: 24rpx 10rpx 65rpx 10rpx;
+                box-sizing: border-box;
+                position: relative;
+                margin-bottom: 16rpx;
+
+                .slider-dot {
+                    width: calc(100% - 20rpx);
+                    height: 10rpx;
+                    border-radius: 10rpx;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    position: absolute;
+                    padding: 0 4rpx;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    background: var(--background-secondary);
+
+                    .active-box {
+                        height: 10rpx;
+                        border-radius: 10rpx;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        background: var(--content-primary);
+                        z-index: 1;
+                    }
+
+                    .dot {
+                        width: 6rpx;
+                        height: 6rpx;
+                        border-radius: 50%;
+                        background: var(--background-strength);
+                        z-index: 2;
+                    }
+                }
+
+                .slider {
+                    width: calc(100% - 20rpx);
+                    position: absolute;
+                    top: 4rpx;
+                    z-index: 3;
+
+                    slider {
+                        width: calc(100% - 28rpx);
+                        margin: 0 0 0 10rpx;
+                    }
+                }
+
+                .slider-number {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    position: absolute;
+                    top: 60rpx;
+                    left: 0;
+
+                    text {
+                        display: inline-flex;
+                        box-sizing: border-box;
+                        position: absolute;
+
+                        &:nth-of-type(1) {
+                            left: 1%;
+                        }
+
+                        &:nth-of-type(2) {
+                            left: 18%;
+                        }
+
+                        &:nth-of-type(3) {
+                            left: 37%;
+                        }
+
+                        &:nth-of-type(4) {
+                            left: 57%;
+                        }
+
+                        &:nth-of-type(5) {
+                            left: 75%;
+                        }
+
+                        &:nth-of-type(6) {
+                            left: 91%;
+                        }
+                    }
+                }
+            }
+
+            .input-box {
+                width: 100%;
+                height: 78rpx;
+                border-radius: 8rpx;
+                padding: 0 16rpx;
+                box-sizing: border-box;
+                border: 2rpx solid transparent;
+
+                &:focus-within {
+                    border-color: var(--color-primary);
+                }
+
+                .input-box-left {
+                    width: calc(100% - 90rpx);
+                    position: relative;
+
+                    text {
+                        z-index: 1;
+                    }
+
+                    input {
+                        width: 100%;
+                        height: 78rpx;
+                        position: absolute;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+
+        &-row-slider {
+            padding: 0 20rpx;
+        }
+
+        &-number-input {
+            .input-box-left {
+                width: calc(100% - 50rpx) !important;
+            }
+        }
+
+        &-row-slider-button {
+            padding: 0;
+
+            .scroll-button {
+                padding: 0 30rpx;
+                box-sizing: border-box;
+                height: 78rpx;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                white-space: nowrap;
+                border-bottom: 2rpx solid var(--border-strength-100);
+
+                .item {
+                    width: fit-content;
+                    height: 72rpx;
+                    border-bottom: 4rpx solid transparent;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 36rpx;
+
+                    &.itemActive {
+                        border-color: var(--content-primary);
+                    }
+                }
+            }
+        }
+
+        .consequence-card {
+            width: 100%;
+            height: auto;
+            padding: 30rpx;
+            box-sizing: border-box;
+
+            .consequence {
+                width: 100%;
+                height: auto;
+
+                .cell {
+                    width: 100%;
+                    height: 56rpx;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+            }
+        }
+
+        .content_bottom {
+            width: 100%;
+            height: auto;
+            padding: 10rpx 30rpx 30rpx;
+            box-sizing: border-box;
+            background: var(--background-primary);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+    }
+}

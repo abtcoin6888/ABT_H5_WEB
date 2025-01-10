@@ -1,0 +1,99 @@
+.share-warp {
+    width: 750rpx;
+    position: relative;
+}
+
+/*share-container*/
+.share-warp .share-container {
+    width: 750rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.share-warp .share-container .poster-image {
+    width: 650rpx;
+    position: absolute;
+}
+
+.empty-artboard {
+    width: 650rpx;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-warp .share-container .painter-warp {
+    position: absolute;
+}
+
+    /*bottom*/
+.share-warp .bottom {
+    width: 750rpx;
+    padding: 40rpx 30rpx;
+    border-radius: 24rpx 24rpx 0 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.share-warp .bottom .image-group {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.share-warp .bottom .image-group .item {
+    width: 138rpx;
+    height: 120rpx;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.share-warp .bottom .image-group .item .icon-warp {
+    position: absolute;
+    top: 0;
+}
+
+.share-warp .bottom .image-group .item .icon-warp .icon {
+    width: 75rpx;
+    height: 75rpx;
+    border-radius: 50%;
+}
+
+.share-warp .bottom .image-group .item .add-size {
+    top: -6rpx;
+}
+
+.share-warp .bottom .image-group .item .add-size .icon{
+    width: 85rpx;
+    height: 85rpx;
+    border-radius: 50%;
+}
+
+.share-warp .bottom .image-group .item .i-txt {
+    position: absolute;
+    bottom: 0;
+}
+
+.share-warp .bottom .button-group {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 40rpx;
+}
+
+.share-warp .bottom .button-group .button-item {
+    width: 325rpx;
+    height: 88rpx;
+    border-radius: 88rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}

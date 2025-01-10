@@ -1,0 +1,259 @@
+.merchants {
+	width: 100%;
+	min-height: 100vh;
+	background: var(--background-primary);
+	padding: 0 30rpx;
+	box-sizing: border-box;
+
+	.merchants-container {
+		width: 100%;
+		height: auto;
+		padding: 30rpx 0;
+		box-sizing: border-box;
+
+		&-header {
+			width: 100%;
+
+			.banner-top {
+				width: 100%;
+				height: 300rpx;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				position: relative;
+
+				.banner-left {
+					width: 60%;
+					height: auto;
+					display: flex;
+					flex-direction: column;
+					z-index: 2;
+
+					text {
+						&:last-of-type {
+							margin-top: 30rpx;
+							line-height: 42rpx;
+						}
+					}
+				}
+
+				.banner-bg {
+					width: 75%;
+					position: absolute;
+					right: -60rpx;
+					bottom: 0;
+					z-index: 1;
+				}
+			}
+
+			.banner-bottom {
+				width: 100%;
+				height: auto;
+				display: flex;
+				flex-direction: column;
+
+				.card {
+					width: 100%;
+					height: auto;
+					margin-bottom: 30rpx;
+					padding: 30rpx;
+					box-sizing: border-box;
+					background-color: var(--background-primary);
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					border-radius: 16rpx;
+					border: 1rpx solid var(--border-strength-100);
+
+					&:last-of-type {
+						margin-bottom: 0;
+					}
+
+					image {
+						width: 80rpx;
+						height: 80rpx;
+					}
+
+					.card-info {
+						width: calc(100% - 110rpx);
+						height: 100rpx;
+						display: flex;
+						flex-direction: column;
+						align-items: flex-start;
+						justify-content: space-around;
+					}
+				}
+			}
+		}
+
+		.title-box {
+			width: 100%;
+			height: auto;
+			padding: 60rpx 0 0;
+			box-sizing: border-box;
+		}
+
+		&-item {
+			width: 100%;
+			margin-bottom: 20rpx;
+			padding-bottom: 30rpx;
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			border-bottom: 1rpx solid var(--border-strength-100);
+
+			.row-cell {
+				width: 100%;
+				height: 78rpx;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 20rpx;
+
+				text {
+					line-height: 38rpx;
+				}
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+			}
+
+			.not-bottom {
+				margin-bottom: 0;
+			}
+
+			.row-box {
+				margin-bottom: 20rpx;
+				width: 100%;
+				height: 78rpx;
+				padding: 0 16rpx;
+				box-sizing: border-box;
+				border-radius: 8rpx;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background-color: var(--background-secondary);
+				border: 2rpx solid transparent;
+				
+				&:focus-within {
+					border-color: var(--color-primary);
+				}
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+
+				image {
+					width: 30rpx;
+					height: 30rpx;
+				}
+				
+				input {
+					width: 100%;
+					height: 78rpx;
+					font-size: 26rpx;
+					color: var(--content-primary);
+				}
+			}
+
+			.upload-box {
+				width: 100%;
+				height: auto;
+				margin: 30rpx 0 10rpx 0;
+			}
+		}
+	}
+
+	.footer-box {
+		margin-top: 60rpx;
+		width: 100%;
+		height: auto;
+		padding: 20rpx 0;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+
+		.check-label {
+			width: 100%;
+			height: auto;
+			display: flex;
+			align-items: center;
+			margin-bottom: 16rpx;
+
+			image {
+				width: 40rpx;
+				height: 40rpx;
+			}
+		}
+
+		.button-box {
+			width: 100%;
+			height: auto;
+			margin-top: 20rpx;
+		}
+	}
+
+	// bottom-popup-wrap
+	.bottom-popup-wrap {
+		width: 100%;
+		height: auto;
+		background-color: var(--background-primary);
+		border-radius: 30rpx;
+		
+		
+		.list-box {
+			width: 100%;
+			height: auto;
+			padding: 30rpx;
+			box-sizing: border-box;
+			
+			&-cell {
+				width: 100%;
+				height: 88rpx;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0 30rpx;
+				box-sizing: border-box;
+				border-radius: 10rpx;
+				margin-top: 10rpx;
+			}
+		}
+		
+		&-cell {
+			width: 100%;
+			height: 88rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0 30rpx;
+			box-sizing: border-box;
+			border-radius: 10rpx;
+			margin-bottom: 20rpx;
+		}
+		
+		.line-box {
+			width: 100%;
+			height: 16rpx;
+			background-color: var(--background-secondary);
+		}
+		
+		.active {
+			background-color: var(--background-secondary);
+			
+			text {
+				color: var(--color-primary);
+			}
+		}
+
+		&-container {
+			width: 100%;
+			height: auto;
+			padding: 30rpx;
+			box-sizing: border-box;
+		}
+	}
+}

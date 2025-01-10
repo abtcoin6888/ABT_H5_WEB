@@ -1,0 +1,679 @@
+.wallet {
+    width: 750rpx;
+}
+
+/*nav-bar*/
+.nav-bar {
+    width: 750rpx;
+    height: 88rpx;
+    padding: 0 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/*wallet-swiper*/
+.wallet-swiper,
+.wallet-swiper-item,
+.scroll-list {
+    width: 750rpx;
+}
+
+
+.refresh-box {
+    width: 750rpx;
+    height: 100rpx;
+    padding-top: 10rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh-box .refresh-icon {
+    width: 34rpx;
+    height: 34rpx;
+    margin-right: 16rpx;
+}
+
+.refresh-box .spin-box {
+    width: 34rpx;
+    height: 34rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16rpx;
+}
+
+
+
+/*asset-val*/
+.scroll-list .asset-val {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+}
+
+.scroll-list .asset-val .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.scroll-list .asset-val .row .tag-button {
+    height: 38rpx;
+    padding: 0 10rpx;
+    border-radius: 4rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 8rpx;
+}
+
+.scroll-list .asset-val .row .tag-button .down-icon {
+    width: 20rpx;
+    margin-left: 6rpx;
+}
+
+.scroll-list .asset-val .row .row-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.scroll-list .asset-val .row .order-icon {
+    width: 45rpx;
+}
+
+.scroll-list .asset-val .row .see-icon {
+    width: 25rpx;
+    margin: 0 6rpx;
+}
+
+.scroll-list .asset-val .row .rang-button {
+    height: 48rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 16rpx;
+}
+
+.scroll-list .asset-val .row .rang-button .down-icon {
+    width: 25rpx;
+}
+
+.scroll-list .asset-val .row .rang-text {
+    margin-left: 10rpx;
+}
+
+.scroll-list .asset-val .row .safe-box {
+    height: 38rpx;
+    padding: 0 10rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 38rpx;
+    margin-left: 10rpx;
+}
+
+.scroll-list .asset-val .row .safe-box .safe-icon {
+    width: 25rpx;
+    margin-right: 6rpx;
+}
+
+/*strategy-tabs*/
+.strategy-tabs {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+}
+
+/*sub-swiper-warp*/
+.sub-swiper-warp,
+.sub-swiper-scroll {
+    width: 750rpx;
+}
+
+.sub-swiper-item .header {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+    margin-bottom: 24rpx;
+}
+
+.sub-swiper-item .header .row {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.sub-swiper-item .header .button-group {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24rpx;
+}
+
+.sub-swiper-item .header .button-group .button {
+    width: 335rpx;
+    height: 72rpx;
+    border-radius: 72rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.sub-swiper-item .list-tabs {
+    width: 750rpx;
+    padding: 16rpx 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/*nil-assets*/
+.scroll-list .nil-assets {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+}
+
+.scroll-list .nil-assets .content-box {
+    width: 690rpx;
+    border-radius: 16rpx;
+    padding: 24rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-list .nil-assets .content-box .banner-image {
+    width: 320rpx;
+    margin-bottom: 24rpx;
+}
+
+.scroll-list .nil-assets .content-box .context {
+    line-height: 40rpx;
+    text-align: center;
+    margin-bottom: 24rpx;
+}
+
+.scroll-list .nil-assets .content-box .button {
+    width: 642rpx;
+    height: 78rpx;
+    border-radius: 78rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24rpx;
+}
+
+/*asset-distribution*/
+.scroll-list .asset-distribution {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-list .asset-distribution .title-box {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.scroll-list .asset-distribution .title-box .chart-button {
+    height: 48rpx;
+    border-radius: 8rpx;
+    padding: 4rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.scroll-list .asset-distribution .title-box .chart-button .button-item {
+    padding: 0 16rpx;
+    height: 40rpx;
+    border-radius: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-list .asset-distribution .title-box .chart-button .button-item .chart-icon {
+    width: 25rpx;
+}
+
+.scroll-list .asset-distribution .chart-time {
+    width: 690rpx;
+    padding: 24rpx 0 16rpx 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.scroll-list .asset-distribution .chart-time .item {
+    height: 48rpx;
+    padding: 0 24rpx;
+    border-radius: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 24rpx;
+}
+
+.scroll-list .asset-distribution .chart-box {
+    width: 690rpx;
+    height: 250px;
+    overflow: hidden;
+}
+
+.scroll-list .asset-distribution .chart-box .webview {
+    width: 690rpx;
+    height: 250px;
+}
+
+/*my-account*/
+.my-account {
+    width: 750rpx;
+    padding: 24rpx 0;
+}
+
+.my-account .title-box {
+    width: 750rpx;
+    padding: 0 30rpx 24rpx 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.my-account .title-box .hide-assets {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.my-account .title-box .hide-assets .check-box {
+    width: 26rpx;
+    height: 26rpx;
+    border-radius: 4rpx;
+    margin-right: 8rpx;
+}
+
+.my-account .title-box .hide-assets .check-box .check-icon {
+    width: 26rpx;
+    height: 26rpx;
+}
+
+.my-account .account-list {
+    width: 750rpx;
+    padding: 0 30rpx;
+}
+
+.my-account .account-list .cell {
+    width: 690rpx;
+    padding: 24rpx 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.my-account .account-list .cell .left {
+    width: 660rpx;
+}
+
+.my-account .account-list .cell .left .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.my-account .account-list .cell .left .row-last {
+    justify-content: flex-end;
+}
+
+/*mini-card*/
+.mini-card {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+}
+
+.mini-card .item {
+    width: 690rpx;
+    padding: 16rpx;
+    border-radius: 8rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mini-card .item .item-left .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.mini-card .item .item-left .row .exchange-icon {
+    width: 25rpx;
+    margin-right: 10rpx;
+}
+
+/*menu*/
+.menu {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.menu .menu-button {
+    width: 690rpx;
+    height: 78rpx;
+    border-radius: 78rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu .item {
+    width: 172.5rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu .item .image-box {
+    width: 90rpx;
+    height: 90rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12rpx;
+}
+
+.menu .item .image-box .menu-image {
+    width: 90rpx;
+    height: 90rpx;
+}
+
+/*coin-list*/
+.coin-list {
+    width: 750rpx;
+    padding: 24rpx 30rpx;
+}
+
+.coin-list .title-box {
+    width: 690rpx;
+}
+
+.coin-list .title-top {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.coin-list .title-bottom {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24rpx;
+}
+
+
+.coin-list .title-bottom .search,
+.sub-swiper-item .list-tabs .search {
+    width: 300rpx;
+    height: 60rpx;
+    border-radius: 60rpx;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.coin-list .title-bottom .search .input,
+.sub-swiper-item .list-tabs .search .input {
+    width: 300rpx;
+    height: 60rpx;
+    padding: 0 16rpx 0 60rpx;
+    font-size: 26rpx;
+    border-radius: 60rpx;
+    position: absolute;
+    left: 0;
+    border: 2rpx solid transparent;
+}
+
+.coin-list .title-bottom .search .input:focus-within,
+.sub-swiper-item .list-tabs .search .input:focus-within {
+    border-color: #03aac7;
+}
+
+.coin-list .title-bottom .search .search-icon,
+.sub-swiper-item .list-tabs .search .search-icon {
+    width: 28rpx;
+    position: absolute;
+    left: 16rpx;
+}
+
+.coin-list .title-bottom .check-label,
+.sub-swiper-item .list-tabs .check-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
+.coin-list .title-bottom .check-box,
+.sub-swiper-item .list-tabs .check-label .check-box {
+    width: 28rpx;
+    height: 28rpx;
+    border-radius: 4rpx;
+    margin-right: 8rpx;
+}
+
+.coin-list .title-bottom .check-box .check-image,
+.sub-swiper-item .list-tabs .check-label .check-box .check-image {
+    width: 28rpx;
+    border-radius: 4rpx;
+}
+
+/*coin-body*/
+.coin-body {
+    width: 750rpx;
+    padding: 0 24rpx 30rpx;
+}
+
+.coin-body .coin-item {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18rpx 0;
+}
+
+.coin-body .coin-item .image-box {
+    width: 60rpx;
+    height: 60rpx;
+    border-radius: 50%;
+    margin-right: 10rpx;
+}
+
+.coin-body .coin-item .image-box .coin-image {
+    width: 60rpx;
+}
+
+.center-box {
+    width: 564rpx;
+}
+
+.center-box .row {
+    width: 564rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/*preference-warp*/
+.preference-warp {
+    width: 750rpx;
+}
+
+.preference-warp .title-box {
+    width: 750rpx;
+    height: 88rpx;
+    padding: 0 30rpx;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.preference-warp .title-box .close {
+    position: absolute;
+    right: 30rpx;
+}
+
+.preference-warp .search-box {
+    width: 690rpx;
+    height: 68rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 62rpx;
+    margin: 16rpx 0 16rpx 30rpx;
+    position: relative;
+}
+
+.preference-warp .search-box .input {
+    width: 690rpx;
+    height: 68rpx;
+    border-radius: 68rpx;
+    padding: 0 16rpx 0 60rpx;
+    font-size: 24rpx;
+    border: 2rpx solid transparent;
+    position: absolute;
+    left: 0;
+}
+
+.preference-warp .search-box .input:focus-within {
+    border-color: #03aac7;
+}
+
+.preference-warp .search-box .search-icon {
+    width: 25rpx;
+    position: absolute;
+    left: 16rpx;
+}
+
+.preference-warp .currency-list {
+    width: 750rpx;
+}
+
+.preference-warp .currency-list .desc-box {
+    width: 750rpx;
+    height: 48rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 30rpx;
+}
+
+.preference-warp .currency-list .cell {
+    width: 690rpx;
+    padding: 24rpx 0;
+    margin-left: 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.preference-warp .currency-list .cell .cell-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.preference-warp .currency-list .cell .cell-left .coin-image {
+    width: 45rpx;
+    margin-right: 20rpx;
+}
+
+.preference-warp .currency-list .cell .select-icon {
+    width: 30rpx;
+}
+
+
+.popup-warp {
+    width: 750rpx;
+    height: 280rpx;
+    padding: 30rpx;
+}
+
+.popup-warp .popup-title {
+    width: 690rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.popup-warp .popup-title .close-icon {
+    position: absolute;
+    right: 0;
+}
+
+.popup-warp .popup-context {
+    padding: 45rpx 0;
+}
+
+.popup-warp .popup-context .context {
+    margin-bottom: 20rpx;
+    line-height: 42rpx;
+}
+
+/*FUI选项卡*/
+/deep/ .fui-tabs__item {
+    padding-left: 0 !important;
+    padding-right: 36rpx !important;
+    /*margin-right: 30rpx !important;*/
+}

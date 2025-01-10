@@ -1,0 +1,197 @@
+/*profit-loss-popup*/
+.layer-warp {
+    width: 750rpx;
+}
+
+.title-warp {
+    width: 750rpx;
+    height: 88rpx;
+    padding: 0 30rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/*popup-container*/
+.popup-container {
+    width: 750rpx;
+    padding: 0 30rpx;
+}
+
+/*c-head*/
+.c-head {
+    width: 690rpx;
+    padding: 24rpx 0;
+}
+
+.c-head .currency-warp {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.c-head .currency-warp .tag-view {
+    height: 38rpx;
+    padding: 0 6rpx;
+    border-radius: 4rpx;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8rpx;
+}
+
+.c-head .currency-warp .currency-txt {
+    margin-right: 8rpx;
+}
+
+.c-head .currency-row-group {
+    padding: 24rpx 0 0;
+}
+
+.c-head .currency-row-group .h-row {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10rpx;
+}
+
+.c-head .currency-row-group .h-row-last {
+    margin-bottom: 0;
+}
+
+/*form-warp*/
+.form-warp {
+    width: 690rpx;
+    padding: 24rpx 0;
+}
+
+.from-price-input-warp {
+    width: 690rpx;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.price-input-item {
+    width: 333rpx;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.price-input-item .price-input {
+    width: 333rpx;
+    height: 78rpx;
+    border-radius: 8rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16rpx;
+    margin-top: 10rpx;
+    border: 2rpx solid transparent;
+    position: relative;
+}
+
+.price-input-item .price-input .input {
+    width: 197rpx;
+    height: 78rpx;
+}
+
+.price-input-item .price-input .sysmol-txt,
+.from-num-input-warp .sysmol-txt{
+    position: absolute;
+    right: 12rpx;
+}
+
+.price-input-item .price-input:focus-within,
+.from-num-input-warp:focus-within {
+    border-color: #03aac7 !important;
+}
+
+/*from-num-input-warp*/
+.from-num-input-warp {
+    width: 690rpx;
+    height: 78rpx;
+    border-radius: 8rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16rpx;
+    border: 2rpx solid transparent;
+    margin: 10rpx 0 24rpx;
+    position: relative;
+}
+
+.from-num-input-warp .input {
+    width: 565rpx;
+    height: 78rpx;
+}
+
+/*from-slider-warp*/
+.from-slider-warp {
+    width: 690rpx;
+    padding: 24rpx 0 38rpx 0;
+    position: relative;
+}
+
+.slider-warp {
+    width: 690rpx;
+    position: relative;
+}
+
+.slider-warp .slider-background {
+    width: 690rpx;
+    height: 14rpx;
+    border-radius: 14rpx;
+    padding: 0 4rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.slider-warp .slider-background .slider-active {
+    height: 14rpx;
+    border-radius: 14rpx;
+    position: absolute;
+    left: 0;
+}
+
+.slider-warp .slider-background .slider-dots {
+    width: 6rpx;
+    height: 6rpx;
+    border-radius: 50%;
+}
+
+.from-slider-warp .slider {
+    width: 690rpx;
+    position: absolute;
+    left: 0;
+    top: 8rpx;
+}
+
+.from-slider-warp .bottom-mark {
+    width: 690rpx;
+    height: 38rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    top: 48rpx;
+}
+
+.from-slider-warp .bottom-mark .mark-txt {
+    position: absolute;
+}
+
+/*confirm-button*/
+.confirm-button {
+    width: 690rpx;
+    height: 88rpx;
+    border-radius: 88rpx;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 40rpx 0 16rpx;
+}

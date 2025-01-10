@@ -1,0 +1,205 @@
+.myorder {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--background-primary);
+
+  &-container {
+    width: 100%;
+    height: auto;
+    padding: 0 30rpx 30rpx;
+    box-sizing: border-box;
+    background: var(--background-primary);
+
+    .not-data {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &-scroll {
+      width: 100%;
+      background: var(--background-primary);
+
+      .card {
+        width: 100%;
+        height: auto;
+        padding: 0 30rpx;
+        box-sizing: border-box;
+        border: 1rpx solid var(--border-strength-100);
+        border-radius: 16rpx;
+        margin-top: 30rpx;
+
+        &-cell {
+          width: 100%;
+          height: 78rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          &:first-of-type {
+            .card-cell-left {
+              .dot {
+                width: 8rpx;
+                height: 8rpx;
+                border-radius: 8rpx;
+                margin: 0 10rpx;
+              }
+            }
+          }
+
+          &:last-of-type {
+            border-top: 1rpx solid var(--border-strength-100);
+          }
+
+          &-left {
+            display: flex;
+            align-items: center;
+          }
+
+          &-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            .fui-icon {
+              margin-left: 10rpx;
+            }
+
+            image {
+              width: 30rpx;
+              height: 30rpx;
+              margin-right: 10rpx;
+
+              &[type=''] {
+                width: 40rpx;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.drawer {
+  width: 600rpx;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+  position: relative;
+
+  .title {
+    width: 100%;
+    height: auto;
+    /*  #ifdef H5  */
+    padding: 30rpx 0;
+    box-sizing: border-box;
+    /*  #endif  */
+    /*  #ifdef APP-PLUS  */
+    min-height: 88rpx;
+    margin-bottom: 30rpx;
+    /*  #endif  */
+
+    text {
+      display: inline-block;
+      width: 100%;
+      height: 88rpx;
+      line-height: 88rpx;
+    }
+
+    .status-bar {
+      width: 100%;
+      height: var(--status-bar-height);
+    }
+  }
+
+  .group-box {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30rpx;
+
+    .group-list {
+      width: 100%;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-top: 16rpx;
+
+      .item {
+        width: calc(100% / 3 - 16rpx);
+        height: 70rpx;
+        margin-bottom: 20rpx;
+        border: 2rpx solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-right: 8rpx;
+
+        .item-box {
+          width: 100%;
+          height: 68rpx;
+          background: var(--background-secondary);
+          border-radius: 8rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          position: relative;
+          border: 2rpx solid var(--background-secondary);
+        }
+
+        .active-box {
+          border-color: var(--color-primary);
+          background-color: var(--background-primary);
+          background-image: url("@/static/img/tactic/select-primary.png");
+          background-size: 40rpx 40rpx;
+          background-repeat: no-repeat;
+          background-position: calc(100% + 2rpx) 100%;
+		  overflow: hidden;
+
+          text {
+            color: var(--color-primary);
+          }
+        }
+      }
+    }
+  }
+
+  .drawer-button {
+    width: 100%;
+    height: auto;
+    padding: 20rpx 30rpx;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    ._button {
+      width: calc(100% / 2 - 16rpx);
+      height: 78rpx;
+      border-radius: 78rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:first-of-type {
+        background: var(--background-secondary);
+      }
+
+      &:last-of-type {
+        background: var(--content-primary);
+      }
+
+      text {
+        font-size: 26rpx;
+      }
+    }
+  }
+}

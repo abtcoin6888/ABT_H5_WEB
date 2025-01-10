@@ -1,0 +1,185 @@
+:root {
+    /*同化bitget颜色*/
+    --background-primary: #ffffff;
+    --background-dark: #f4f5f7;
+    --background-disabled: #d4d4d4;
+    --background-secondary: #f4f5f7;
+    --background-secondary-light: rgba(246, 246, 246, 0.1);
+    --background-secondary-100: #ffffff;
+    --background-strength: #ffffff;
+    --border-strength-100: #e3e3e3;
+    --border-strength-200: #d4d4d4;
+    --content-tertiary: #898989;
+    --content-trade-buy: #01bc8d;
+    --content-trade-sell: #f1493f;
+    --color-primary: #03aac7;
+    --color-primary-light: rgba(3, 170, 199, 0.1);
+    --content-disabled: #b8b8b8;
+    --content-secondary: #565656;
+    --content-primary: #1f1f1f;
+    --content-always-white: #ffffff;
+    --content-warning: #fb9833;
+    --content-warning-light: rgba(251, 152, 51, .1);
+    --shadow-color: rgba(146, 160, 171, 0.28);
+
+
+
+
+    --text-white: #f5f5f5;
+    --text-black: #1d1d1d;
+    --text-blue: #3070ec;
+    --text-green: #56bd77;
+    --text-red: #ea4337;
+    --text-gray: #999999;
+    --light-green: #e9f9f0;
+    --background-gray: #f4f4f4;
+    --background-white: #ffffff;
+    --border-blue: #3070ec;
+    --border-gray: #f4f4f4;
+    --fui-color-border: #f4f4f4;
+    --fui-color-success: #60b485;
+    --fui-color-danger: #e25355;
+    --fui-bg-color-hover: #f4f4f4;
+    --background-blue-soft: #3070ec;
+
+    --shadow-color: rgba(146, 160, 171, 0.18);
+
+
+    --black: #23262e;
+    --white: #ffffff;
+    --blue: #3070ec;
+    --red: #e25355;
+    --green: #60b485;
+    --gray-bg: #f4f4f4;
+    --dark-gray: #85898e;
+    --light-gray: #b9bdc2;
+    --line-bg: #f4f4f4;
+    --sub-text: #494c56;
+    --light-bg: #f4f4f4;
+    --slide-tag-bg: #f1f2f4;
+    --slide-tag-active-bg: #fefefe;
+    --ice-page-bg: #fbfbfb;
+    --ice-banner-bg: #1b47c3;
+    --ice-banner-tag-bg: #0e3794;
+    --ice-level-blue: #113081;
+    --ice-time-blue: #0d265e;
+    --color-title-black: #23262e;
+    --color-text-dark-gray: #85898e;
+    --color-text-gray: #b9bdc2;
+    --color-text-red: #e25355;
+    --color-text-green: #60b485;
+    --color-text-golden: #fb9833;
+    --color-text-light-golden: #ffe6bc;
+    --color-subtext: #494c56;
+    --color-gray-bg: #f4f4f4;
+    --color-blue-bg: #3070ec;
+    --color-golden-light-bg: #fcfaee;
+    --color-light-red-bg: #fbf0f1;
+    --color-light-green-bg: #f0f9f5;
+    --color-light-golden-bg: #262221;
+    --color-navbar-white-bg: #ffffff;
+    --color-input-bg: #f9fafc;
+    --color-arcode-input-bg: #f2f3f5;
+    --color-button-defalut-bg: #f3f4f6;
+    --color-border-bg: #f1f2f4;
+    --mask-bakground-bg: rgba(0, 0, 0, 0.6);
+    --button-hover-after-bg: rgba(0, 0, 0, .1);
+    --fui-color-border: #f4f4f4 !important;
+    --fui-color-success: #60b485;
+    --fui-color-danger: #e25355;
+    --fui-bg-color-hover: #f4f4f4;
+    --rotate-block-bg: #d0d0d0;
+    --rotate-slider-bg: #f4f4f4;
+}
+
+[data-theme='dark'] {
+    /*同化bitget颜色*/
+    --background-primary: #111111;
+    --background-dark: #000000;
+    --background-disabled: #565656;
+    --background-secondary: #262728;
+    --background-secondary-light: rgba(40, 40, 40, 0.1);
+    --background-secondary-100: #262728;
+    --background-strength: #363636;
+    --border-strength-100: #363636;
+    --border-strength-200: #565656;
+    --content-tertiary: #7a7a7a;
+    --content-trade-buy: #26c99b;
+    --content-trade-sell: #f45f4f;
+    --color-primary: #4d9eb1;
+    --color-primary-light: rgba(77, 158, 177, 0.1);
+    --content-disabled: #b8b8b8;
+    --content-secondary: #ebebeb;
+    --content-primary: #ffffff;
+    --content-always-white: #ffffff;
+    --content-warning: #fb9833;
+    --content-warning-light: rgba(251, 152, 51, .1);
+    --shadow-color: rgba(17, 17, 17, 0.28);
+
+
+    --text-white: #f5f5f5;
+    --text-black: #f5f5f5;
+    --text-blue: #3070ec;
+    --text-green: #56bd77;
+    --text-red: #ea4337;
+    --text-gray: #555555;
+    --light-green: #213f30;
+    --background-gray: #202229;
+    --background-white: #17181e;
+    --border-blue: #3070ec;
+    --border-gray: #202229;
+    --fui-color-border: #f4f4f4;
+    --fui-color-success: #56bd77;
+    --fui-color-danger: #ea4337;
+    --fui-bg-color-hover: #f4f4f4;
+    --background-blue-soft: #2f63ca;
+
+    --shadow-color: rgba(17, 17, 17, 0.18);
+
+
+    --black: #f1f2f4;
+    --white: #17181e;
+    --blue: #3070ec;
+    --red: #e25355;
+    --green: #60b485;
+    --gray-bg: #202229;
+    --dark-gray: #85898e;
+    --light-gray: #50535b;
+    --line-bg: #202229;
+    --sub-text: #b9bdc2;
+    --light-bg: #202229;
+    --slide-tag-bg: #202229;
+    --slide-tag-active-bg: #50535b;
+    --ice-page-bg: #17181e;
+    --ice-banner-bg: #1b47c3;
+    --ice-banner-tag-bg: #0e3794;
+    --ice-level-blue: #113081;
+    --ice-time-blue: #0d265e;
+    --color-title-black: #f1f2f4;
+    --color-text-dark-gray: #85898e;
+    --color-text-gray: #50535b;
+    --color-text-red: #e25355;
+    --color-text-green: #60b485;
+    --color-text-golden: #fb9833;
+    --color-text-light-golden: #ffe6bc;
+    --color-subtext: #b9bdc2;
+    --color-gray-bg: #202229;
+    --color-blue-bg: #3070ec;
+    --color-golden-light-bg: #fcfaee;
+    --color-light-red-bg: #fbf0f1;
+    --color-light-green-bg: #f0f9f5;
+    --color-light-golden-bg: #262221;
+    --color-navbar-white-bg: #17181e;
+    --color-input-bg: #202229;
+    --color-arcode-input-bg: #202229;
+    --color-button-defalut-bg: #23262e;
+    --color-border-bg: #202229;
+    --mask-bakground-bg: rgba(0, 0, 0, 0.6);
+    --button-hover-after-bg: rgba(0, 0, 0, .1);
+    --fui-color-border: #202229 !important;
+    --fui-color-success: #60b485;
+    --fui-color-danger: #e25355;
+    --fui-bg-color-hover: #202229;
+    --rotate-block-bg: #50535b;
+    --rotate-slider-bg: #202229;
+}

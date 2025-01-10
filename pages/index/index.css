@@ -1,0 +1,236 @@
+ /* 添加这段样式后，Primary Button 会变成红色 */
+ :root:root {
+   --van-swipe-indicator-margin:50px
+ }
+ .my-swipe{
+	 height: 300px;
+ }
+
+ .my-swipe .van-swipe-item {
+    color: #fff;
+    font-size: 20px;
+    height: 100%;
+    text-align: center;
+    background-color: #39a9ed;
+  }
+  
+.my-swipe .van-swipe__indicators {
+	  bottom: 50px !important;
+}
+
+.header {
+	display:flex;
+	width: 100%;
+	height: 45px;
+	position: absolute;
+	background: none;
+	z-index: 10000;
+}
+.header_app {
+	display:flex;
+	width: 100%;
+	height: 45px;
+	position: fixed;
+	background: none;
+	z-index: 10000;
+	top:var(--status-bar-height)
+}
+
+.avatar_view{
+	margin: 7.5px 7.5px 0px 7.5px;
+}
+.search_bar {
+	width: 250px;
+}
+.search_view {
+	background: none;
+	opacity: 0.8;
+/* 	padding: 7.5px 10px 0 0; */
+}
+.tool_bar {
+	height: 50px;
+	line-height: 60px;
+	display: flex;
+	width: 100px;
+}
+
+.tool_bar view {
+	width: 33%;
+	text-align: center;
+}
+/* #ifdef APP-PLUS */
+.notice_panel {
+	position: absolute;
+	height: 30px;
+	line-height: 30px;
+	top:250px;
+	overflow: hidden;
+}
+/* #endif */
+/* #ifdef H5 */
+.notice_panel {
+	position: absolute;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	top:250px;
+	overflow: hidden;
+}
+/* #endif */
+
+.notice_bar {
+	background: none;
+	font-size: 12px;
+	color:#fff;
+	padding: 0 15px;
+}
+
+.notice-swipe {
+    height: 30px;
+    line-height: 30px;
+  }
+  
+.container {
+	position: relative;
+	top:-20px;
+	height: 100%;
+	width: 100%;
+	background-color: #fff;
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
+	padding-top:20px
+}
+
+.topCurrency {
+	width: 100%;
+}
+
+.topCurrency .top_item {
+	display: inline-block;
+	padding: 10px;
+	height: 80px;
+	line-height: 20px;
+	flex: 0 0 33.33%;
+	width: 36.33%;
+	box-sizing: border-box;
+}
+
+.scrollble {
+	white-space: nowrap;
+	width: 100%;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.scrollble::-webkit-scrollbar {
+	display: none;
+}
+.uni-scroll-view::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	display: none;
+}
+.uni-scroll-view-content::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+	background-color: transparent;
+	display: none;
+}
+
+.top_item view:nth-child(3){
+	color: #999;
+}
+
+.top_indicators {
+	width: 30px;
+	margin: auto;
+	height: 3px;
+	background: #ddd;
+	margin-top: 10px;
+	text-align: center;
+	border-radius: 20px;
+}
+
+.top_indicators_active {
+	width: 75%;
+	height: 100%;
+	background: #39a9ed;
+	border-radius: 20px;
+}
+
+.coin_panel {
+	width: 100%;
+	padding: 0 15px;
+}
+
+.coin_panel_header {
+	display: flex;
+}
+
+.coin_panel_header view:nth-child(1) {
+	width: 50%;
+}
+.coin_panel_header view:nth-child(2) {
+	width: 25%;
+}
+
+.coin_line {
+	display: flex;
+	height: 50px;
+	list-style: 50px;
+	align-items: center;
+}
+
+.coin_line .one{
+	width: 50%;
+	display: flex;
+	align-items: center;
+}
+
+.coin_line .two{
+	width: 25%;
+}
+
+.loginAndFile {
+	height: 200px;
+	background: url('../../static/img/minebg.png') no-repeat;
+	width: 100%;
+	background-size: 100% 100%;
+}
+.logreg {
+	display: flex;
+	padding: 10px 15px;
+}
+.mineClose {
+	padding-left: 15px;
+}
+
+.logreg view {
+	margin-right: 10px;
+}
+.yqpannel {
+	padding: 10px 15px;
+}
+
+.yqbj {
+	width: 100%;
+	height: 90px;
+	background:url('../../static/img/yqbj.png') no-repeat;
+	background-size: 100% 100%;
+}
+
+.yqbj view {
+	padding-left: 15px;
+}
+
+.yqbj view:nth-child(1) {
+	
+	line-height: 50px;
+}
+
+.van-tabs__line {
+	display: none;
+}
+.menu .van-cell {
+	padding:15px
+}

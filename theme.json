@@ -1,0 +1,56 @@
+{
+	"light": {
+		"icePageBg": "#fbfbfb",
+		// 顶部导航
+		"navigationBarTextStyle": "black",
+		"navigationBarBackgroundColor": "#ffffff",
+		// 页面背景
+		"backgroundColor": "#ffffff",
+		"backgroundGray": "#f8f9f9",
+		"backgroundPrimary": "#ffffff",
+		"backgroundSecondary": "#f6f6f6",
+		// 底部导航
+		"tabBarColor": "#85898e",
+		"tabBarSelectedColor": "#23262e",
+		"tabBarBorderStyle": "#ffffff",
+		"tabBarBackgroundColor": "#ffffff",
+		// 底部图标
+		"home_s": "/static/statbar/new/home_lb.png",
+		"home_d": "/static/statbar/new/home_p.png",
+		"market_s": "/static/statbar/new/market_lb.png",
+		"market_d": "/static/statbar/new/market_p.png",
+		"trade_s": "/static/statbar/new/trade_lb.png",
+		"trade_d": "/static/statbar/new/trade_p.png",
+		"contract_s": "/static/statbar/new/contract_lb.png",
+		"contract_d": "/static/statbar/new/contract_p.png",
+		"asset_s": "/static/statbar/new/asset_lb.png",
+		"asset_d": "/static/statbar/new/asset_p.png"
+	},
+	"dark": {
+		"icePageBg": "#17181e",
+		// 顶部导航
+		"navigationBarTextStyle": "white",
+		"navigationBarBackgroundColor": "#17181e",
+		// 页面背景
+		"backgroundColor": "#17181e",
+		"backgroundGray": "#202229",
+		"backgroundPrimary": "#111111",
+		"backgroundSecondary": "#282828",
+		// 底部导航
+		"tabBarColor": "#85898e",
+		"tabBarSelectedColor": "#f1f2f4",
+		"tabBarBorderStyle": "#17181e",
+		"tabBarBackgroundColor": "#17181e",
+		// 底部图标
+		"home_s": "/static/statbar/new/home_l.png",
+		"home_d": "/static/statbar/new/home_p.png",
+		"market_s": "/static/statbar/new/market_l.png",
+		"market_d": "/static/statbar/new/market_p.png",
+		"trade_s": "/static/statbar/new/trade_l.png",
+		"trade_d": "/static/statbar/new/trade_p.png",
+		"contract_s": "/static/statbar/new/contract_l.png",
+		"contract_d": "/static/statbar/new/contract_p.png",
+		"asset_s": "/static/statbar/new/asset_l.png",
+		"asset_d": "/static/statbar/new/asset_p.png"
+	}
+}

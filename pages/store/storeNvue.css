@@ -1,0 +1,273 @@
+.storeNvue {
+    width: 750rpx;
+}
+
+.titleBar {
+    width: 750rpx;
+    height: 88rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30rpx;
+}
+
+.titleBar .tabBox {
+    width: 600rpx;
+    height: 88rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.titleBar .tabBox .item {
+    margin-right: 30rpx;
+    padding-right: 16rpx;
+}
+
+.titleBar .searchIcon {
+    width: 30rpx;
+    height: 30rpx;
+}
+
+.store-body,
+.body-swiper,
+.body-swiper-item,
+.container-swiper,
+.container-swiper-item,
+.scroll-view{
+    width: 750rpx;
+}
+
+.body-swiper-item,
+.container-swiper-item{
+    height: 100%;
+}
+
+/*submenu*/
+.submenu {
+    width: 750rpx;
+    height: 78rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30rpx;
+}
+
+.submenu .tag-group {
+    width: 600rpx;
+    height: 78rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.submenu .tag-group .item {
+    height: 48rpx;
+    border-radius: 8rpx;
+    padding: 0 24rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10rpx;
+}
+
+.submenu .edit {
+    width: 60rpx;
+    height: 60rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submenu .edit .edit-icon {
+    width: 38rpx;
+}
+
+/*sort-menu*/
+.sort-menu {
+    width: 750rpx;
+    height: 48rpx;
+    padding: 0 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16rpx;
+}
+
+.sort-menu .sort-menu-group {
+    width: 345rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.sort-menu .sort-menu-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 16rpx;
+}
+
+.sort-menu .sort-menu-item .sort-text {
+    font-size: 22rpx;
+    font-weight: 500;
+    color: #898989;
+}
+
+.sort-menu .sort-menu-item .sort-icon {
+    width: 12rpx;
+    height: 20rpx;
+    margin-left: 8rpx;
+}
+
+.sort-menu .sort-menu-left {
+    justify-content: flex-start;
+}
+
+.sort-menu .sort-menu-right {
+    justify-content: flex-end;
+}
+
+.sort-menu .sort-menu-right .sort-menu-item {
+    width: 172.5rpx;
+    justify-content: flex-end;
+    margin-right: 0;
+}
+
+
+/*scroll-view*/
+/*checkbox-group*/
+.checkbox-group {
+    width: 750rpx;
+    padding: 30rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.checkbox-group .checkbox-item {
+    width: 333rpx;
+    padding: 24rpx;
+    border-radius: 16rpx;
+    margin-bottom: 24rpx;
+}
+
+.checkbox-group .checkbox-item .row {
+    width: 285rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8rpx 0;
+}
+
+.checkbox-group .checkbox-item .row .mini-tag {
+    height: 32rpx;
+    padding: 0 12rpx;
+    border-radius: 4rpx;
+    background-color: rgba(3, 170, 199, 0.2);
+    font-size: 20rpx;
+    color: #03aac7;
+    margin-left: 6rpx;
+}
+
+.checkbox-group .checkbox-item .row .checkbox {
+    margin-right: 8rpx;
+}
+
+.checkbox-group .checkbox-item .row-first {
+    justify-content: flex-start;
+}
+
+.checkbox-group .checkbox-item .row-first,
+.checkbox-group .checkbox-item .row-last {
+    margin: 0;
+}
+
+/*checkbox-confirm-button*/
+.checkbox-confirm-button {
+    width: 690rpx;
+    height: 78rpx;
+    border-radius: 78rpx;
+    margin-left: 30rpx;
+    margin-top: 40rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*coin-group*/
+.coin-group {
+    width: 750rpx;
+    padding: 0 30rpx;
+}
+
+.coin-group .coin-item {
+    width: 690rpx;
+    padding: 24rpx 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.coin-group .coin-item .coin-item-cell {
+    width: 345rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.coin-group .coin-item .coin-item-cell .column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.coin-group .coin-item .coin-item-cell .column .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.coin-group .coin-item .coin-item-cell .column .row .mini-tag {
+    height: 32rpx;
+    padding: 0 12rpx;
+    border-radius: 4rpx;
+    background-color: rgba(3, 170, 199, 0.2);
+    font-size: 20rpx;
+    color: #03aac7;
+    margin-left: 6rpx;
+}
+.coin-group .coin-item .coin-item-cell .column .rate-tag {
+    width: 130rpx;
+    height: 52rpx;
+    border-radius: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coin-group .coin-item .coin-item-right {
+    justify-content: flex-end;
+}
+
+.coin-group .coin-item .coin-item-right .column {
+    width: 172.5rpx;
+    align-items: flex-end;
+}
+
+/*底部占位*/
+.ph_view {
+    width: 690rpx;
+    height: 100rpx;
+}

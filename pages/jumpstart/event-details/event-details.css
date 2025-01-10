@@ -1,0 +1,393 @@
+.page-warp {
+    background: transparent;
+    position: relative;
+}
+
+.scroll-view {
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+
+/*banner*/
+.banner {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.banner .banner-image {
+    width: 100%;
+    height: 600rpx;
+}
+
+.banner .banner-content {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 0;
+    padding: 30rpx;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .3), rgba(0, 0, 0, .7), rgba(0, 0, 0, .8));
+}
+
+.banner .banner-content .intro {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 30rpx;
+}
+
+.banner .banner-content .intro .currency-icon {
+    width: 55rpx;
+    height: 55rpx;
+    border-radius: 50%;
+    margin-right: 20rpx;
+}
+
+.banner .banner-content .intro .tag {
+    padding: 4rpx 16rpx;
+    box-sizing: border-box;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 45rpx;
+    margin-left: 20rpx;
+}
+
+.banner .banner-content .banner-row {
+    width: 100%;
+    height: auto;
+    padding: 10rpx 0 20rpx 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/*list-warp*/
+.list-warp {
+    width: 100%;
+    height: auto;
+    border-radius: 20rpx 20rpx 0 0;
+    overflow: hidden;
+    z-index: 2;
+    position: absolute;
+    padding: 30rpx;
+    box-sizing: border-box;
+}
+
+.list-warp .purchase {
+    width: 100%;
+    height: 78rpx;
+    border-radius: 78rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 60rpx;
+}
+
+.list-warp .step-box {
+    width: 100%;
+    height: 140rpx;
+    position: relative;
+}
+
+.list-warp .step-box .before {
+    display: block;
+    width: 100%;
+    height: 2rpx;
+    background: var(--content-primary);
+    position: absolute;
+    top: 16rpx;
+    left: 10rpx;
+}
+
+.list-warp .step-box .step-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-content: flex-start;
+    justify-content: flex-start;
+}
+
+.list-warp .step-box .step-item .dot {
+    width: 34rpx;
+    height: 34rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .2);
+    margin-bottom: 14rpx;
+}
+
+.list-warp .step-box .step-item .dot:before {
+    content: "";
+    display: block;
+    width: 18rpx;
+    height: 18rpx;
+    border-radius: 50%;
+    background: var(--content-primary);
+}
+
+.list-warp .card-box {
+    width: 100%;
+    height: auto;
+    padding: 30rpx;
+    box-sizing: border-box;
+    border-radius: 16rpx;
+    position: relative;
+    margin-bottom: 30rpx;
+}
+
+.list-warp .before-card .after-box {
+    display: inline-flex;
+    width: 30rpx;
+    height: 30rpx;
+    background: var(--background-primary);
+    border-radius: 6rpx;
+    position: absolute;
+    top: -12rpx;
+    left: 20rpx;
+    transform: rotate(45deg);
+}
+
+.list-warp .card-box .card-tab {
+    width: 100%;
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 2rpx solid var(--background-secondary);
+}
+
+.list-warp .card-box .card-tab .item {
+    width: fit-content;
+    height: 88rpx;
+    line-height: 88rpx;
+    border-bottom: 4rpx solid transparent;
+    margin-right: 30rpx;
+}
+
+.list-warp .card-box .card-tab .active {
+    border-color: var(--content-primary);
+}
+
+.list-warp .card-box .label {
+    width: 100%;
+    height: auto;
+    padding: 30rpx 0 16rpx 0;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .label-title {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 16rpx;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .row-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.list-warp .card-box .label .label-title .label-icon {
+    width: 45rpx;
+    height: 45rpx;
+    border-radius: 50%;
+    margin-right: 20rpx;
+}
+
+.list-warp .card-box .label .label-content .content-text {
+    padding: 6rpx 0 50rpx 0;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .label-content .row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10rpx 0;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .label-content .row .icon {
+    width: 35rpx;
+    height: 35rpx;
+}
+
+.list-warp .card-box .label .label-content .record-list {
+    width: 100%;
+    height: auto;
+    border-radius: 10rpx;
+    padding: 30rpx;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .label-content .record-list .record-row {
+    height: 58rpx;
+    line-height: 58rpx;
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+}
+
+.list-warp .card-box .label .label-content .record-list .record-row .item:nth-of-type(2) {
+    /*text-align: center;*/
+}
+
+.list-warp .card-box .label .label-content .record-list .record-row .item:last-of-type {
+    text-align: right;
+}
+
+.list-warp .card-box .label .label-step {
+    width: 100%;
+    height: auto;
+    position: relative;
+    margin-top: 24rpx;
+}
+
+.list-warp .card-box .label .label-step .before {
+    width: 2rpx;
+    height: calc(100% - 45rpx);
+    background: var(--content-primary);
+    position: absolute;
+    top: 24rpx;
+    left: calc(18rpx / 2 - 0.7rpx);
+}
+
+.list-warp .card-box .label .label-step .step-item {
+    width: 100%;
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-warp .card-box .label .label-step .step-item .item-cell {
+    display: inline-flex;
+    align-items: center;
+}
+
+.list-warp .card-box .label .label-step .step-item .item-cell .tag {
+    width: fit-content;
+    padding: 4rpx 10rpx;
+    box-sizing: border-box;
+    border-radius: 4rpx;
+    margin-right: 10rpx;
+}
+
+.list-warp .card-box .view-more-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20rpx 0;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .view-more-step .fui-icon {
+    transition: all 0.25s ease-in-out;
+}
+
+.list-warp .card-box .view-more-step .up-icon {
+    transform: rotate(180deg);
+}
+
+.list-warp .card-box .label .label-step .step-item .dot {
+    width: 18rpx;
+    height: 18rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--content-primary);
+    margin-right: 10rpx;
+}
+
+.list-warp .card-box .label .label-canvas {
+    width: 100%;
+    height: 400rpx;
+    padding: 30rpx 0;
+    box-sizing: border-box;
+}
+
+.list-warp .card-box .label .label-canvas .canvas {
+    width: 100%;
+    height: 380rpx;
+}
+
+.container {
+    width: 100%;
+    height: 40rpx;
+    color: white !important;
+    /*background: red;*/
+}
+
+.purchase-popup {
+    width: 100%;
+    height: auto;
+}
+
+.purchase-popup .title-box {
+    width: 100%;
+    height: 88rpx;
+    border-bottom: 2rpx solid var(--background-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.purchase-popup .title-box .fui-icon {
+    position: absolute;
+    right: 30rpx;
+}
+
+.purchase-popup .purchase-popup-form {
+    width: 100%;
+    height: auto;
+    padding: 30rpx;
+    box-sizing: border-box;
+    transition: all 0.15s ease-in-out;
+}
+
+.purchase-popup .purchase-popup-form .input-box {
+    width: 100%;
+    height: 88rpx;
+    background: var(--background-secondary);
+    border-radius: 16rpx;
+    padding: 0 20rpx;
+    box-sizing: border-box;
+    margin: 16rpx 0;
+    border: 2rpx solid transparent;
+    transition: all 0.15s ease-in-out;
+}
+
+.purchase-popup .purchase-popup-form .input-box .input {
+    width: 100%;
+    height: 88rpx;
+}
+
+.purchase-popup .purchase-popup-form .input-box:focus-within {
+    border-color: var(--color-primary);
+}
+
+.purchase-popup .purchase-popup-form .input-unfilled {
+    border-color: var(--content-trade-sell);
+}
+
+.purchase-popup .purchase-popup-form .confirm-button {
+    width: 100%;
+    height: 88rpx;
+    border-radius: 88rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 80rpx;
+}
