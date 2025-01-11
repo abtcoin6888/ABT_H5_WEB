@@ -1,10 +1,6 @@
-import {
-    mapGetters,
-    mapState
-} from 'vuex';
+import {mapGetters, mapState} from 'vuex';
 
 import tradeApi from '@/common/api/contract';
-import Api from '@/common/api/trade';
 import fuiDatePicker from "@/components/firstui/fui-date-picker/fui-date-picker.vue";
 import config from '@/common/api/config.js';
 import emptyView from "@/components/emptyView/emptyView.vue";
@@ -17,7 +13,7 @@ let start;
 let end;
 
 export default {
-    components: { fuiDatePicker, emptyView },
+    components: {fuiDatePicker, emptyView},
     computed: {
         ...mapGetters(['userTheme']),
         ...mapState(['userinfo'])
@@ -58,7 +54,8 @@ export default {
             end: "",
 
             visible: false,
-            path: ""
+            path: "",
+
         }
     },
     onReady() {
@@ -111,7 +108,8 @@ export default {
         getData() {
             try {
                 this.$refs.loading.open();
-            } catch (e) { }
+            } catch (e) {
+            }
             let time = '';
             if (this.dateFilter) {
                 time = this.start + '|' + this.end
@@ -207,11 +205,28 @@ export default {
                 }
             });
         },
+        createTime(createAt) {
+            const utcDate = new Date(createAt.replace(" ", "T") + "Z");
+            const options = {
+                timeZone: 'America/New_York',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // 24小时制，如果需要12小时制，改为 true
+            };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const formattedDate = formatter.format(utcDate);
+            return `${formattedDate} (EST)`; // 输出格式：MM/DD/YYYY, HH:MM:SS (EST)
+        },
         setPoster(item) {
             this.visible = true;
             const share_background = "/static/img/tactic/tactic-share-bg.png"
             const logo_image = "/static/home/cvlogo.png"
             const code_img = "/static/home/cblogo.png"
+            const createTimeZone = this.createTime(item['created_at']);
 
             setTimeout(() => {
                 var poster = {
@@ -258,7 +273,8 @@ export default {
                                 },
                                 {
                                     type: "text",
-                                    text: item['created_at'] + "(UTC+8)",
+                                    // text: item['created_at'] + "(UTC+8)",
+                                    text: createTimeZone,
                                     css: {
                                         width: "100%",
                                         textAlign: "left",
