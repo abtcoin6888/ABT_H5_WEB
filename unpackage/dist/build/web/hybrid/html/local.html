@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" style="background: #FFFFFF;height: 100%">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="KLineChart example" />
+		<title></title>
+		<script type="text/javascript" src="./js/klinecharts.min.js"></script>
+		<script type="text/javascript" src="./js/config.js"></script>
+		<script type="text/javascript" src="./js/chartstyle.js"></script>
+	</head>
+	<style>
+		
+		@font-face {
+			font-family: "PingFang";
+			src: url("@/static/font/PingFang.ttf");
+		}
+		html,body {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			overflow: hidden;
+		}
+		
+		.time {
+			width: 100%;
+			height: 44px;
+			display: flex;
+			align-items: center;
+			align-items: center;
+			overflow-x: scroll;
+		}
+		
+		.time::-webkit-scrollbar  {
+			width: 0;
+			height: 0;
+			display: none;
+		}
+		
+		.time span {
+			min-width: 66px;
+			display: block;
+			padding: 0 15px;
+			box-sizing: border-box;
+			font-size: 13px;
+			color: #000000;
+			font-family: "PingFang" !important;
+		}
+	</style>
+	<body style="height: 100%;">
+		<div id="chart" style="height: 100%"></div>
+		<script>
+			var chart ;
+			var MAID ;
+			var interval ;
+			var last = {};
+			
+			var init = 0;
+			var decimals = 2;
+			
+			const map = {
+				"1s":1,
+				"1m":60,
+				"5m":300,
+				"15m":900,
+				"30m":1800,
+				"1H":3600,
+				"4H":14400,
+				"12H":43200,
+				"1D":86400,
+				"1W":604800,
+				"1Y":60480000
+			};
+			
+			
+			
+			/**
+			 * 接收最新价格数据并更新图表
+			 * @param {Object} price
+			 * @param {Object} vol
+			 */
+			
+			function ticker(price,vol){
+				if(init === 1){
+					if(last['high'] < price){
+						last['high'] = price;
+					}
+					if(price < last['low']){
+						last['low'] = price;
+					}
+					last['close'] = price
+					last['volume'] = last['volume'] + vol;
+					if(last['timestamp'] < Date.now()){
+						last['timestamp'] = Date.now() + (map[interval] * 1000);
+						last['volume'] = vol;
+					}
+					
+					chart.updateData(last);
+				}
+			}
+			
+			function showMa(flag){
+				if(flag===1){
+					chart.createIndicator({
+						name:"MA",
+						calcParams:[5, 10, 30]
+					},false,{ id: 'candle_pane' })
+				}else{
+					chart.removeIndicator('candle_pane');
+				}
+			}
+			
+			function showEma(flag){
+				if(flag===1){
+					MAID = chart.createIndicator({
+						name:"EMA",
+						calcParams:[6, 12, 20]
+					},false,{ id: 'candle_pane' })
+				}else{
+					chart.removeIndicator('candle_pane');
+				}
+			}
+			
+			function showBoll(flag){
+				if(flag===1){
+					MAID = chart.createIndicator({
+						name:"BOLL",
+						calcParams:[30]
+					},false,{ id: 'candle_pane' })
+				}else{
+					chart.removeIndicator('candle_pane');
+				}
+			}
+			
+			function setDecimals(dec){
+				decimals = dec;
+				chart.setPriceVolumePrecision(dec,dec);
+			}
+			
+			function loadHistory(currency_id,_interval){
+				interval = _interval;
+				var xhr = new XMLHttpRequest();
+				var data = JSON.stringify({
+				    interval: interval,
+				    currency_id: currency_id,
+					limit:120
+				});
+				
+				xhr.open('POST', 'https://api.tedbit.pro/api/currency/contractLine', true);
+				xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+				xhr.onreadystatechange = function() {
+				    // 如果请求已完成
+				    if (xhr.readyState == 4 && xhr.status == 200) {
+				        var response = JSON.parse(xhr.responseText);
+						var klineData = [];
+						for(var i = 0 ; i < response.data.length;i++){
+							
+							klineData.push({
+								timestamp:response.data[i]['time'],
+								open:response.data[i]['open'],
+								close:response.data[i]['close'],
+								high:response.data[i]['high'],
+								low:response.data[i]['low'],
+								volume:response.data[i]['vol'],
+								turnover:response.data[i]['amount'],
+							});
+						}
+						last = klineData[klineData.length - 1];
+						chart.applyNewData(klineData);
+						chart.setPriceVolumePrecision(decimals,decimals);
+					
+						if(interval !== '1s'){
+							chart.setStyles({
+								candle:{
+									type:"candle_solid"
+								}
+							});
+							MAID = chart.createIndicator({
+								name:"MA",
+								calcParams:[5, 10, 30]
+							},false,{ id: 'candle_pane' })
+						}else{
+							chart.removeIndicator('candle_pane');
+							chart.setStyles({
+								candle:{
+									type:"area"
+								}
+							});
+						}
+						
+						init = 1;
+					}
+				};
+				xhr.send(data);
+			}
+			
+			window.onload = function() {
+				// 初始化图表
+				chart = klinecharts.init('chart')
+				// 样式
+				chart.setStyles(chartStyle);
+				
+				// 创建一个副图技术指标MACD
+				chart.createIndicator({
+					name:"MACD",
+					calcParams:[12, 26, 9]
+				})
+				
+				MAID = chart.createIndicator({
+					name:"MA",
+					calcParams:[5, 10, 30]
+				},false,{ id: 'candle_pane' })
+				
+				// 创建一个副图技术指标VOL
+				chart.createIndicator({
+					name:"VOL",
+					calcParams:[5,10,20]
+				});
+				// 为图表添加数据
+				// chart.applyNewData();
+				// loadHistory(1,'1s');
+				// setInterval(()=>{
+				// 	var price = Math.floor(Math.random() * (26426 - 26326 + 1)) + 26326;
+				// 	ticker(price,100);
+				// },1500);
+				window.addEventListener('resize', () => {
+				    chart.resize();
+				});
+			}
+		</script>
+	</body>
+</html>
