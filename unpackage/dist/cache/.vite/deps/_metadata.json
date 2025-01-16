@@ -1,0 +1,31 @@
+{
+  "hash": "9415c82a",
+  "configHash": "bc3803e4",
+  "lockfileHash": "2b5d8f98",
+  "browserHash": "54171330",
+  "optimized": {
+    "vant": {
+      "src": "../../../../../node_modules/vant/es/index.mjs",
+      "file": "vant.js",
+      "fileHash": "bf532eda",
+      "needsInterop": false
+    },
+    "vant/lib/utils": {
+      "src": "../../../../../node_modules/vant/lib/utils/index.js",
+      "file": "vant_lib_utils.js",
+      "fileHash": "3fa501e2",
+      "needsInterop": true
+    },
+    "moment-timezone": {
+      "src": "../../../../../node_modules/moment-timezone/index.js",
+      "file": "moment-timezone.js",
+      "fileHash": "4a25ba07",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-35XAPQLS": {
+      "file": "chunk-35XAPQLS.js"
+    }
+  }
+}

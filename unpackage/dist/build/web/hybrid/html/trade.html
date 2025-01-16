@@ -1,0 +1,213 @@
+<html lang="zh">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title></title>
+</head>
+<body>
+	<style>
+		@font-face {
+			font-family: "PingFang";
+			src: url("@/static/font/PingFang.ttf");
+		}
+		html,body {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			overflow: hidden;
+		}
+	</style>
+	<div id="container" style="height: 100%"></div>
+	<script src="./js/lightweight-charts.standalone.production.js" type="text/javascript"></script>
+	<script>
+		var chart;
+		var lineSeries;
+		var areaSeries;
+		var decimal = 2;
+		var currency_id = 1;
+		
+		var init = 0;
+		
+		/**
+		 * 切换币种重新加载k线数据
+		 * @param {Object} _cid
+		 * @param {Object} _dec
+		 */
+		function reload(_cid,_dec){
+			currency_id = _cid;
+			decimal = _dec;
+			
+			areaSeries.setData([]);
+			lineSeries.setData([]);
+			
+			loadKline();
+		}
+		
+		/**
+		 * @param {Object} time
+		 * @param {Object} price
+		 */
+		function updatePrice(time,price){
+			if(init === 0){
+				return false;
+			}
+			time = new Date().getTime();
+			areaSeries.update({
+				time:time,
+				value:price
+			});
+			lineSeries.update({
+				time:time,
+				value:price
+			});
+		}
+		
+		/**
+		 * 设置价格格式化精度
+		 * @param {Object} i
+		 */
+		function setDecimal(i){
+			decimal = i;
+		}
+		
+		
+		function PriceFormatter(price){
+			return parseFloat(price).toFixed(decimal);
+		}
+		
+		function localToUTCDate(localDateString) {
+		    // 使用Date对象解析本地日期字符串
+		    const date = new Date(localDateString);
+		    
+		    const year = date.getUTCFullYear();
+		    const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // Months are 0-based
+		    const day = String(date.getUTCDate()).padStart(2, '0');
+		    const hours = String(date.getUTCHours()).padStart(2, '0');
+		    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+		    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+		
+		    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+		}
+		
+		function loadKline(){
+			var xhr = new XMLHttpRequest();
+			var data = JSON.stringify({
+			    interval: "1s",
+			    currency_id: currency_id,
+				limit:200
+			});
+			xhr.open('POST', 'https://api.comebit.pro/api/currency/contractLine', true);
+			xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+			xhr.onreadystatechange = function() {
+			    // 如果请求已完成
+			    if (xhr.readyState == 4 && xhr.status == 200) {
+			        var response = JSON.parse(xhr.responseText);
+					areaSeries.setData(response.data);
+					lineSeries.setData(response.data);
+					
+					chart.timeScale().applyOptions({
+						barSpacing:7,
+						borderColor: '#71649C',
+						timeVisible:true,
+						secondsVisible:true,
+						scrollToRealTime:true,
+						tickMarkFormatter:(time,tickMarkType,locale)=>{
+							var date = new Date(time);  // 将微秒转换为毫秒
+							var hours = String(date.getHours()).padStart(2, '0');
+							var minutes = String(date.getMinutes()).padStart(2, '0');
+							var seconds = String(date.getSeconds()).padStart(2, '0');
+							return `${hours}:${minutes}:${seconds}`;
+						}
+					});
+					chart.timeScale().scrollToRealTime();
+					const currentScrollPosition = chart.timeScale().scrollPosition();
+					chart.timeScale().scrollToPosition(currentScrollPosition + 15, false);
+					// chart.timeScale().fitContent();
+					chart.applyOptions({
+						localization:{
+							priceFormatter:PriceFormatter,
+							timeFormatter:(businessDayOrTimestamp)=>{
+								var date = new Date(businessDayOrTimestamp);  // 将微秒转换为毫秒
+								var hours = String(date.getHours()).padStart(2, '0');
+								var minutes = String(date.getMinutes()).padStart(2, '0');
+								var seconds = String(date.getSeconds()).padStart(2, '0');
+								return `${hours}:${minutes}:${seconds}`;
+							}
+							
+						},
+						watermark: {
+							visible: true,
+							fontSize: 24,
+							horzAlign: 'center',
+							vertAlign: 'center',
+							color: 'rgba(171, 71, 188, 0.5)',
+							text: 'comebit',
+						},
+					});
+					
+					init = 1;
+			    }
+			};
+			xhr.send(data);
+		}
+		
+		function create(){
+			chart = LightweightCharts.createChart(
+				document.getElementById('container'), 
+				{
+					width: window.screen.availWidth,
+					height: 245,
+					layout: {
+						background: { color: "#fff" },
+						textColor: "#333",
+					},
+					grid: {
+						vertLines: { color: "#ddd" },
+						horzLines: { color: "#ddd" },
+					},
+					priceScale:{
+						borderColor: 'rgba(242, 250, 255, 0.8)',
+					},
+					timeScale:{
+						borderColor: 'rgba(242, 250, 255, 0.8)',
+					}
+				},
+			);
+			chatHandler = chart;
+			lineSeries = chart.addAreaSeries({
+				topColor: '#00ddfa',
+				bottomColor: 'rgba(41, 98, 255, 0.1)',
+				lineColor: '#2979ff',
+				lineWidth: 1,
+				lastPriceAnimation:1
+			});
+			
+			
+			areaSeries = chart.addAreaSeries({
+			    lastValueVisible: false, // hide the last value marker for this series
+			    crosshairMarkerVisible: false, // hide the crosshair marker for this series
+			    lineColor: 'transparent', // hide the line
+			    topColor: 'rgba(102, 57, 220, 0.6)',
+			    bottomColor: 'rgba(102, 57, 220, 0.1)',
+			});
+			
+			
+			areaSeries.priceScale().applyOptions({
+				scaleMargins: {
+					top: 0.1,
+					bottom: 0.2,
+					right:0.2,
+					left:0.2
+				}
+			})
+			// loadKline();
+			
+			window.addEventListener('resize', () => {
+			    chart.resize(window.innerWidth, this.$device.screenWidth);
+			});
+		}
+		window.onload = create;
+	</script>
+</body>
+</html>
