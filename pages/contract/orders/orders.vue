@@ -370,11 +370,11 @@
                                 <view class="row">
                                     <view class="column">
                                         <text>{{$t('myFollow.open_time')}}</text>
-                                        <text class="font-weight">{{item.created_at}}</text>
+                                        <text class="font-weight">{{this.convertToEasternTime(item.created_at,"-05:00")}}</text>
                                     </view>
                                     <view class="column">
                                         <text>{{$t('newOrder.ptime')}}</text>
-                                        <text class="font-weight">{{item.updated_at}}</text>
+                                        <text class="font-weight">{{this.convertToEasternTime(item.updated_at,"-18:00")}}</text>
                                     </view>
                                 </view>
                                 <view class="row">

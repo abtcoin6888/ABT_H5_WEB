@@ -221,6 +221,33 @@ export default {
             const formattedDate = formatter.format(utcDate);
             return `${formattedDate} (EST)`; // 输出格式：MM/DD/YYYY, HH:MM:SS (EST)
         },
+
+        convertToEasternTime(chinaTime,utc) {
+            console.log(`当前时间为:${chinaTime}`)
+            // 将中国时间字符串解析为 Date 对象（加上 'T' 符号）
+            const utcDate = new Date(chinaTime.replace(" ", "T") + utc); // 指定 UTC+8 时区
+            console.log(`转换后的时间:${utcDate}`)
+
+
+
+            // 将中国时间转换为美国东部时间
+            const options = {
+                timeZone: 'America/New_York',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // 24小时制，如果需要12小时制，改为 true
+            };
+
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            console.log(`格式化后的时间：${formatter.format(utcDate)}`)
+            return formatter.format(utcDate).toString();
+        },
+
+
         setPoster(item) {
             this.visible = true;
             const share_background = "/static/img/tactic/tactic-share-bg.png"
